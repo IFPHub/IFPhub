@@ -1,15 +1,30 @@
 import { createClient } from './backend/utils/supabase/server'
 
 export default async function Page() {
-  const supabase = await createClient(); // ✅ await porque es async
+  const supabase = await createClient(); // Cliente SSR
 
-  const { data: todos } = await supabase.from('todos').select();
+  // Consultar todos los usuarios
+  const { data: usuarios, error } = await supabase
+    .from('usuarios')
+    .select('email, username, nombre, apellido');
+
+  if (error) {
+    console.error(error);
+    return <div>Error al cargar los usuarios</div>;
+  }
 
   return (
-    <ul>
-      {todos?.map((todo) => (
-        <li key={todo.id}>{todo.title}</li> // agregar key y campo correcto
-      ))}
-    </ul>
+    <html>
+      <body>
+        <h1>Lista de usuarios</h1>
+        <ul>
+          {usuarios?.map((user) => (
+            <li key={user.email}>
+              <strong>{user.username}</strong> ({user.nombre} {user.apellido}) - {user.email}
+            </li>
+          ))}
+        </ul>
+      </body>
+    </html>
   );
 }
