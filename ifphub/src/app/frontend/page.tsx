@@ -1,4 +1,4 @@
-import { createClient } from './backend/utils/supabase/server'
+import { createClient } from '../backend/utils/supabase/server'
 
 export default async function Page() {
   const supabase = await createClient(); // Cliente SSR
