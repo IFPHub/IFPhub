@@ -17,6 +17,7 @@ export default async function Page() {
     <html>
       <body>
         <h1>Lista de usuarios</h1>
+        <h1>hola cayeyemito</h1>
         <ul>
           {usuarios?.map((user) => (
             <li key={user.email}>
