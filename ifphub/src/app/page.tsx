@@ -16,6 +16,7 @@ export default async function Page() {
   return (
     <html>
       <body>
+        <h1>Hola</h1>
         <h1>Lista de usuarios</h1>
         <ul>
           {usuarios?.map((user) => (
