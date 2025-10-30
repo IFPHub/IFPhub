@@ -8,4 +8,5 @@ export const createClient = () =>
     supabaseUrl!,
     supabaseKey!,
   );
+  
 0.
