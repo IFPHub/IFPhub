@@ -1,8 +1,5 @@
-# Todo el repo
-* @Stevengs7 @cayeyemito
+# Archivos de backend
+/backend/ @IFPHub/Lideres-Back
 
-# Archivos del frontend
-/frontend/ @Front-End
-
-# Archivos del backend
-/backend/ @Back-End
+# Archivos de frontend
+/frontend/ @IFPHub/Lideres-Front
