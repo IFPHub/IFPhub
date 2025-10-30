@@ -1,5 +1,5 @@
 # Archivos de backend
-/backend/ @IFPHub/Lideres-Back
+/src/app/backend/ @IFPHub/Lideres-Back
 
 # Archivos de frontend
-/frontend/ @IFPHub/Lideres-Front
+/src/app/frontend/ @IFPHub/Lideres-Front
