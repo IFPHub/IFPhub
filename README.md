@@ -21,3 +21,7 @@ Solicitud de citas con secretaría.
 Visualización de reuniones grabadas.
 
 Acceso autenticado mediante Supabase Auth.
+
+Una vez hagais el clon teneis que crear un archivo .env.local donde pongais estos datos para que se haga la conexion con supabase
+NEXT_PUBLIC_SUPABASE_URL=https://fcjxxhayxyylbzpfkast.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjanh4aGF5eHl5bGJ6cGZrYXN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA2Nzg3NTYsImV4cCI6MjA3NjI1NDc1Nn0.ZjEu7ACH9haMYLPemtXh4PV7A36VXnIeWMRlP80mOdw**
