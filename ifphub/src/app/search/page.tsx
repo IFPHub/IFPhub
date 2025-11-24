@@ -1,3 +1,4 @@
+// src/app/search/page.tsx
 import Header from '@/components/Header'
 import Sidebar from '@/components/Sidebar'
 
@@ -24,7 +25,6 @@ export default function SearchPage() {
     <main className="wrap">
       <Header />
 
-      {/* Search Section */}
       <section className="bg-card rounded-[14px] shadow-md p-7 mt-10">
         <h2 className="text-2xl font-extrabold mb-5">
           Resultados para: <span className="text-accent">“Inteligencia Artificial”</span>
@@ -48,12 +48,11 @@ export default function SearchPage() {
         </div>
       </section>
 
-      {/* Layout */}
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_320px]">
         <div className="grid gap-4">
           {resultados.map((r) => (
             <div key={r.title} className="flex gap-4 bg-card p-4 rounded-lg border border-[#eef3f6] shadow-sm hover:shadow-md transition-transform">
-              <div className="w-36 h-24 rounded-lg bg-gradient-to-br from-soft to-[#ffeaf0]" />
+              <div className="w-36 h-24 rounded-lg bg-gradient-to-br from-[var(--soft)] to-[#ffeaf0]" />
               <div className="flex flex-col justify-center">
                 <h3 className="font-semibold text-lg">{r.title}</h3>
                 <p className="text-gray-700 text-sm">{r.desc}</p>

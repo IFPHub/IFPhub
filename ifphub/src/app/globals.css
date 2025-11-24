@@ -1,7 +1,4 @@
 @import "tailwindcss";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 
 :root{
@@ -35,3 +32,6 @@ color: var(--primary);
     padding: 0 16px;
   }
 }
+
+.font-montserrat { font-family: var(--font-montserrat), sans-serif; }
+.font-libre { font-family: var(--font-libre), serif; }
