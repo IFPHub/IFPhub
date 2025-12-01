@@ -4,11 +4,13 @@ import Sidebar from '@/app/frontend/components/sidebar-noticias'
 import Link from "next/link"
 
 async function getNoticias() {
-  const res = await fetch("http://localhost:3000/api/noticias", {
-    cache: "no-store"
+  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/noticias`, {
+    cache: "no-store",
   });
+
   return await res.json();
 }
+
 
 export default async function Page() {
   const noticias = await getNoticias();
