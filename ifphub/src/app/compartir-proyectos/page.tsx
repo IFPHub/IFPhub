@@ -244,9 +244,7 @@ export default function Page() {
 
             <nav className="flex flex-wrap justify-center gap-6 text-sm text-[#0E4A54] font-medium mb-3">
               <a href="#" className="hover:underline">Home / News</a>
-              <a href="/proyectos" className="hover:underline">Proyectos</a>
-              <a href="/secretaria" className="hover:underline">Secretaria</a>
-              <a href="/reuniones" className="hover:underline">Reuniones</a>
+              <a href="/compartir-proyectos" className="hover:underline">Proyectos</a>
               <a href="/quedadas" className="hover:underline">Quedadas</a>
               <a href="/incidencias" className="hover:underline">Incidencias</a>
             </nav>
