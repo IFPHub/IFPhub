@@ -20,6 +20,15 @@ export default function Sidebar() {
 
             <li>
               <a
+                href="/reuniones"
+                className="block p-2 rounded-md hover:bg-[#f3f6f7] cursor-pointer transition-colors"
+              >
+                Reuniones
+              </a>
+            </li>
+
+            <li>
+              <a
                 href="#"
                 className="block p-2 rounded-md hover:bg-[#f3f6f7] cursor-pointer transition-colors"
               >
