@@ -101,7 +101,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
         </section>
 
         <aside>
-          <Sidebar />
+          <Sidebar uid={uid} sig={sig} />
         </aside>
       </div>
     </main>
