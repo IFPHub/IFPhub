@@ -2,6 +2,7 @@ import Header from '@/app/frontend/components/header'
 import Hero from '@/app/frontend/components/hero'
 import Sidebar from '@/app/frontend/components/sidebar-noticias'
 import Link from "next/link"
+import { hashUserId } from "@/app/utils/hashid";
 
 async function getNoticias() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/noticias`, {
@@ -11,11 +12,19 @@ async function getNoticias() {
   return await res.json();
 }
 
+export default async function Page(props: { searchParams: Promise<any> }) {
+  const search = await props.searchParams;
 
-export default async function Page() {
+  const uid = search?.uid;
+  const sig = search?.sig;
+
+  console.log("UID:", uid);
+  console.log("SIG:", sig);
+
   const noticias = await getNoticias();
 
-  const getImg = (img: string) => img && img.trim() !== "" ? img : "/imagenes/default_image.webp";
+  const getImg = (img: string) =>
+    img && img.trim() !== "" ? img : "/imagenes/default_image.webp";
 
   return (
     <main>
@@ -33,7 +42,10 @@ export default async function Page() {
 
             <div className="grid gap-4">
               {noticias.slice(0, 3).map((n: any) => (
-                <Link key={n.id_noticia} href={`/detail/${n.id_noticia}`}>
+                <Link 
+                  key={n.id_noticia} 
+                  href={`/detail/${n.id_noticia}?uid=${uid}&sig=${sig}`}
+                >
                   <article className="flex gap-4 items-center p-4 rounded-lg bg-white border border-[#eef3f6] hover:shadow-md-custom transition-transform cursor-pointer">
                     <img
                       src={getImg(n.imagen)}
@@ -53,7 +65,7 @@ export default async function Page() {
           {/* EXTRA CARDS */}
           <section className="mt-8 grid gap-4 lg:grid-cols-2">
             {noticias.slice(3, 5).map((n: any) => (
-              <Link key={n.id_noticia} href={`/detail/${n.id_noticia}`}>
+              <Link key={n.id_noticia} href={`/detail/${n.id_noticia}?uid=${uid}&sig=${sig}`}>
                 <div className="bg-white rounded-lg p-4 border border-[#eef3f6] hover:shadow-md-custom transition-transform cursor-pointer">
                   <img
                     src={getImg(n.imagen)}
@@ -68,7 +80,7 @@ export default async function Page() {
 
             <div className="flex flex-col gap-3">
               {noticias.slice(5, 7).map((n: any) => (
-                <Link key={n.id_noticia} href={`/detail/${n.id_noticia}`}>
+                <Link key={n.id_noticia} href={`/detail/${n.id_noticia}?uid=${uid}&sig=${sig}`}>
                   <div className="bg-white rounded-lg p-3 border border-[#eef3f6] cursor-pointer">
                     <img
                       src={getImg(n.imagen)}
@@ -93,5 +105,5 @@ export default async function Page() {
         </aside>
       </div>
     </main>
-  )
+  );
 }

@@ -1,0 +1,42 @@
+import { NextResponse } from "next/server";
+import { createClient } from "@/app/backend/utils/supabase/client";
+import { hashUserId } from "@/app/utils/hashid";
+
+export async function POST(req: Request) {
+  const { email, password } = await req.json();
+  const supabase = createClient();
+
+  const { data, error } = await supabase.rpc("fn_validar_usuario", {
+    p_mail: email,
+    p_password: password,
+  });
+
+  if (error) {
+    console.error(error);
+    return NextResponse.json(
+      { error: "Error interno del servidor" },
+      { status: 500 }
+    );
+  }
+
+  if (!data || data.length === 0) {
+    return NextResponse.json(
+      { error: "Correo o contraseña incorrectos" },
+      { status: 401 }
+    );
+  }
+
+  // Supabase RPC devuelve un array
+  const user = data[0];
+
+  const uid = user.id_usuario;
+  const sig = hashUserId(uid);
+
+  return NextResponse.json({
+    success: true,
+    usuario: {
+      uid,
+      sig
+    }
+  });
+}
