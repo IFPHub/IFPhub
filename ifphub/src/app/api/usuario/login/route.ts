@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/app/backend/utils/supabase/client";
-import { hashUserId } from "@/app/utils/hashid";
+import { encodeUserId } from "@/app/utils/hashid";
 
 export async function POST(req: Request) {
   const { email, password } = await req.json();
@@ -30,7 +30,7 @@ export async function POST(req: Request) {
   const user = data[0];
 
   const uid = user.id_usuario;
-  const sig = hashUserId(uid);
+  const sig = encodeUserId(uid);
 
   return NextResponse.json({
     success: true,

@@ -39,10 +39,18 @@ type Proyecto = {
   id_usuario: number | null;
 };
 
-export default async function Page(props: { params?: any }) {
-  const params = await props.params;
+export default async function Page({
+  params,
+  searchParams,
+}: {
+  params: any;
+  searchParams: any;
+}) {
   const supabase = createClient();
   const proyectoId = Number(params?.id);
+  const uid = searchParams?.uid ?? null;
+  const sig = searchParams?.sig ?? null;
+
   // Obtener proyecto
   const { data: proyectoData, error } = await supabase.rpc(
     "fn_get_proyecto_por_id",
@@ -67,7 +75,7 @@ export default async function Page(props: { params?: any }) {
 
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar uid={uid} sig={sig} />
 
       <SidebarInset>
         {/* HEADER */}
@@ -80,7 +88,9 @@ export default async function Page(props: { params?: any }) {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="/compartir-proyectos">
+                  <BreadcrumbLink
+                    href={`/compartir-proyectos?uid=${uid}&sig=${sig}`}
+                  >
                     Proyectos
                   </BreadcrumbLink>
                 </BreadcrumbItem>
@@ -132,36 +142,84 @@ export default async function Page(props: { params?: any }) {
                 </div>
               </div>
 
-              {/* COMENTARIOS */}
-              <div className="flex flex-col gap-6">
-                {(comentarios as Comentario[] | null)?.map(
-                  (c: Comentario) => (
-                    <div
-                      key={c.id_comentario}
-                      className="flex items-center gap-4"
-                    >
-                      <Image
-                        src="/imagenes/placeholder.webp"
-                        width={50}
-                        height={50}
-                        alt="Avatar"
-                        className="rounded-full object-cover"
-                      />
-                      <div>
-                        <span className="text-sm text-gray-500">
-                          Usuario {c.id_usuario}
-                        </span>
-                        <p className="text-gray-800">{c.texto}</p>
-                      </div>
-                    </div>
-                  )
-                )}
+              {/* COMENTARIOS + INPUT FIJO */}
+              <div className="flex flex-col h-full max-h-[600px] relative">
 
-                {(!comentarios || comentarios.length === 0) && (
-                  <p className="text-gray-500 text-sm">
-                    No hay comentarios todavía.
-                  </p>
-                )}
+                {/* LISTA DE COMENTARIOS (SCROLL INVISIBLE) */}
+                <div
+                  className="flex flex-col gap-6 pr-2 overflow-y-auto"
+                  style={{
+                    scrollbarWidth: "none",
+                    msOverflowStyle: "none",
+                  }}
+                >
+                  <style>
+                    {`
+                      div::-webkit-scrollbar {
+                        display: none;
+                      }
+                    `}
+                  </style>
+
+                  {(comentarios as Comentario[] | null)?.map(
+                    (c: Comentario) => (
+                      <div
+                        key={c.id_comentario}
+                        className="flex items-center gap-4"
+                      >
+                        <Image
+                          src="/imagenes/placeholder.webp"
+                          width={50}
+                          height={50}
+                          alt="Avatar"
+                          className="rounded-full object-cover"
+                        />
+                        <div>
+                          <span className="text-sm text-gray-500">
+                            Usuario {c.id_usuario}
+                          </span>
+                          <p className="text-gray-800">{c.texto}</p>
+                        </div>
+                      </div>
+                    )
+                  )}
+
+                  {(!comentarios || comentarios.length === 0) && (
+                    <p className="text-gray-500 text-sm">
+                      No hay comentarios todavía.
+                    </p>
+                  )}
+                </div>
+
+                {/* FORMULARIO FIJO ABAJO */}
+                <form
+                  action={`/api/comentarios/agregar`}
+                  method="POST"
+                  className="sticky bottom-0 bg-white pt-4 flex flex-col gap-3 pb-4"
+                >
+                  <input type="hidden" name="id_proyecto" value={proyectoId} />
+                  <input type="hidden" name="id_usuario" value={uid || ""} />
+                  <input type="hidden" name="uid" value={uid} />
+                  <input type="hidden" name="sig" value={sig} />
+
+                  <input
+                    type="text"
+                    name="texto"
+                    placeholder="Escribe un comentario"
+                    className="border rounded-lg px-4 py-2 text-sm text-gray-700 w-full"
+                    required
+                  />
+
+                  <button
+                    type="submit"
+                    disabled={!uid}
+                    className={`bg-[#0E4A54] text-white px-4 py-2 rounded-lg text-sm font-semibold transition 
+                      ${uid ? "hover:bg-[#0c3f48]" : "opacity-50 cursor-not-allowed"}
+                    `}
+                  >
+                    {uid ? "Comentar" : "Debes iniciar sesión"}
+                  </button>
+                </form>
               </div>
             </div>
           </div>

@@ -1,8 +1,9 @@
-"use client"
+"use client";
+export const dynamic = "force-dynamic";
 
-import * as React from "react"
-import Link from "next/link"
-import { AppSidebar } from "@/app/frontend/compartir-proyectos/app-sidebar"
+import * as React from "react";
+import Link from "next/link";
+import { AppSidebar } from "@/app/frontend/compartir-proyectos/app-sidebar";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -10,13 +11,13 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/app/frontend/components/ui/breadcrumb"
-import { Separator } from "@/app/frontend/components/ui/separator"
+} from "@/app/frontend/components/ui/breadcrumb";
+import { Separator } from "@/app/frontend/components/ui/separator";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from "@/app/frontend/components/ui/sidebar"
+} from "@/app/frontend/components/ui/sidebar";
 
 import {
   Carousel,
@@ -24,8 +25,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/app/frontend/components/ui/carousel"
-
+} from "@/app/frontend/components/ui/carousel";
 
 async function getProyectos() {
   const res = await fetch("/api/proyecto", { cache: "no-store" });
@@ -33,10 +33,17 @@ async function getProyectos() {
 }
 
 export default function Page() {
-
   const [proyectos, setProyectos] = React.useState<any[]>([]);
 
+  /* ========= UID y SIG desde la URL (SIN useSearchParams) ========= */
+  const [uid, setUid] = React.useState<string | null>(null);
+  const [sig, setSig] = React.useState<string | null>(null);
+
   React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setUid(params.get("uid"));
+    setSig(params.get("sig"));
+
     getProyectos().then((data) => {
       setProyectos(data);
     });
@@ -55,7 +62,10 @@ export default function Page() {
         <header className="flex h-16 shrink-0 items-center gap-2">
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
-            <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
+            <Separator
+              orientation="vertical"
+              className="mr-2 data-[orientation=vertical]:h-4"
+            />
 
             <Breadcrumb>
               <BreadcrumbList>
@@ -74,12 +84,13 @@ export default function Page() {
         {/* ------------------------------------ */}
         {/*  CONTENIDO PRINCIPAL */}
         {/* ------------------------------------ */}
-
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0 overflow-x-hidden">
 
           {/* ---------- CARRUSEL DINÁMICO ---------- */}
           <div className="w-full px-4">
-            <h2 className="text-xl font-semibold mb-2">Proyectos por curso</h2>
+            <h2 className="text-xl font-semibold mb-2">
+              Proyectos por curso
+            </h2>
 
             <Carousel className="w-full relative">
               <CarouselContent className="-ml-2 md:-ml-4">
@@ -89,7 +100,9 @@ export default function Page() {
                     key={p.id_proyecto}
                     className="pl-2 md:pl-4 basis-1/2 md:basis-1/3 lg:basis-1/4"
                   >
-                    <Link href={`/proyecto/${p.id_proyecto}`}>
+                    <Link
+                      href={`/proyecto/${p.id_proyecto}?uid=${uid ?? ""}&sig=${sig ?? ""}`}
+                    >
                       <div className="p-1">
                         <div className="relative overflow-hidden rounded-xl">
                           <img
@@ -116,14 +129,18 @@ export default function Page() {
 
         {/* ---------- SECCIÓN DESTACADO ---------- */}
         <section className="w-full px-6 py-10">
-          <h2 className="text-2xl font-semibold text-red-400 mb-6">Destacado</h2>
+          <h2 className="text-2xl font-semibold text-red-400 mb-6">
+            Destacado
+          </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
             {/* PROYECTO DESTACADO */}
             {proyectos[0] && (
               <div className="md:col-span-2 bg-white rounded-xl shadow overflow-hidden h-full flex flex-col">
-                <Link href={`/proyecto/${proyectos[0].id_proyecto}`}>
+                <Link
+                  href={`/proyecto/${proyectos[0].id_proyecto}?uid=${uid ?? ""}&sig=${sig ?? ""}`}
+                >
                   <img
                     src={getImg(proyectos[0].imagen)}
                     alt={proyectos[0].titulo}
@@ -148,7 +165,10 @@ export default function Page() {
             {/* TARJETAS PEQUEÑAS */}
             <div className="flex flex-col justify-between h-full">
               {proyectos.slice(1, 4).map((p: any) => (
-                <div key={p.id_proyecto} className="flex bg-white rounded-xl shadow overflow-hidden">
+                <div
+                  key={p.id_proyecto}
+                  className="flex bg-white rounded-xl shadow overflow-hidden"
+                >
                   <img
                     src={getImg(p.imagen)}
                     alt={p.titulo}
@@ -170,11 +190,6 @@ export default function Page() {
           </div>
         </section>
 
-
-        {/* ----------------- RESTO DE TU CÓDIGO (NO TOCADO) ----------------- */}
-        {/* COMENTARIOS + COMUNIDAD + FOOTER */}
-
-        {/* COMENTARIOS */}
         <section className="w-full bg-[#104B57] py-16 px-6">
           <h2 className="text-white text-3xl font-semibold mb-12 text-center">
             Comentarios
@@ -184,7 +199,10 @@ export default function Page() {
 
             {/* Comentarios estáticos */}
             {[1, 2, 3].map((i) => (
-              <div key={i} className="flex flex-col items-center text-white space-y-4">
+              <div
+                key={i}
+                className="flex flex-col items-center text-white space-y-4"
+              >
                 <img
                   src="/imagenes/placeholder.webp"
                   alt="User"
@@ -204,7 +222,6 @@ export default function Page() {
 
           </div>
         </section>
-
 
         {/* COMUNIDAD */}
         <section className="w-full py-16 px-6">

@@ -18,6 +18,7 @@ import { NavMain } from "@/app/frontend/compartir-proyectos/nav-main"
 import { NavProjects } from "@/app/frontend/compartir-proyectos/nav-projects"
 import { NavSecondary } from "@/app/frontend/compartir-proyectos/nav-secondary"
 import { NavUser } from "@/app/frontend/compartir-proyectos/nav-user"
+
 import {
   Sidebar,
   SidebarContent,
@@ -152,14 +153,21 @@ const data = {
   ],
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({
+  uid,
+  sig,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & {
+  uid?: string | null;
+  sig?: string | null;
+}) {
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href="#">
+              <a href={`/?uid=${uid}&sig=${sig}`}>
                 <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                   <Command className="size-4" />
                 </div>
@@ -173,13 +181,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        <NavMain items={data.navMain} uid={uid} sig={sig} />
+        <NavProjects projects={data.projects} uid={uid} sig={sig} />
+        <NavSecondary items={data.navSecondary} uid={uid} sig={sig} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={data.user} uid={uid} sig={sig} />
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }

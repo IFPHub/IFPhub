@@ -2,7 +2,6 @@ import Header from '@/app/frontend/components/header'
 import Hero from '@/app/frontend/components/hero'
 import Sidebar from '@/app/frontend/components/sidebar-noticias'
 import Link from "next/link"
-import { hashUserId } from "@/app/utils/hashid";
 
 async function getNoticias() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/noticias`, {
