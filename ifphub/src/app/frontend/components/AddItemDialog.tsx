@@ -8,7 +8,7 @@ import {
   DialogTrigger,
   DialogFooter,
   DialogClose,
-} from "@/components/ui/dialog"
+} from "@/app/frontend/components/ui/dialog"
 
 import {
   Select,
@@ -16,7 +16,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/app/frontend/components/ui/select"
 
 export function AddItemDialog() {
   return (
