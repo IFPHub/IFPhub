@@ -35,16 +35,6 @@ const data = {
       url: "/reuniones",
       icon: Calendar,
     },
-    {
-      title: "Citas",
-      url: "/citas",
-      icon: Calendar,
-    },
-    {
-      title: "Incidencias",
-      url: "/incidencias",
-      icon: AlertCircle,
-    },
   ],
 
   navSecondary: [],
