@@ -1,21 +1,6 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { AppSidebar } from "@/app/frontend/compartir-proyectos/app-sidebar";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/app/frontend/components/ui/breadcrumb";
-import { Separator } from "@/app/frontend/components/ui/separator";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/app/frontend/components/ui/sidebar";
 
 type CardItem = {
   id: number;
@@ -30,14 +15,15 @@ type CardItem = {
   coverUrl?: string;
 };
 
-const COURSES = [
-  "ENFERMERIA",
-  "DAW/DAM",
-  "VIDEOJUEGOS",
-  "Producción de Audiovisuales",
-  "DJ",
-  "Sistemas informáticos en Red",
-];
+type Curso = {
+  id_curso: number;
+  nombre: string;
+  grado: number | null;
+  horario: {
+    horario: string;
+  } | null;
+};
+
 
 const WEEKDAYS = ["L", "M", "X", "J", "V", "S", "D"];
 const MONTHS = [
@@ -107,7 +93,7 @@ function MiniCalendar({
     a.getDate() === b.getDate();
 
   return (
-    <div className="w-[260px] rounded-lg border border-black/10 bg-[#D46D85] p-3 text-sm shadow-lg dark:border-white/15 dark:bg-black">
+    <div className="w-[260px] rounded-lg border border-black/10 bg-[#D46D85] p-3 text-sm shadow-lg">
       <div className="mb-2 flex items-center justify-between">
         <button
           onClick={() => {
@@ -123,10 +109,10 @@ function MiniCalendar({
         </button>
 
         <div className="flex items-center gap-2 font-medium">
-          <span className="rounded-md border border-black/10 px-2 py-0.5 dark:border-white/15">
+          <span className="rounded-md border border-black/10 px-2 py-0.5">
             {MONTHS[month]}
           </span>
-          <span className="rounded-md border border-black/10 px-2 py-0.5 dark:border-white/15">
+          <span className="rounded-md border border-black/10 px-2 py-0.5">
             {year}
           </span>
         </div>
@@ -164,8 +150,8 @@ function MiniCalendar({
                 "h-8 rounded-md",
                 c.inMonth ? "opacity-100" : "opacity-40",
                 selected
-                  ? "border border-black/30 font-semibold dark:border-white/50"
-                  : "hover:bg-black/[.04] dark:hover:bg-white/10",
+                  ? "border border-black/30 font-semibold"
+                  : "hover:bg-black/[.04]",
               ].join(" ")}
             >
               {c.day}
@@ -175,6 +161,11 @@ function MiniCalendar({
       </div>
     </div>
   );
+}
+
+function capitalize(str?: any) {
+  if (!str) return "";
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 /* -------------------- MODAL CREAR -------------------- */
@@ -198,6 +189,10 @@ function CreateModal({
   newCourse,
   setNewCourse,
   tags,
+  courses,
+  newTag,
+  setNewTag,
+  addNewTag
 }: {
   onClose: () => void;
   title: string;
@@ -215,9 +210,13 @@ function CreateModal({
   videoFile: File | null;
   setVideoFile: (f: File | null) => void;
   onSave: () => void;
-  newCourse: string;
-  setNewCourse: (v: string) => void;
+  newCourse: Curso | null;
+  setNewCourse: (v: Curso | null) => void;
+  courses: Curso[];
   tags: string[];
+  newTag: string;
+  setNewTag: (v: string) => void;
+  addNewTag: () => void;
 }) {
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -230,13 +229,30 @@ function CreateModal({
     return () => document.removeEventListener("mousedown", onDown);
   }, [onClose]);
 
-  const courseLabel = newCourse || "Curso";
+  const randomCourses = useMemo(() => {
+    const shuffled = [...courses].sort(() => 0.5 - Math.random());
+    return {
+      visible: shuffled.slice(0, 3),
+      rest: shuffled.slice(3),
+    };
+  }, [courses]);
+
+  const courseLabel = newCourse
+  ? [
+      newCourse.nombre,
+      newCourse.grado ? `${newCourse.grado}º` : null,
+      capitalize(newCourse.horario),
+    ]
+      .filter(Boolean)
+      .join(" · ")
+  : "Curso";
+  const [showAllCourses, setShowAllCourses] = useState(false);
 
   return (
-    <div className="fixed inset-0 z-[100] bg-black/30 p-4 sm:p-8">
+    <div className="fixed inset-0 z-[100] overflow-y-auto bg-black/30 p-4 sm:p-8">
       <div
         ref={panelRef}
-        className="mx-auto flex w-full max-w-5xl flex-col gap-6 rounded-xl bg-[#F5F5F5] p-6 shadow-xl dark:bg-black"
+        className="mx-auto flex w-full max-w-5xl flex-col gap-6 rounded-xl bg-[#F5F5F5] p-6 shadow-xl"
         style={bodyFont}
       >
         {/* PARTE ARRIBA */}
@@ -270,7 +286,7 @@ function CreateModal({
               <input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="h-12 w-full rounded-md border border-black/20 bg-[#124D58] px-4 text-sm text-white placeholder:text-zinc-200 dark:border-white/20"
+                className="h-12 w-full rounded-md border border-black/20 bg-[#124D58] px-4 text-sm text-white placeholder:text-zinc-200"
                 placeholder="Introduce un título..."
               />
             </div>
@@ -286,7 +302,7 @@ function CreateModal({
               <textarea
                 value={desc}
                 onChange={(e) => setDesc(e.target.value)}
-                className="min-h-[120px] w-full rounded-md border border-black/20 bg-[#124D58] p-4 text-sm text-white placeholder:text-zinc-200 dark:border-white/20"
+                className="min-h-[120px] w-full rounded-md border border-black/20 bg-[#124D58] p-4 text-sm text-white placeholder:text-zinc-200"
                 placeholder="Describe el contenido..."
               />
             </div>
@@ -307,24 +323,68 @@ function CreateModal({
                   Curso
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {COURSES.map((c) => {
-                    const active = newCourse === c;
+                  {randomCourses.visible.map((c) => {
+                    const active = newCourse?.id_curso === c.id_curso;
+                    
                     return (
                       <button
-                        key={c}
+                        key={c.id_curso}
                         type="button"
                         onClick={() => setNewCourse(c)}
-                        className={`rounded-full border px-3 py-1 text-xs ${
+                        className={`flex items-center justify-between gap-2 rounded-full border px-3 py-1 text-xs ${
                           active
                             ? "border-[#124D58] bg-[#124D58] text-white"
                             : "border-[#124D58] text-[#124D58]"
                         }`}
                       >
-                        {c}
+                        <span className="max-w-[160px] truncate">
+                          {c.nombre}
+                          
+                        </span>
+                        <span className="text-[10px] opacity-70">{capitalize(c.horario)}</span>
+                        <span className="text-[10px] opacity-70">{c.grado + 'º'}</span>
                       </button>
                     );
                   })}
+                  
+                  {/* CUARTO BOTÓN */}
+                  {randomCourses.rest.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setShowAllCourses((v) => !v)}
+                      className="flex overflow-hidden items-center gap-2 rounded-full border border-dashed px-3 py-1 text-xs text-[#124D58] hover:bg-[#124D58]/5"
+                    >
+                      {newCourse ? (
+                        <>
+                          <span className="truncate max-w-[120px]">
+                            {newCourse.nombre}
+                          </span>
+                          <span className="text-[10px] opacity-60">{newCourse?.horario?.horario}</span>
+                        </>
+                      ) : (
+                        "Ver más"
+                      )}
+                    </button>
+                  )}
                 </div>
+
+                {showAllCourses && (
+                  <div className="mt-3 max-h-64 overflow-auto rounded-lg border border-black/10 bg-white shadow-sm">
+                    {randomCourses.rest.map((c) => (
+                      <button
+                        key={c.id_curso}
+                        type="button"
+                        onClick={() => {
+                          setNewCourse(c);
+                          setShowAllCourses(false);
+                        }}
+                        className="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-black/[.04]"
+                      >
+                        <span>{c.nombre + ' · ' + capitalize(c.horario) + ' · ' + c.grado + 'º'}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
 
                 {/* TAGS */}
                 <p className="mt-4 mb-2 text-sm font-medium text-[#004B57]">
@@ -348,6 +408,28 @@ function CreateModal({
                       </button>
                     );
                   })}
+                  <input
+                    value={newTag}
+                    onChange={(e) => setNewTag(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        const value = newTag.trim();
+                        if (!value) return;
+
+                        if (!tags.includes(value)) {
+                          addNewTag();
+                        }
+
+                        toggleCat(value); // ✅ se añade a cats del modal
+                        setNewTag("");
+                      }
+                    }}
+                    placeholder="+"
+                    className="h-8 w-20 rounded-md border border-dashed border-black/30 bg-transparent px-2 text-sm text-[#D46D85]"
+                  />
                 </div>
               </div>
 
@@ -364,11 +446,11 @@ function CreateModal({
                   type="url"
                   value={coverUrl}
                   onChange={(e) => setCoverUrl(e.target.value)}
-                  className="mb-2 h-10 w-full rounded-md border border-black/20 bg-white px-3 text-xs text-zinc-800 placeholder:text-zinc-400 dark:border-white/20 dark:bg-black dark:text-white"
+                  className="mb-2 h-10 w-full rounded-md border border-black/20 bg-white px-3 text-xs text-zinc-800 placeholder:text-zinc-400"
                   placeholder="https://tuservidor.com/portada.png"
                 />
 
-                <label className="mt-1 flex flex-col gap-1 text-xs text-zinc-700 dark:text-zinc-300">
+                <label className="mt-1 flex flex-col gap-1 text-xs text-zinc-700">
                   Subir imagen de portada
                   <input
                     type="file"
@@ -383,7 +465,7 @@ function CreateModal({
                   )}
                 </label>
 
-                <div className="mt-3 aspect-[4/3] w-full overflow-hidden rounded-md border border-black/15 bg-zinc-100 dark:border-white/20 dark:bg-zinc-900">
+                <div className="mt-3 aspect-[4/3] w-full overflow-hidden rounded-md border border-black/15 bg-zinc-100">
                   {coverUrl ? (
                     <img
                       src={coverUrl}
@@ -409,7 +491,7 @@ function CreateModal({
                   type="url"
                   value={videoUrl}
                   onChange={(e) => setVideoUrl(e.target.value)}
-                  className="h-10 w-full rounded-md border border-black/20 bg-white px-3 text-xs text-zinc-800 placeholder:text-zinc-400 dark:border-white/20 dark:bg-black dark:text-white"
+                  className="h-10 w-full rounded-md border border-black/20 bg-white px-3 text-xs text-zinc-800 placeholder:text-zinc-400"
                   placeholder="https://tuservidor.com/video.mp4"
                 />
               </div>
@@ -425,7 +507,7 @@ function CreateModal({
                   onChange={(e) => setVideoFile(e.target.files?.[0] ?? null)}
                 />
                 {videoFile && (
-                  <span className="mt-1 block text-[11px] text-zinc-700 opacity-80 dark:text-zinc-300">
+                  <span className="mt-1 block text-[11px] text-zinc-700 opacity-80">
                     Archivo seleccionado: {videoFile.name}
                   </span>
                 )}
@@ -436,7 +518,7 @@ function CreateModal({
           {/* COLUMNA DERECHA: PREVIEW */}
           <div className="flex flex-col items-center gap-4">
             <div className="w-full max-w-sm">
-              <div className="aspect-[4/3] w-full overflow-hidden rounded-md border border-black/15 bg-zinc-100 dark:border-white/20 dark:bg-zinc-900">
+              <div className="aspect-[4/3] w-full overflow-hidden rounded-md border border-black/15 bg-zinc-100">
                 {coverUrl ? (
                   <img
                     src={coverUrl}
@@ -454,14 +536,14 @@ function CreateModal({
                 className="mt-3 text-lg font-semibold text-[#004B57]"
                 style={titleFont}
               >
-                {title || "Ejemplo 1"}
+                {title || "Ejemplo"}
               </h3>
-              <p className="mt-1 text-sm text-zinc-800 dark:text-zinc-200">
+              <p className="mt-1 text-sm text-zinc-800">
                 {desc ||
                   "Descripción de ejemplo del contenido que se mostrará en esta clase."}
               </p>
 
-              <p className="mt-2 text-[11px] text-zinc-600 dark:text-zinc-400">
+              <p className="mt-2 text-[11px] text-zinc-600">
                 {courseLabel}
               </p>
 
@@ -496,13 +578,13 @@ function CreateModal({
         <div className="mt-2 flex items-center justify-end gap-3">
           <button
             onClick={onClose}
-            className="h-9 rounded-md border border-black/20 bg-white px-5 text-sm text-[#D46D85] hover:bg-black/[.04] dark:border-white/25 dark:bg-black dark:text-white dark:hover:bg-white/10"
+            className="h-9 rounded-md border border-black/20 bg-white px-5 text-sm text-[#D46D85] hover:bg-black/[.04]"
           >
             Cancelar
           </button>
           <button
             onClick={onSave}
-            className="h-9 rounded-md border border-black/20 bg-[#D46D85] px-6 text-sm font-medium text-white hover:bg-[#c55c77] dark:border-white/25"
+            className="h-9 rounded-md border border-black/20 bg-[#D46D85] px-6 text-sm font-medium text-white hover:bg-[#c55c77]"
           >
             Siguiente
           </button>
@@ -543,8 +625,8 @@ function VideoModal({
   return (
     <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/60 px-4">
       <div
-        className="w-full max-w-3xl rounded-xl bg-white p-4 shadow-xl dark:bg-black"
         ref={panelRef}
+        className="mx-auto flex max-h-[90vh] w-full max-w-5xl flex-col gap-6 overflow-y-auto rounded-xl bg-[#F5F5F5] p-6 shadow-xl"
         style={bodyFont}
       >
         <div className="flex items-center justify-between gap-2">
@@ -552,7 +634,7 @@ function VideoModal({
             <h2 className="text-lg font-semibold" style={titleFont}>
               {item.title}
             </h2>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            <p className="text-xs text-zinc-500">
               {item.professor ?? item.author} · {item.course ?? "Sin curso"}
             </p>
           </div>
@@ -572,7 +654,7 @@ function VideoModal({
             className="mt-4 w-full rounded-md bg-black"
           />
         ) : (
-          <div className="mt-4 rounded-md border border-dashed border-black/20 p-6 text-sm text-zinc-600 dark:border-white/30 dark:text-zinc-300">
+          <div className="mt-4 rounded-md border border-dashed border-black/20 p-6 text-sm text-zinc-600">
             <p>Esta clase todavía no tiene ningún vídeo asociado.</p>
             <p className="mt-2 text-xs opacity-80">
               Cuando se suba un vídeo o se rellene este campo en la base de
@@ -593,7 +675,7 @@ function Card({ it, onOpen }: { it: CardItem; onOpen: (it: CardItem) => void }) 
       className="group flex cursor-pointer flex-col gap-2"
       style={bodyFont}
     >
-      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-md border border-black/10 bg-white dark:border-white/15 dark:bg-black">
+      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-md border border-black/10 bg-white">
         {it.coverUrl ? (
           <img
             src={it.coverUrl}
@@ -614,17 +696,17 @@ function Card({ it, onOpen }: { it: CardItem; onOpen: (it: CardItem) => void }) 
       </div>
 
       <h3
-        className="mt-2 text-[22px] leading-6 text-[#004B57] dark:text-zinc-50"
+        className="mt-2 text-[22px] leading-6 text-[#004B57]"
         style={titleFont}
       >
         {it.title}
       </h3>
 
-      <p className="text-sm leading-5 text-zinc-700 dark:text-zinc-400">
+      <p className="text-sm leading-5 text-zinc-700">
         {it.description}
       </p>
 
-      <div className="mt-1 flex items-center justify-between text-xs text-zinc-600 dark:text-zinc-400">
+      <div className="mt-1 flex items-center justify-between text-xs text-zinc-600">
         <div className="flex items-center gap-3">
           <span title="descargar">↓</span>
           <span title="favorito">☆</span>
@@ -632,7 +714,7 @@ function Card({ it, onOpen }: { it: CardItem; onOpen: (it: CardItem) => void }) 
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="h-5 w-5 rounded-full border border-black/10 dark:border-white/15" />
+          <span className="h-5 w-5 rounded-full border border-black/10"/>
           <span>{it.author}</span>
         </div>
       </div>
@@ -657,7 +739,7 @@ function ProfessorPopover({
 
   return (
     <div
-      className="absolute left-0 top-11 z-50 w-56 rounded-lg border border-black/10 bg-white p-2 text-sm shadow-lg dark:border-white/15 dark:bg-black"
+      className="absolute left-0 top-11 z-50 w-56 rounded-lg border border-black/10 bg-white p-2 text-sm shadow-lg"
       style={bodyFont}
     >
       <div className="relative mb-2">
@@ -668,7 +750,7 @@ function ProfessorPopover({
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Buscar..."
-          className="h-8 w-full rounded-md border border-black/10 bg-white pl-6 pr-2 text-xs dark:border-white/15 dark:bg-black"
+          className="h-8 w-full rounded-md border border-black/10 bg-white pl-6 pr-2 text-xs"
         />
       </div>
 
@@ -677,9 +759,9 @@ function ProfessorPopover({
           <button
             key={p}
             onClick={() => onPick(p)}
-            className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left hover:bg-black/[.04] dark:hover:bg-white/10"
+            className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left hover:bg-black/[.04]"
           >
-            <span className="h-5 w-5 rounded-full border border-black/10 dark:border-white/15" />
+            <span className="h-5 w-5 rounded-full border border-black/10" />
             {p}
           </button>
         ))}
@@ -690,7 +772,7 @@ function ProfessorPopover({
 
       <button
         onClick={onClear}
-        className="mt-2 w-full rounded-md px-2 py-2 text-left text-xs opacity-60 hover:bg-black/[.04] dark:hover:bg-white/10"
+        className="mt-2 w-full rounded-md px-2 py-2 text-left text-xs opacity-60 hover:bg-black/[.04]"
       >
         Quitar filtro
       </button>
@@ -699,9 +781,12 @@ function ProfessorPopover({
 }
 
 export function Board() {
+  const [courses, setCourses] = useState<any[]>([]);
   const [items, setItems] = useState<CardItem[]>([]);
   const [query, setQuery] = useState("");
   const [activeTag, setActiveTag] = useState<string | null>(null);
+  const [customTags, setCustomTags] = useState<string[]>([]);
+  const [newTag, setNewTag] = useState("");
 
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
@@ -725,10 +810,48 @@ export function Board() {
   const [newCoverUrl, setNewCoverUrl] = useState("");
   const [newCoverFile, setNewCoverFile] = useState<File | null>(null);
   const [newVideoFile, setNewVideoFile] = useState<File | null>(null);
-  const [newCourse, setNewCourse] = useState<string>("");
+  const [newCourse, setNewCourse] = useState<Curso | null>(null);
 
   // MODAL VIDEO
   const [activeVideoItem, setActiveVideoItem] = useState<CardItem | null>(null);
+  
+  useEffect(() => {
+    if (isCreateOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isCreateOpen]);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const res = await fetch("/api/cursos");
+        if (!res.ok) throw new Error("Error al cargar datos");
+
+        const data = await res.json();
+
+        // 👇 si la api devuelve SOLO cursos
+        if (Array.isArray(data)) {
+          setCourses(data);
+          return;
+        }
+
+        // 👇 si luego decides devolver más cosas
+        if (data.cursos) {
+          setCourses(data.cursos);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    fetchData();
+  }, []);
 
   // CARGAR REUNIONES DESDE /api/reuniones
   useEffect(() => {
@@ -776,14 +899,19 @@ export function Board() {
     fetchReuniones();
   }, []);
 
-  // TAGS DINÁMICOS (a partir de lo que viene de la BD)
-  const TAGS = useMemo(() => {
-    const set = new Set<string>();
-    items.forEach((it) => {
-      if (it.tag && it.tag.trim()) set.add(it.tag.trim());
-    });
-    return Array.from(set).sort();
-  }, [items]);
+    // TAGS DINÁMICOS (a partir de lo que viene de la BD)
+    const TAGS = useMemo(() => {
+      const set = new Set<string>();
+      items.forEach((it) => {
+        if (it.tag && it.tag.trim()) set.add(it.tag.trim());
+      });
+      return Array.from(set).sort();
+    }, [items]);
+
+    const ALL_TAGS = useMemo(() => {
+      const set = new Set([...TAGS, ...customTags]);
+      return Array.from(set).sort();
+    }, [TAGS, customTags]);
 
   useEffect(() => {
     function onDown(e: MouseEvent) {
@@ -812,6 +940,21 @@ export function Board() {
     );
   };
 
+  const addNewTag = () => {
+    const value = newTag.trim();
+    if (!value) return;
+
+    if (!customTags.includes(value) && !TAGS.includes(value)) {
+      setCustomTags((prev) => [...prev, value]);
+    }
+
+    setNewCats((prev) =>
+      prev.includes(value) ? prev : [...prev, value]
+    );
+
+    setNewTag("");
+  };
+
   const filtered = useMemo(() => {
     return items.filter((it) => {
       const q = query.toLowerCase();
@@ -819,7 +962,9 @@ export function Board() {
         it.title.toLowerCase().includes(q) ||
         it.description.toLowerCase().includes(q);
 
-      const matchesTag = activeTag ? it.tag === activeTag : true;
+      const matchesTag = activeTag
+        ? it.tag === activeTag || !TAGS.includes(activeTag)
+        : true;
       const matchesCourse = selectedCourse ? it.course === selectedCourse : true;
       const matchesProfessor = selectedProfessor
         ? (it.professor ?? it.author) === selectedProfessor
@@ -838,52 +983,67 @@ export function Board() {
     });
   }, [items, query, activeTag, selectedCourse, selectedProfessor, selectedDate]);
 
-  const saveNewItem = () => {
-    const nextId = items.length + 1;
-    const tagToUse = newCats[0] ?? (TAGS[0] ?? "General");
-    const courseToUse = newCourse || "DAW/DAM";
+  const saveNewItem = async () => {
+    if (!newTitle.trim()) return;
 
-    const formData = new FormData();
-    formData.append("title", newTitle);
-    formData.append("description", newDesc);
-    formData.append("author", "Jorge Aguirre");
-    formData.append("tag", tagToUse);
-    formData.append("course", courseToUse);
-    formData.append("professor", "Jorge Aguirre");
-    if (selectedDate) {
-      formData.append("date", selectedDate.toISOString().slice(0, 10));
+    const payload = {
+      titulo: newTitle.trim(),
+      descripcion: newDesc.trim() || null,
+      tag: newCats[0] ?? null,
+      profesor: "Jorge Aguirre",
+      date: selectedDate
+        ? selectedDate.toISOString().slice(0, 10)
+        : null,
+      video: newVideoUrl.trim() || null,
+      id_usuario: 1, // ✅ fijo por ahora
+      id_curso: newCourse?.id_curso ?? null,
+    };
+
+    try {
+      const res = await fetch("/api/reuniones/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        throw new Error("Error al insertar reunión");
+      }
+
+      // 🔄 RECARGAR REUNIONES (simple y limpio)
+      const reload = await fetch("/api/reuniones");
+      const data = await reload.json();
+
+      const mapped = data.map((r: any) => ({
+        id: r.id_reuniones,
+        title: r.titulo ?? "Sin título",
+        description: r.descripcion ?? "Sin descripción",
+        author: r.profesor ?? "Profesor",
+        tag: r.tag ?? "",
+        date: r.date ?? undefined,
+        course: undefined,
+        professor: r.profesor ?? undefined,
+        videoUrl: r.video ?? undefined,
+        coverUrl: undefined,
+      }));
+
+      setItems(mapped);
+
+      // ✅ CERRAR MODAL Y LIMPIAR
+      setCreateOpen(false);
+      setNewTitle("");
+      setNewDesc("");
+      setNewCats([]);
+      setNewVideoUrl("");
+      setNewCoverUrl("");
+      setNewCoverFile(null);
+      setNewVideoFile(null);
+      setNewCourse(null);
+
+    } catch (err) {
+      console.error(err);
+      alert("No se pudo guardar la reunión");
     }
-    if (newCoverUrl) formData.append("coverUrl", newCoverUrl);
-    if (newVideoUrl) formData.append("videoUrl", newVideoUrl);
-    if (newCoverFile) formData.append("coverFile", newCoverFile);
-    if (newVideoFile) formData.append("videoFile", newVideoFile);
-
-    // De momento solo lo añadimos al estado local
-    setItems((prev) => [
-      ...prev,
-      {
-        id: nextId,
-        title: newTitle.trim() || `Nuevo ${nextId}`,
-        description: newDesc.trim() || "Sin descripción.",
-        author: "Jorge Aguirre",
-        tag: tagToUse,
-        course: courseToUse,
-        professor: "Jorge Aguirre",
-        date: selectedDate ? selectedDate.toISOString().slice(0, 10) : undefined,
-        videoUrl: newVideoUrl.trim() || undefined,
-        coverUrl: newCoverUrl.trim() || undefined,
-      },
-    ]);
-
-    setCreateOpen(false);
-    setNewTitle("");
-    setNewDesc("");
-    setNewCats([]);
-    setNewVideoUrl("");
-    setNewCoverUrl("");
-    setNewCoverFile(null);
-    setNewVideoFile(null);
-    setNewCourse("");
   };
 
   const openCard = (it: CardItem) => {
@@ -891,7 +1051,7 @@ export function Board() {
   };
 
   const openCreateModal = () => {
-    setNewCourse(selectedCourse || "");
+    setNewCourse(null);
     setCreateOpen(true);
   };
 
@@ -907,7 +1067,7 @@ export function Board() {
               onClick={() =>
                 setOpenFilter(openFilter === "fecha" ? null : "fecha")
               }
-              className="flex h-9 w-36 items-center justify-between rounded-md border border-black/10 bg-[#D46D85] px-3 text-sm text-zinc-800 dark:border-white/15 dark:bg-black dark:text-zinc-200"
+              className="flex h-9 w-36 items-center justify-between rounded-md border border-black/10 bg-[#D46D85] px-3 text-sm text-zinc-800"
             >
               <span className="text-white">
                 {selectedDate ? selectedDate.toLocaleDateString() : "Fecha"}
@@ -934,22 +1094,22 @@ export function Board() {
               onClick={() =>
                 setOpenFilter(openFilter === "curso" ? null : "curso")
               }
-              className="flex h-9 w-36 items-center justify-between rounded-md border border-black/10 bg-[#D46D85] px-3 text-sm text-zinc-800 dark:border-white/15 dark:bg-black dark:text-zinc-200"
+              className="flex h-9 w-36 items-center justify-between rounded-md border border-black/10 bg-[#D46D85] px-3 text-sm text-zinc-800"
             >
               <span className="text-white">{selectedCourse ?? "Curso"}</span>
               <span className="text-xs opacity-60">▾</span>
             </button>
 
             {openFilter === "curso" && (
-              <div className="absolute left-0 top-11 z-50 w-56 rounded-lg border border-black/10 bg-white p-1 text-sm shadow-lg dark:border-white/15 dark:bg-black">
-                {COURSES.map((c) => (
+              <div className="absolute left-0 top-11 z-50 w-56 rounded-lg border border-black/10 bg-white p-1 text-sm shadow-lg">
+                {courses.map((c) => (
                   <button
                     key={c}
                     onClick={() => {
                       setSelectedCourse(c);
                       setOpenFilter(null);
                     }}
-                    className="w-full rounded-md px-3 py-2 text-left hover:bg-black/[.04] dark:hover:bg-white/10"
+                    className="w-full rounded-md px-3 py-2 text-left hover:bg-black/[.04]"
                   >
                     {c}
                   </button>
@@ -959,7 +1119,7 @@ export function Board() {
                     setSelectedCourse(null);
                     setOpenFilter(null);
                   }}
-                  className="w-full rounded-md px-3 py-2 text-left opacity-60 hover:bg-black/[.04] dark:hover:bg-white/10"
+                  className="w-full rounded-md px-3 py-2 text-left opacity-60 hover:bg-black/[.04]"
                 >
                   Quitar filtro
                 </button>
@@ -973,7 +1133,7 @@ export function Board() {
               onClick={() =>
                 setOpenFilter(openFilter === "profesor" ? null : "profesor")
               }
-              className="flex h-9 w-36 items-center justify-between rounded-md border border-black/10 bg-[#D46D85] px-3 text-sm text-zinc-800 dark:border-white/15 dark:bg-black dark:text-zinc-200"
+              className="flex h-9 w-36 items-center justify-between rounded-md border border-black/10 bg-[#D46D85] px-3 text-sm text-zinc-800"
             >
               <span className="text-white">
                 {selectedProfessor ?? "Profesor"}
@@ -999,7 +1159,7 @@ export function Board() {
           {/* CREAR */}
           <button
             onClick={openCreateModal}
-            className="h-9 rounded-md border border-black/10 bg-[#D46D85] px-4 text-sm text-white hover:bg-black/[.04] dark:border-white/15 dark:hover:bg-white/10"
+            className="h-9 rounded-md border border-black/10 bg-[#D46D85] px-4 text-sm text-white hover:bg-black/[.04]"
           >
             + Crear
           </button>
@@ -1013,18 +1173,18 @@ export function Board() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Buscador"
-              className="h-10 w-full rounded-md border border-black/10 bg-[#124D58] pl-9 pr-3 text-sm text-zinc-100 placeholder:text-zinc-200 dark:border-white/15 dark:bg-black dark:text-zinc-100 dark:placeholder:text-zinc-600"
+              className="h-10 w-full rounded-md border border-black/10 bg-[#124D58] pl-9 pr-3 text-sm text-zinc-100 placeholder:text-zinc-200"
             />
           </div>
 
-          <button className="h-10 w-32 shrink-0 rounded-md border border-black/10 bg-[#124D58] text-sm text-zinc-100 hover:bg-black/[.04] dark:border-white/15 dark:hover:bg-white/10">
+          <button className="h-10 w-32 shrink-0 rounded-md border border-black/10 bg-[#124D58] text-sm text-zinc-100 hover:bg-black/[.04]">
             Ordenar por &nbsp;›
           </button>
         </div>
 
         {/* TAGS FILTRO */}
         <div className="mt-4 flex flex-wrap gap-2">
-          {TAGS.map((tag) => {
+          {ALL_TAGS.map((tag) => {
             const active = activeTag === tag;
             return (
               <button
@@ -1032,9 +1192,9 @@ export function Board() {
                 onClick={() => setActiveTag(active ? null : tag)}
                 className={`h-8 rounded-md border px-3 text-sm text-white bg-[#D46D85] ${
                   active
-                    ? "border-black/30 dark:border-white/40"
-                    : "border-black/10 dark:border-white/15"
-                } hover:bg-black/[.04] dark:hover:bg-white/10`}
+                    ? "border-black/30"
+                    : "border-black/10"
+                } hover:bg-black/[.04]`}
               >
                 {tag}
               </button>
@@ -1071,7 +1231,11 @@ export function Board() {
           onSave={saveNewItem}
           newCourse={newCourse}
           setNewCourse={setNewCourse}
-          tags={TAGS}
+          tags={ALL_TAGS}
+          courses={courses}
+          newTag={newTag}
+          setNewTag={setNewTag}
+          addNewTag={addNewTag}
         />
       )}
 
