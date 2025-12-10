@@ -164,6 +164,11 @@ const data = {
 
   navMain: [
     {
+      title: "Home",
+      url: "/noticias",
+      icon: Folder,
+    },
+    {
       title: "Proyectos",
       url: "/compartir-proyectos",
       icon: Folder,
@@ -171,6 +176,16 @@ const data = {
     {
       title: "Reuniones",
       url: "/reuniones",
+      icon: Calendar,
+    },
+    {
+      title: "Citas",
+      url: "/citas",
+      icon: Calendar,
+    },
+    {
+      title: "Quedadas",
+      url: "/quedadas",
       icon: Calendar,
     },
   ],
