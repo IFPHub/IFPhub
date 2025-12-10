@@ -32,6 +32,15 @@ export default function Sidebar({ uid, sig }: { uid?: string; sig?: string }) {
 
           <li>
             <a
+              href={`/quedadas${query}`}
+              className="block p-2 rounded-md hover:bg-[#f3f6f7] cursor-pointer transition-colors"
+            >
+              Quedadas
+            </a>
+          </li>
+
+          <li>
+            <a
               href={`/citas${query}`}
               className="block p-2 rounded-md hover:bg-[#f3f6f7] cursor-pointer transition-colors"
             >

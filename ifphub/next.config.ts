@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-    typedRoutes: false,     // evita más problemas
+    typedRoutes: false,  
+    images: {
+        domains: ['images.unsplash.com'],
+      },   
 };
 
 export default nextConfig;
