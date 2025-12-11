@@ -61,7 +61,7 @@ export function Testimonials() {
     useGSAP(() => {
         // Animación de entrada para las cards
         gsap.from(cardsRef.current, {
-            y: 100,
+            y: 20,
             opacity: 0,
             duration: 0.8,
             stagger: 0.15,
@@ -76,7 +76,7 @@ export function Testimonials() {
         // Animación continua de flotación
         cardsRef.current.forEach((card, index) => {
             gsap.to(card, {
-                y: -15,
+                y: -2.5,
                 duration: 2 + (index * 0.2),
                 repeat: -1,
                 yoyo: true,
@@ -124,7 +124,7 @@ export function Testimonials() {
                             }}
                             className="testimonial-card"
                         >
-                            <Card className="border-none shadow-lg bg-white h-full relative overflow-hidden group">
+                            <Card className="border-none shadow-lg h-full relative overflow-hidden group">
                                 {/* Accent bar */}
                                 <div
                                     className="absolute top-0 left-0 w-1 h-full transition-all duration-300 group-hover:w-2"
