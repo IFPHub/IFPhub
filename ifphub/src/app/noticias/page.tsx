@@ -22,8 +22,19 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   const noticias = await getNoticias();
 
-  const getImg = (img: string) =>
-    img && img.trim() !== "" ? img : "/imagenes/default_image.webp";
+  const shuffle = <T,>(arr: T[]) => {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+  
+  const randomNoticias = shuffle(noticias).slice(0, 8);
+
+  const getPicsum = (seed: string | number, w: number, h: number) =>
+    `https://picsum.photos/seed/${encodeURIComponent(String(seed))}/${w}/${h}`;
 
   return (
     <main>
@@ -36,20 +47,21 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           {/* POPULAR */}
           <section className="mt-8">
             <div className="border-l-4 border-accent pl-3 mb-4">
-              <h3 className="text-accent uppercase tracking-widest text-sm font-libre">Popular</h3>
+              <h3 className="text-accent uppercase tracking-widest text-sm font-libre">
+                Popular
+              </h3>
             </div>
 
             <div className="grid gap-4">
-              {noticias.slice(0, 3).map((n: any) => (
-                <Link 
-                  key={n.id_noticia} 
-                  href={`/detail/${n.id_noticia}?uid=${uid}&sig=${sig}`}
-                >
+              {randomNoticias.slice(0, 3).map((n: any) => (
+                <Link key={n.id_noticia} href={`/detail/${n.id_noticia}?uid=${uid}&sig=${sig}`}>
                   <article className="flex gap-4 items-center p-4 rounded-lg bg-white border border-[#eef3f6] hover:shadow-md-custom transition-transform cursor-pointer">
                     <img
-                      src={getImg(n.imagen)}
+                      src={getPicsum(n.id_noticia, 110, 72)}
                       alt={n.titulo}
                       className="w-[110px] h-[72px] rounded-md object-cover"
+                      loading="lazy"
+                      decoding="async"
                     />
                     <div>
                       <h4 className="text-[15px] font-semibold">{n.titulo}</h4>
@@ -63,13 +75,15 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
           {/* EXTRA CARDS */}
           <section className="mt-8 grid gap-4 lg:grid-cols-2">
-            {noticias.slice(3, 5).map((n: any) => (
+            {randomNoticias.slice(0, 8).map((n: any) => (
               <Link key={n.id_noticia} href={`/detail/${n.id_noticia}?uid=${uid}&sig=${sig}`}>
                 <div className="bg-white rounded-lg p-4 border border-[#eef3f6] hover:shadow-md-custom transition-transform cursor-pointer">
                   <img
-                    src={getImg(n.imagen)}
+                    src={getPicsum(n.id_noticia, 640, 360)}
                     alt={n.titulo}
                     className="h-[140px] w-full rounded-md object-cover"
+                    loading="lazy"
+                    decoding="async"
                   />
                   <h4 className="mt-3">{n.titulo}</h4>
                   <p className="text-sm text-muted mt-1">{n.descripcion.slice(0, 100)}...</p>
@@ -77,21 +91,28 @@ export default async function Page(props: { searchParams: Promise<any> }) {
               </Link>
             ))}
 
-            <div className="flex flex-col gap-3">
+            {/* <div className="flex flex-col gap-3">
               {noticias.slice(5, 7).map((n: any) => (
-                <Link key={n.id_noticia} href={`/detail/${n.id_noticia}?uid=${uid}&sig=${sig}`}>
+                <Link
+                  key={n.id_noticia}
+                  href={`/detail/${n.id_noticia}?uid=${uid}&sig=${sig}`}
+                >
                   <div className="bg-white rounded-lg p-3 border border-[#eef3f6] cursor-pointer">
                     <img
-                      src={getImg(n.imagen)}
+                      src={getPicsum(n.id_noticia, 640, 240)}
                       alt={n.titulo}
                       className="h-20 w-full rounded-md object-cover"
+                      loading="lazy"
+                      decoding="async"
                     />
                     <h5 className="mt-2">{n.titulo}</h5>
-                    <p className="text-sm text-muted mt-1">{n.descripcion.slice(0, 80)}...</p>
+                    <p className="text-sm text-muted mt-1">
+                      {n.descripcion.slice(0, 80)}...
+                    </p>
                   </div>
-                </Link>
-              ))}
-            </div>
+                </Link> */}
+              {/* ))} */}
+            {/* </div> */}
           </section>
 
           <footer className="mt-8 text-center text-sm text-muted border-t pt-4">
