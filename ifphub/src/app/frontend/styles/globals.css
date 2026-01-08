@@ -36,3 +36,47 @@ color: var(--primary);
 
 .font-montserrat { font-family: var(--font-montserrat), sans-serif; }
 .font-libre { font-family: var(--font-libre), serif; }
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+
+.scrollbar-hide {
+  scrollbar-width: none;
+}
+
+/* Tema SOLO para el calendario de secretaria */
+.secretaria-theme {
+  /* radio de las cards del calendario */
+  --radius: 0.625rem;
+
+  /* fondo y texto del calendario */
+  --background: #ffffff;
+  --foreground: #111827;
+
+  /* tarjetas internas (días, popover, etc.) */
+  --card: #ffffff;
+  --card-foreground: #111827;
+  --popover: #ffffff;
+  --popover-foreground: #111827;
+
+  /* colores de selección y hover */
+  --primary: #18181b;
+  --primary-foreground: #f9fafb;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #18181b;
+
+  /* textos apagados (días de otros meses, etc.) */
+  --muted: #f4f4f5;
+  --muted-foreground: #6b7280;
+
+  /* bordes, inputs, anillo de foco */
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #9f9fa9;
+
+  /* acentos (hoy, hover, etc.) */
+  --accent: #f4f4f5;
+  --accent-foreground: #18181b;
+}

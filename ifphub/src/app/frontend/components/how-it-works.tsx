@@ -28,7 +28,7 @@ export function HowItWorks() {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {steps.map((step, index) => (
-                        <div key={index} className="flex flex-col items-center text-center p-6 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div key={index} className="flex flex-col items-center text-center p-6 rounded-lg hover:-translate-y-5 hover:shadow-xl/20 transition-all duration-300 ease-in">
                             <div className="mb-6 p-4 bg-[#F7D0D7]/20 rounded-full">
                                 {step.icon}
                             </div>
