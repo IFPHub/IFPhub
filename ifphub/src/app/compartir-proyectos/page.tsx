@@ -179,9 +179,6 @@ export default function Page() {
                       Alumno {p.id_usuario}
                     </span>
                     <h4 className="font-semibold">{p.titulo}</h4>
-                    <p className="text-gray-600 text-sm">
-                      {p.descripcion.slice(0, 70)}...
-                    </p>
                   </div>
                 </div>
               ))}
@@ -222,39 +219,6 @@ export default function Page() {
 
           </div>
         </section>
-
-        {/* COMUNIDAD */}
-        <section className="w-full py-16 px-6">
-          <div className="max-w-6xl mx-auto bg-white shadow-xl rounded-2xl p-10 md:p-16 flex flex-col md:flex-row items-center gap-12">
-            <div className="flex-1">
-              <span className="inline-block mb-4 px-4 py-1 text-sm font-semibold bg-blue-100 text-blue-700 rounded-full">
-                Nuestra Comunidad
-              </span>
-
-              <h2 className="text-3xl font-bold text-[#103b47] mb-4">
-                Comunidad
-              </h2>
-
-              <p className="text-gray-700 mb-4 leading-relaxed">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit lorem sit amet dolor.
-              </p>
-
-              <a href="#" className="text-red-500 text-sm font-medium relative group">
-                Ver más +
-                <span className="block w-0 group-hover:w-full transition-all duration-300 h-[1px] bg-red-500"></span>
-              </a>
-            </div>
-
-            <div className="flex-1 flex justify-center md:justify-end">
-              <img
-                src="/imagenes/placeholder.webp"
-                alt="Comunidad"
-                className="w-full max-w-sm rounded-xl shadow-lg object-cover"
-              />
-            </div>
-          </div>
-        </section>
-
         {/* FOOTER */}
         <footer className="w-full mt-8 pt-6 border-t">
           <div className="max-w-6xl mx-auto text-center px-4">
