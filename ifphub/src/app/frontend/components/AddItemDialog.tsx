@@ -1,5 +1,7 @@
 "use client"
 
+import { useState } from "react"
+
 import {
   Dialog,
   DialogContent,
@@ -18,115 +20,125 @@ import {
   SelectValue,
 } from "@/app/frontend/components/ui/select"
 
+/**
+ * Prioridad automática según el tipo de incidencia
+ * null = requiere evaluación manual
+ */
+const PRIORITY_BY_TYPE: Record<string, number | null> = {
+  "Electricidad/Iluminación": 5,
+  "Internet/Red": 5,
+  Proyector: 3,
+  Mobiliario: 1,
+  Otro: null,
+}
+
 export function AddItemDialog() {
+  const [aula, setAula] = useState<string | null>(null)
+  const [tipo, setTipo] = useState<string | null>(null)
+  const [descripcion, setDescripcion] = useState("")
+
+  const prioridad = tipo ? PRIORITY_BY_TYPE[tipo] : null
+
+  const handleSubmit = () => {
+    const incidencia = {
+      aula,
+      tipo,
+      descripcion,
+      prioridad, // number | null
+    }
+
+    // Por ahora solo lo mostramos por consola
+    // Más adelante aquí irá el fetch al backend
+    console.log("Incidencia enviada:", incidencia)
+  }
+
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <button className="w-full text-left px-4 py-2 rounded-md bg-[#124D58] text-white hover:bg-[#0F3F48] text-center font-['Libre_Baskerville']">
+        <button className="w-full px-4 py-2 rounded-md bg-[#124D58] text-white hover:bg-[#0F3F48] text-center font-['Libre_Baskerville']">
           Nueva incidencia
         </button>
       </DialogTrigger>
 
       <DialogContent className="font-montserrat">
         <DialogHeader>
-          <DialogTitle className="text-center font-['Libre_Baskerville'] text-3xl">
+          <DialogTitle className="text-center font-['Libre_Baskerville'] text-3xl font-light tracking-wide">
             INCIDENCIAS
           </DialogTitle>
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
-
-          {/* Campo 1 - SELECT */}
-          <div className="w-full max-w-md font-montserrat">
-            <Select>
-              <SelectTrigger className="justify-center text-center bg-[#124D58] text-white font-montserrat">
+          {/* Aula */}
+          <div className="w-full max-w-md">
+            <Select onValueChange={setAula}>
+              <SelectTrigger className="justify-center text-center bg-[#124D58] text-white">
                 <SelectValue placeholder="Número del aula" />
               </SelectTrigger>
-              <SelectContent className="font-montserrat">
-                <SelectItem value="aula1">Aula 1</SelectItem>
-                <SelectItem value="aula2">Aula 2</SelectItem>
-                <SelectItem value="aula3">Aula 3</SelectItem>
-                <SelectItem value="aula4">Aula 4</SelectItem>
-                <SelectItem value="aula5">Aula 5</SelectItem>
-                <SelectItem value="aula6">Aula 6</SelectItem>
-                <SelectItem value="aula7">Aula 7</SelectItem>
-                <SelectItem value="aula8">Aula 8</SelectItem>
-                <SelectItem value="aula9">Aula 9</SelectItem>
-                <SelectItem value="aula10">Aula 10</SelectItem>
+              <SelectContent>
+                <SelectItem value="Aula 1">Aula 1</SelectItem>
+                <SelectItem value="Aula 2">Aula 2</SelectItem>
+                <SelectItem value="Aula 3">Aula 3</SelectItem>
+                <SelectItem value="Aula 4">Aula 4</SelectItem>
+                <SelectItem value="Aula 5">Aula 5</SelectItem>
+                <SelectItem value="Aula 6">Aula 6</SelectItem>
+                <SelectItem value="Aula 7">Aula 7</SelectItem>
+                <SelectItem value="Aula 8">Aula 8</SelectItem>
+                <SelectItem value="Aula 9">Aula 9</SelectItem>
+                <SelectItem value="Aula 10">Aula 10</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {/* Campo 2 - SELECT */}
-          <div className="w-full max-w-md font-montserrat">
-            <Select>
-              <SelectTrigger className="justify-center text-center bg-[#124D58] text-white font-montserrat">
+          {/* Tipo de incidencia */}
+          <div className="w-full max-w-md">
+            <Select onValueChange={setTipo}>
+              <SelectTrigger className="justify-center text-center bg-[#124D58] text-white">
                 <SelectValue placeholder="Tipo de incidencia" />
               </SelectTrigger>
-              <SelectContent className="font-montserrat">
-                <SelectItem value="Proyector">Proyector</SelectItem>
-                <SelectItem value="Ordenadores">Ordenadores</SelectItem>
+              <SelectContent>
                 <SelectItem value="Internet/Red">Internet/Red</SelectItem>
-                <SelectItem value="Mobiliario">Mobiliario</SelectItem>
                 <SelectItem value="Electricidad/Iluminación">
-                  Electricidad/Iluminación
+                  Electricidad / Iluminación
                 </SelectItem>
+                <SelectItem value="Proyector">Proyector</SelectItem>
+                <SelectItem value="Mobiliario">Mobiliario</SelectItem>
                 <SelectItem value="Otro">Otro</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {/* Campo 3 - TEXTAREA */}
-          <div className="w-full max-w-md font-montserrat">
+          {/* Descripción */}
+          <div className="w-full max-w-md">
             <textarea
               placeholder="Explica tu incidencia con detalle"
-              className="w-full h-40 p-4 rounded-xl bg-[#124D58] text-white placeholder:text-white/60 border border-white/20 outline-none resize-none focus:ring-2 focus:ring-white/20 font-montserrat"
-            ></textarea>
-          </div>
-        </div>
-
-        {/* Barra deslizable */}
-        <div className="w-full flex justify-center font-montserrat">
-          <div className="w-80 mt-[-5px] mb-8">
-            <div className="flex justify-between text-sm mb-1 font-montserrat">
-              <span>1</span>
-              <span>5</span>
-            </div>
-
-            <input
-              type="range"
-              min={1}
-              max={5}
-              defaultValue={3}
-              className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-300 transition-all duration-150
-              [&::-webkit-slider-thumb]:appearance-none
-              [&::-webkit-slider-thumb]:h-6
-              [&::-webkit-slider-thumb]:w-12
-              [&::-webkit-slider-thumb]:rounded-full
-              [&::-webkit-slider-thumb]:bg-[#124D58]
-              [&::-webkit-slider-thumb]:border
-              [&::-webkit-slider-thumb]:border-gray-200
-              [&::-webkit-slider-thumb]:shadow-md
-              
-              [&::-moz-range-thumb]:h-6
-              [&::-moz-range-thumb]:w-12
-              [&::-moz-range-thumb]:rounded-full
-              [&::-moz-range-thumb]:bg-[#124D58]
-              [&::-moz-range-thumb]:border
-              [&::-moz-range-thumb]:border-gray-200
-              [&::-moz-range-thumb]:shadow-md"
+              value={descripcion}
+              onChange={(e) => setDescripcion(e.target.value)}
+              className="w-full h-40 p-4 rounded-xl bg-[#124D58] text-white placeholder:text-white/60 border border-white/20 outline-none resize-none focus:ring-2 focus:ring-white/20"
             />
           </div>
+
+          {/* Información de prioridad (solo informativa) */}
+          {tipo && (
+            <p className="text-center text-sm text-gray-500">
+              Prioridad asignada:{" "}
+              <span className="font-semibold">
+                {prioridad ?? "Sin prioridad"}
+              </span>
+            </p>
+          )}
         </div>
 
         <DialogFooter>
           <DialogClose asChild>
-            <button className="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300 font-montserrat">
+            <button className="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300">
               Cancelar
             </button>
           </DialogClose>
 
-          <button className="px-4 py-2 rounded-md bg-[#D46D95] hover:bg-[#c25f88] text-white font-montserrat">
+          <button
+            onClick={handleSubmit}
+            className="px-4 py-2 rounded-md bg-[#D46D95] hover:bg-[#c25f88] text-white"
+          >
             Enviar
           </button>
         </DialogFooter>

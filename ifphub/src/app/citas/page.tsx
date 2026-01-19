@@ -17,28 +17,19 @@ import {
   SidebarTrigger,
 } from "@/app/frontend/components/ui/sidebar"
 import Calendar01 from "@/app/frontend/components/calendar-01"
-import { useEffect, useState } from "react";
-
+import { useSearchParams } from "next/navigation"
 
 export default function Page() {
   const [date, setDate] = React.useState<Date | undefined>(new Date(2025, 5, 12))
-
-  const [uid, setUid] = useState<string | null>(null);
-    const [sig, setSig] = useState<string | null>(null);
-  
-    useEffect(() => {
-      const params = new URLSearchParams(window.location.search);
-      setUid(params.get("uid"));
-      setSig(params.get("sig"));
-    }, []);
-  
-    if (!uid || !sig) return null;
+  const searchParams = useSearchParams()
+  const uid = searchParams.get("uid")
+  const sig = searchParams.get("sig")
 
   return (
     <SidebarProvider>
-      <AppSidebar uid={uid} sig={sig}/>
+      <AppSidebar uid={uid} sig={sig} />
 
-      <SidebarInset>º
+      <SidebarInset>
 
         {/* HEADER */}
         <header className="flex h-16 shrink-0 items-center gap-2 border-b border-gray-200">
@@ -60,82 +51,67 @@ export default function Page() {
         </header>
 
         {/* CONTENIDO */}
-        <main className="flex flex-1 flex-col gap-4 p-6">
+        <main className="flex-1 p-4 md:p-6">
 
-          {/* CONTENEDOR GRANDE */}
-       
-            <div className="bg-white min-h-[90vh] rounded-xl shadow-sm p-10 flex justify-center items-start">
+          {/* CONTENEDOR PRINCIPAL */}
+          <div className="bg-white min-h-[calc(100vh-8rem)] rounded-xl shadow-sm p-4 md:p-10">
 
-            {/* CONTENEDOR COMPACTO */}
-            <div
-              className="
-                bg-[#124d58]
-                rounded-xl 
-                p-10 
-                border 
-                border-black 
-                shadow-[0_0_25px_rgba(0,0,0,0.8)]
-                w-full
-                h-full
-                flex
-                gap-10
-                "
-            >
+            {/* CONTENEDOR CON FONDO OSCURO */}
+            <div className="bg-[#124d58] rounded-xl p-4 md:p-6 lg:p-10 border border-black shadow-lg w-full min-h-[500px] flex flex-col">
 
-              {/* CALENDARIO A LA IZQUIERDA */}
-              <div className=" scale-130 origin-top-left absolute right-60 top-70">
-                <Calendar01 date={date} setDate={setDate} />
-              </div>
-
-              {/* TÍTULO A LA DERECHA */}
-              <div className="flex flex-col justify-center">
-                <h1 className="text-4xl font-bold font-['Libre_Baskerville'] text-[#fff] absolute top-50 left-40">
-                  Citas de Secretaria
+              {/* TÍTULO */}
+              <div className="mb-6 md:mb-8 lg:mb-10 text-center md:text-left">
+                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold font-['Libre_Baskerville'] text-white">
+                  Citas de Secretaría
                 </h1>
               </div>
 
-              {/* DIV DE REGISTRO DE CITAS */}
-              <div className="flex flex-col justify-start w-[40rem] h-[26rem] rounded-xl border border-black shadow-[0_0_25px_rgba(0,0,0,0.8)] p-4 absolute top-72 left-40 scrollbar-hide overflow-y-auto">
-                <h2 className="text-2xl font-bold font-['Libre_Baskerville'] text-[#fff] mb-4">Registro de Citas</h2>
+              {/* CONTENIDO RESPONSIVE - GRID */}
+              <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8 lg:gap-10 items-start">
 
-                {/* Citas simuladas */}
-                <div className="flex flex-col gap-3">
-                  <div className="p-3 bg-gray-100 rounded shadow-sm">
-                    <p className="font-semibold">14/11/2025 - 10:00</p>
-                    <p>Estado: Realizada</p>
-                  </div>
-
-                  <div className="p-3 bg-gray-100 rounded shadow-sm">
-                    <p className="font-semibold">15/11/2025 - 11:00</p>
-                    <p>Estado: Pendiente</p>
-                  </div>
-
-                  <div className="p-3 bg-gray-100 rounded shadow-sm">
-                    <p className="font-semibold">16/11/2025 - 09:30</p>
-                    <p>Estado: Realizada</p>
-                  </div>
-
-                  <div className="p-3 bg-gray-100 rounded shadow-sm">
-                    <p className="font-semibold">17/11/2025 - 12:00</p>
-                    <p>Estado: Pendiente</p>
-                  </div>
-
-                  <div className="p-3 bg-gray-100 rounded shadow-sm">
-                    <p className="font-semibold">18/11/2025 - 10:30</p>
-                    <p>Estado: Realizada</p>
-                  </div>
-
-                  <div className="p-3 bg-gray-100 rounded shadow-sm">
-                    <p className="font-semibold">19/11/2025 - 11:15</p>
-                    <p>Estado: Pendiente</p>
-                  </div>
-
-                  <div className="p-3 bg-gray-100 rounded shadow-sm">
-                    <p className="font-semibold">20/11/2025 - 09:00</p>
-                    <p>Estado: Realizada</p>
+                {/* CALENDARIO */}
+                <div className="order-2 lg:order-1 relative z-30">
+                  <div className="flex justify-center lg:justify-start">
+                    <div className="origin-center lg:origin-top-left scale-[0.95] sm:scale-100 md:scale-110 lg:scale-125">
+                      <Calendar01 date={date} setDate={setDate} />
+                    </div>
                   </div>
                 </div>
+
+                {/* REGISTRO DE CITAS */}
+                <div className="order-1 lg:order-2 relative z-10">
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl border border-black shadow-lg p-4 md:p-6 h-full max-h-[320px] sm:max-h-[380px] md:max-h-[500px] lg:max-h-[500px] overflow-y-auto">
+                    <h2 className="text-xl md:text-2xl font-bold font-['Libre_Baskerville'] text-white mb-4 md:mb-6">
+                      Registro de Citas
+                    </h2>
+
+                    {/* Citas simuladas */}
+                    <div className="flex flex-col gap-3 md:gap-4">
+                      {[
+                        { date: "14/11/2025 - 10:00", status: "Realizada" },
+                        { date: "15/11/2025 - 11:00", status: "Pendiente" },
+                        { date: "16/11/2025 - 09:30", status: "Realizada" },
+                        { date: "17/11/2025 - 12:00", status: "Pendiente" },
+                        { date: "18/11/2025 - 10:30", status: "Realizada" },
+                        { date: "19/11/2025 - 11:15", status: "Pendiente" },
+                        { date: "20/11/2025 - 09:00", status: "Realizada" },
+                      ].map((cita, index) => (
+                        <div 
+                          key={index}
+                          className="p-3 md:p-4 bg-white/20 rounded-lg shadow-sm hover:bg-white/30 transition-colors duration-200"
+                        >
+                          <p className="font-semibold text-white text-sm md:text-base">{cita.date}</p>
+                          <p className="text-white/90 text-sm">Estado: {cita.status}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
               </div>
+
+              {/* ESPACIO ADICIONAL PARA DISPOSITIVOS MÓVILES */}
+              <div className="mt-6 lg:hidden"></div>
 
             </div>
 

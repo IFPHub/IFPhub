@@ -79,31 +79,33 @@ export default function Calendar01({ date, setDate }: Calendar01Props) {
 
       {/* POPUP DE HORAS */}
       {isHourPopupOpen && selectedDay && (
-        <div className="absolute top-4 right-[calc(100%+1rem)] w-64 max-h-80 bg-[#124d58] text-white rounded-xl border border-black shadow-xl p-4 overflow-y-auto scrollbar-hide z-50">
-          <h2 className="font-semibold text-lg mb-3">
-            Selecciona hora {selectedDay.toLocaleDateString()}
-          </h2>
+        <div className="absolute top-0 left-0 md:left-auto md:right-0 lg:top-0 lg:left-full lg:ml-4 w-72 max-h-80 bg-[#124d58] text-white rounded-xl border border-black shadow-xl p-4 overflow-y-auto scrollbar-hide z-50">
+          <div className="flex justify-between items-center mb-3">
+            <h2 className="font-semibold text-lg">
+              Horas para {selectedDay.toLocaleDateString()}
+            </h2>
+            <button
+              onClick={() => setIsHourPopupOpen(false)}
+              className="text-white hover:text-gray-300"
+            >
+              ✕
+            </button>
+          </div>
           <ul className="flex flex-col gap-2">
             {hours.map((hour, index) => (
               <li
                 key={index}
-                className={`p-2 rounded cursor-pointer ${
+                className={`p-2 rounded cursor-pointer transition-colors ${
                   hour.available
                     ? "bg-green-200 hover:bg-green-300 text-black"
                     : "bg-gray-300 text-gray-600 cursor-not-allowed"
                 }`}
                 onClick={() => handleSelectHour(hour.time, hour.available)}
               >
-                {hour.time}
+                {hour.time} {!hour.available && "(Ocupado)"}
               </li>
             ))}
           </ul>
-          <button
-            className="mt-4 w-full px-4 py-2 bg-[#F7D0D7] text-black rounded hover:bg-[#d46d85]"
-            onClick={() => setIsHourPopupOpen(false)}
-          >
-            Cerrar
-          </button>
         </div>
       )}
 

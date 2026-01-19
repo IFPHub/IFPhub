@@ -6,7 +6,6 @@ import { Command, Folder, Calendar, AlertCircle } from "lucide-react";
 import { NavMain } from "@/app/frontend/compartir-proyectos/nav-main";
 import { NavSecondary } from "@/app/frontend/compartir-proyectos/nav-secondary";
 import { NavUser } from "@/app/frontend/compartir-proyectos/nav-user";
-import { NavProjects } from "@/app/frontend/compartir-proyectos/nav-projects"
 import { AddItemDialog } from "@/app/frontend/components/AddItemDialog"
 
 import {

@@ -56,7 +56,7 @@ export function Hero_quedadas({ onCreateEvent }: HeroProps) {
                             size="lg"
                             className="bg-[#D65A7E] hover:bg-[#b54666] text-white font-bold text-lg px-8 py-6 rounded-md shadow-[0_0_15px_rgba(214,90,126,0.5)] transition-all hover:scale-105"
                         >
-                            crear quedada
+                            Crear quedada
                         </Button>
                     </CreateEventModal>
                 </motion.div>
