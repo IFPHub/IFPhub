@@ -32,12 +32,31 @@ async function getProyectos() {
   return await res.json();
 }
 
+async function getCursos() {
+  const res = await fetch("/api/cursos", { cache: "no-store" });
+  return await res.json();
+}
+
 export default function Page() {
   const [proyectos, setProyectos] = React.useState<any[]>([]);
+  const [cursos, setCursos] = React.useState<any[]>([]);
 
   /* ========= UID y SIG desde la URL (SIN useSearchParams) ========= */
   const [uid, setUid] = React.useState<string | null>(null);
   const [sig, setSig] = React.useState<string | null>(null);
+
+  const cursosFiltrados = React.useMemo(() => {
+    const map = new Map<string, any>();
+
+    cursos.forEach((c) => {
+      const key = `${c.nombre}-${c.grado}`;
+      if (!map.has(key)) {
+        map.set(key, c);
+      }
+    });
+
+    return Array.from(map.values());
+  }, [cursos]);
 
   React.useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -47,6 +66,7 @@ export default function Page() {
     getProyectos().then((data) => {
       setProyectos(data);
     });
+    getCursos().then(setCursos);
   }, []);
 
   // Imagen placeholder si no hay imagen real
@@ -89,29 +109,37 @@ export default function Page() {
           {/* ---------- CARRUSEL DINÁMICO ---------- */}
           <div className="w-full px-4">
             <h2 className="text-xl font-semibold mb-2">
-              Proyectos por curso
+              Cursos de IFP
             </h2>
 
             <Carousel className="w-full relative">
               <CarouselContent className="-ml-2 md:-ml-4">
 
-                {proyectos.map((p: any) => (
+                {cursosFiltrados.map((c: any) => (
                   <CarouselItem
-                    key={p.id_proyecto}
+                    key={c.id_curso}
                     className="pl-2 md:pl-4 basis-1/2 md:basis-1/3 lg:basis-1/4"
                   >
                     <Link
-                      href={`/proyecto/${p.id_proyecto}?uid=${uid ?? ""}&sig=${sig ?? ""}`}
+                      href={{
+                        pathname: "/proyectos-curso",
+                        query: {
+                          curso: c.id_curso,
+                          grado: c.grado,
+                          uid: uid ?? "",
+                          sig: sig ?? "",
+                        },
+                      }}
                     >
                       <div className="p-1">
                         <div className="relative overflow-hidden rounded-xl">
                           <img
-                            src={getImg(p.imagen)}
-                            alt={p.titulo}
+                            src="/imagenes/placeholder.webp"
+                            alt={c.nombre}
                             className="w-full h-[200px] object-cover"
                           />
                           <span className="absolute bottom-2 left-2 bg-black/60 text-white text-sm px-2 py-1 rounded-md">
-                            {p.titulo}
+                            {c.nombre} · Grado {c.grado}
                           </span>
                         </div>
                       </div>
