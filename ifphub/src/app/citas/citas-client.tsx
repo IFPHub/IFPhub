@@ -20,7 +20,7 @@ import Calendar01 from "@/app/frontend/components/calendar-01"
 import { useSearchParams } from "next/navigation"
 
 export default function Page() {
-  const [date, setDate] = React.useState<Date | undefined>(new Date(2025, 5, 12))
+  const [date, setDate] = React.useState<Date | undefined>(new Date(2026, 0, 12))
   const searchParams = useSearchParams()
   const uid = searchParams.get("uid")
   const sig = searchParams.get("sig")
