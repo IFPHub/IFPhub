@@ -21,17 +21,6 @@ import {
 } from "@/app/frontend/components/ui/sidebar";
 import { usePathname, useSearchParams } from "next/navigation";
 
-const fpNavItem = {
-  title: "FP",
-  icon: SquareTerminal,
-  url: "", // 👈 NO navega
-  items: [
-    { title: "Grado Medio", url: "/fp/grado-medio" },
-    { title: "Grado Superior", url: "/fp/grado-superior" },
-    { title: "Especializaciones", url: "/fp/especializaciones" },
-  ],
-};
-
 const data = {
   user: {
     name: "shadcn",
@@ -40,7 +29,7 @@ const data = {
   },
   navMain: [
     { title: "Home", url: "/noticias", icon: Folder },
-    { title: "Proyectos", url: "/compartir-proyectos", icon: Folder },
+    { title: "Proyectos", url: "/proyectos-curso", icon: Folder },
     { title: "Reuniones", url: "/reuniones", icon: Calendar },
     { title: "Citas", url: "/citas", icon: Calendar },
     { title: "Quedadas", url: "/quedadas", icon: Calendar },
@@ -70,13 +59,6 @@ export function AppSidebar({
 
   const navMainWithQuery = isProyectosCurso
     ? [
-        {
-          ...fpNavItem,
-          items: fpNavItem.items.map((item) => ({
-            ...item,
-            url: `${item.url}${query}`,
-          })),
-        },
         ...baseNavMain,
       ]
     : baseNavMain;

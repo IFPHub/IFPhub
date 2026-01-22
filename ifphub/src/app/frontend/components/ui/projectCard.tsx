@@ -12,7 +12,21 @@ type ProjectCardProps = {
   authorAvatar?: string;
   date: string;
   coverImage: string;
+  cursoNombre?: string | null;
+  cursoGrado?: string | null;
 };
+
+function getCursoSiglas(nombreCurso: string | null) {
+  if (!nombreCurso) return "";
+
+  const curso = nombreCurso.toLowerCase();
+
+  if (curso.includes("multiplataforma")) return "DAM";
+  if (curso.includes("web")) return "DAW";
+  if (curso.includes("sistemas")) return "ASIX";
+
+  return nombreCurso;
+}
 
 export function ProjectCard({
   title,
@@ -21,9 +35,11 @@ export function ProjectCard({
   authorAvatar,
   date,
   coverImage,
+  cursoGrado,
+  cursoNombre,
 }: ProjectCardProps) {
   return (
-    <Card className="max-w-sm overflow-hidden rounded-3xl border-0 bg-[#00525b] text-white shadow-xl p-0">
+    <Card className="max-w-sm overflow-hidden rounded-3xl border-0 bg-[#00525b] text-white shadow-xl p-0 flex flex-col">
       <div className="relative h-40 w-full">
         <Image
           src={coverImage}
@@ -34,9 +50,28 @@ export function ProjectCard({
         />
       </div>
 
-      <CardContent className="pt-4 pb-3 px-5">
-        <h3 className="text-lg font-semibold mb-1">{title}</h3>
-        <p className="text-sm leading-snug text-white/90">
+      <CardContent className="pt-4 pb-3 px-5 flex-1">
+        {cursoNombre && cursoGrado && (
+          <div className="text-xs font-medium text-white/90 mb-1">
+            {cursoGrado}º {getCursoSiglas(cursoNombre)}
+          </div>
+        )}
+
+        {/* 🔒 ALTURA FIJA DEL TÍTULO */}
+        <h3
+          className="
+            text-lg
+            font-semibold
+            leading-6
+            line-clamp-2
+            h-[3rem]
+            mb-1
+          "
+        >
+          {title}
+        </h3>
+
+        <p className="text-sm leading-snug text-white/90 line-clamp-6">
           {description}
         </p>
       </CardContent>

@@ -24,93 +24,50 @@ import UploadDialog from "@/app/frontend/components/upload";
 const baskervville = Baskervville({ weight: "400", subsets: ["latin"] });
 const montserrat = Montserrat({ subsets: ["latin"] });
 
-const proyectos = [
-  {
-    id: 1,
-    title: "Sistema Operativo",
-    description:
-      "Un marco de trabajo integral diseñado para eliminar la dependencia de la motivación y la fuerza de voluntad.",
-    authorName: "Usuario",
-    authorAvatar: "",
-    date: "24 Nov 25",
-    coverImage: "/imagenes/sistema operativo.jpg",
-    href: "/",
-  },
-  {
-    id: 1,
-    title: "Sistema Operativo",
-    description:
-      "Un marco de trabajo integral diseñado para eliminar la dependencia de la motivación y la fuerza de voluntad.",
-    authorName: "Usuario",
-    authorAvatar: "",
-    date: "24 Nov 25",
-    coverImage: "/imagenes/sistema operativo.jpg",
-    href: "/",
-  },
-  {
-    id: 1,
-    title: "Sistema Operativo",
-    description:
-      "Un marco de trabajo integral diseñado para eliminar la dependencia de la motivación y la fuerza de voluntad.",
-    authorName: "Usuario",
-    authorAvatar: "",
-    date: "24 Nov 25",
-    coverImage: "/imagenes/sistema operativo.jpg",
-    href: "/",
-  },
-  {
-    id: 1,
-    title: "Sistema Operativo",
-    description:
-      "Un marco de trabajo integral diseñado para eliminar la dependencia de la motivación y la fuerza de voluntad.",
-    authorName: "Usuario",
-    authorAvatar: "",
-    date: "24 Nov 25",
-    coverImage: "/imagenes/sistema operativo.jpg",
-    href: "/",
-  },
-  {
-    id: 1,
-    title: "Sistema Operativo",
-    description:
-      "Un marco de trabajo integral diseñado para eliminar la dependencia de la motivación y la fuerza de voluntad.",
-    authorName: "Usuario",
-    authorAvatar: "",
-    date: "24 Nov 25",
-    coverImage: "/imagenes/sistema operativo.jpg",
-    href: "/",
-  },
-  {
-    id: 1,
-    title: "Sistema Operativo",
-    description:
-      "Un marco de trabajo integral diseñado para eliminar la dependencia de la motivación y la fuerza de voluntad.",
-    authorName: "Usuario",
-    authorAvatar: "",
-    date: "24 Nov 25",
-    coverImage: "/imagenes/sistema operativo.jpg",
-    href: "/",
-  },
-  // ... Hay que hacer la consulta a la base de datos para traer los proyectos reales
-];
+type Proyecto = {
+  id_proyecto: number;
+  titulo: string;
+  descripcion: string;
+  fecha: string;
+  imagen: string | null;
+  autor_nombre: string | null;
+  autor_avatar: string | null;
+  curso_nombre: string | null;
+  curso_grado: number | null;
+};
+
 
 export default function Page() {
     const [uploadOpen, setUploadOpen] = useState(false);
     const [uid, setUid] = React.useState<string | null>(null);
     const [sig, setSig] = React.useState<string | null>(null);
     const [cursoId, setCursoId] = React.useState<string | null>(null);
-    const cursosMap: Record<string, string> = {
-        "61": "1º Desarrollo de Aplicaciones Web",
-        "62": "2º Desarrollo de Aplicaciones Web",
-        "63": "1º Desarrollo de Aplicaciones Multiplataforma",
-    };
-    const cursoNombre = cursoId ? cursosMap[cursoId] : null;
+    const [proyectos, setProyectos] = React.useState<Proyecto[]>([]);
+    const [loading, setLoading] = React.useState(true);
+
 
     React.useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        setUid(params.get("uid"));
-        setSig(params.get("sig"));
-        setCursoId(params.get("curso"));
+      const params = new URLSearchParams(window.location.search);
+      setUid(params.get("uid"));
+      setSig(params.get("sig"));
+      setCursoId(params.get("curso"));
+
+      async function fetchProyectos() {
+        try {
+          const res = await fetch("/api/proyecto");
+          if (!res.ok) throw new Error("Error al cargar proyectos");
+
+          const data: Proyecto[] = await res.json();
+          console.log(data)
+          setProyectos(data);
+        } catch (error) {
+          console.error(error);
+        } finally {
+          setLoading(false);
+        }
+      }
+
+      fetchProyectos();
     }, []);
 
   return (
@@ -140,14 +97,6 @@ export default function Page() {
               >
                 Proyectos Estudiantiles
               </h1>
-
-              {cursoNombre && (
-                <p
-                    className={`${montserrat.className} text-white/80 text-sm sm:text-base md:text-lg`}
-                >
-                    {cursoNombre}
-                </p>
-            )}
             </div>
 
             <div className="flex-shrink-0">
@@ -173,18 +122,44 @@ export default function Page() {
         <div className="p-8 md:p-16">
           <div className="max-w-7xl mx-auto space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10 lg:gap-12">
-              {proyectos.map((proyecto) => (
-                <Link key={proyecto.id} href={proyecto.href}>
-                  <ProjectCard
-                    title={proyecto.title}
-                    description={proyecto.description}
-                    authorName={proyecto.authorName}
-                    authorAvatar={proyecto.authorAvatar}
-                    date={proyecto.date}
-                    coverImage={proyecto.coverImage}
-                  />
-                </Link>
-              ))}
+              {loading && (
+                <p className="text-white/80">Cargando proyectos...</p>
+              )}
+
+              {!loading && proyectos.length === 0 && (
+                <p className="text-white/80">No hay proyectos todavía</p>
+              )}
+
+              {!loading &&
+                proyectos.map((proyecto) => (
+                  <Link
+                    key={proyecto.id_proyecto}
+                    href={`/proyectos/${proyecto.id_proyecto}`}
+                  >
+                    <ProjectCard
+                      title={proyecto.titulo}
+                      description={proyecto.descripcion}
+                      authorName={proyecto.autor_nombre ?? "Usuario"}
+                      authorAvatar={proyecto.autor_avatar ?? undefined}
+                      date={new Date(proyecto.fecha).toLocaleDateString("es-ES", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                      coverImage={
+                        proyecto.imagen
+                          ? proyecto.imagen
+                          : "/imagenes/sistema operativo.jpg"
+                      }
+                      cursoNombre={proyecto.curso_nombre}
+                      cursoGrado={
+                        proyecto.curso_grado !== null
+                          ? String(proyecto.curso_grado)
+                          : null
+                      }
+                    />
+                  </Link>
+                ))}
             </div>
           </div>
         </div>

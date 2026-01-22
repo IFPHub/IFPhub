@@ -112,7 +112,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
               {/* EXTRA CARDS */}
               <section className="mt-8 grid gap-4 lg:grid-cols-2">
-                {randomNoticias.slice(0, 8).map((n: any) => (
+                {randomNoticias.slice(0, 4).map((n: any) => (
                   <Link key={n.id_noticia} href={`/detail/${n.id_noticia}?uid=${uid}&sig=${sig}`}>
                     <div className="bg-white rounded-lg p-4 border border-[#eef3f6] hover:shadow-md-custom transition-transform cursor-pointer">
                       <img
