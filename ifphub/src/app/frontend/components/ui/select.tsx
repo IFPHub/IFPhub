@@ -26,7 +26,7 @@ const SelectTrigger = React.forwardRef<
   >
     {/* Círculo rosa con flecha */}
     <div className="absolute left-3 flex items-center justify-center">
-      <div className="h-6 w-6 rounded-full bg-[#D46D95] flex items-center justify-center">
+      <div className="h-6 w-6 rounded-full bg-[#D46D95] border border-[#123d58]/40 flex items-center justify-center">
         <SelectPrimitive.Icon asChild>
           <ChevronDown className="h-3 w-3 text-white" />
         </SelectPrimitive.Icon>
@@ -48,7 +48,7 @@ const SelectContent = React.forwardRef<
     <SelectPrimitive.Content
       ref={ref}
       className={cn(
-        "relative z-50 w-[var(--radix-select-trigger-width)] overflow-hidden rounded-md border bg-[#124D58] text-white shadow-md",
+        "relative z-50 w-[var(--radix-select-trigger-width)] overflow-hidden rounded-md border bg-[#123d58] text-white shadow-md",
         position === "popper" &&
           "data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2",
         className
@@ -121,7 +121,8 @@ const SelectScrollUpButton = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SelectPrimitive.ScrollUpButton
     ref={ref}
-    className={cn("flex cursor-default items-center justify-center py-1", className)}
+    data-slot="scroll-up"
+    className={cn("pointer-events-none flex cursor-default items-center justify-center py-1", className)}
     {...props}
   >
     <ChevronUp className="h-4 w-4" />
@@ -135,7 +136,8 @@ const SelectScrollDownButton = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SelectPrimitive.ScrollDownButton
     ref={ref}
-    className={cn("flex cursor-default items-center justify-center py-1", className)}
+    data-slot="scroll-down"
+    className={cn("pointer-events-none flex cursor-default items-center justify-center py-1", className)}
     {...props}
   >
     <ChevronDown className="h-4 w-4" />
@@ -155,3 +157,4 @@ export {
   SelectScrollUpButton,
   SelectScrollDownButton,
 }
+
