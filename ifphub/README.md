@@ -1,1 +1,0 @@
-Página web dedicada a los alumnos de IFP donde podran encontrar varias funcionalidades como quedades, subir proyecto entre otras.

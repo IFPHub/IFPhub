@@ -14,6 +14,7 @@ import { Calendar, Clock, Users, Tag } from "lucide-react"
 import { toast } from "sonner"
 
 interface Event {
+    id_quedada: number; // ✅ NECESARIO para la inscripción
     title: string;
     description: string;
     image: string;
@@ -29,7 +30,8 @@ interface EventDetailsModalProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     isRegistered: boolean;
-    onRegister: () => void;
+    onRegister: () => void; // se mantiene
+    id_usuario: number;     // ✅ NECESARIO
 }
 
 export function EventDetailsModal({
@@ -37,15 +39,34 @@ export function EventDetailsModal({
     open,
     onOpenChange,
     isRegistered,
-    onRegister
+    onRegister,
+    id_usuario
 }: EventDetailsModalProps) {
     if (!event) return null;
 
-    const handleRegister = () => {
-        onRegister();
-        toast.success("¡Inscripción confirmada!", {
-            description: `Te has apuntado a "${event.title}". ¡Nos vemos allí!`,
-        });
+    const handleRegister = async () => {
+        try {
+            const res = await fetch("/api/quedadas/inscribirse", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    id_quedada: event.id_quedada,
+                    id_usuario: id_usuario,
+                }),
+            });
+
+            if (!res.ok) throw new Error("Error al inscribirse");
+
+            onRegister(); // 🔁 mantiene comportamiento actual del padre
+
+            toast.success("¡Inscripción confirmada!", {
+                description: `Te has apuntado a "${event.title}". ¡Nos vemos allí!`,
+            });
+
+        } catch (error) {
+            toast.error("No se pudo completar la inscripción");
+            console.error(error);
+        }
     };
 
     const googleMapsUrl = event.address
@@ -54,7 +75,7 @@ export function EventDetailsModal({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto p-0">
+            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-scroll scrollbar-hide p-0">
                 {/* Event Image */}
                 <div className="relative w-full h-[250px] overflow-hidden">
                     <Image
@@ -66,7 +87,9 @@ export function EventDetailsModal({
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                     <div className="absolute bottom-4 left-6 right-6">
-                        <DialogTitle className="text-2xl font-bold text-white mb-2">{event.title}</DialogTitle>
+                        <DialogTitle className="text-2xl font-bold text-white mb-2">
+                            {event.title}
+                        </DialogTitle>
                         <span className="inline-flex items-center gap-1 bg-[#D65A7E] text-white px-3 py-1 rounded-full text-sm">
                             <Tag className="w-3 h-3" />
                             {event.category}
@@ -133,7 +156,7 @@ export function EventDetailsModal({
                                 <Button
                                     variant="outline"
                                     className="w-full text-[#124d58] border-[#124d58] hover:bg-[#124d58]/5"
-                                    onClick={() => window.open(googleMapsUrl, '_blank')}
+                                    onClick={() => window.open(googleMapsUrl, "_blank")}
                                 >
                                     Cómo llegar (Google Maps)
                                 </Button>
@@ -147,7 +170,9 @@ export function EventDetailsModal({
                         </div>
                         <div>
                             <p className="text-xs text-green-600 uppercase font-semibold">Participantes</p>
-                            <p className="text-green-900 font-bold text-lg">{event.participants} personas inscritas</p>
+                            <p className="text-green-900 font-bold text-lg">
+                                {event.participants} personas inscritas
+                            </p>
                         </div>
                     </div>
                 </div>

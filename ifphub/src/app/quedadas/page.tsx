@@ -1,10 +1,9 @@
-"use client"
+"use client";
 
 import { AppSidebar } from "@/app/frontend/compartir-proyectos/app-sidebar";
 import {
   SidebarInset,
   SidebarProvider,
-  SidebarTrigger,
 } from "@/app/frontend/components/ui/sidebar";
 import { Hero_quedadas } from "@/app/frontend/components/hero-quedadas";
 import { EventCard } from "@/app/frontend/components/event-card";
@@ -16,84 +15,95 @@ import { Footer } from "@/app/frontend/components/footer";
 import { StatsSection } from "@/app/frontend/components/stats-section";
 import { NewsletterSection } from "@/app/frontend/components/newsletter-section";
 import { Button } from "@/app/frontend/components/ui/button";
-import { ArrowLeft, Search } from "lucide-react";
-import { Input } from "@/app/frontend/components/ui/input";
+import { ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
+type Event = {
+  id_quedada: number;
+  title: string;
+  description: string;
+  image: string;
+  participants: number;
+  date: string;
+  time: string;
+  category: string;
+  address: string;
+};
+
 export default function Page() {
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [registeredEvents, setRegisteredEvents] = useState<number[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const [events, setEvents] = useState([
-    {
-      title: "TALLER DE PROGRAMACIÓN",
-      description: "Aprende los fundamentos de React y Next.js en este taller intensivo para principiantes.",
-      image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2070&auto=format&fit=crop",
-      participants: 20,
-      date: "Apr 1, 2025",
-      time: "9:41 AM",
-      category: "Tecnologia",
-      address: "Biblioteca Central, Sala 3"
-    },
-    {
-      title: "PARTIDO DE FÚTBOL",
-      description: "Ven a jugar un partido amistoso con compañeros de otros cursos. ¡Todos son bienvenidos!",
-      image: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?q=80&w=2070&auto=format&fit=crop",
-      participants: 14,
-      date: "Apr 1, 2025",
-      time: "5:00 PM",
-      category: "Deportes",
-      address: "Polideportivo Municipal"
-    },
-    {
-      title: "HACKATHON NOCTURNO",
-      description: "Desarrolla una solución innovadora en 12 horas. Pizza y bebidas incluidas.",
-      image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2070&auto=format&fit=crop",
-      participants: 45,
-      date: "Apr 2, 2025",
-      time: "8:00 PM",
-      category: "Tecnologia",
-      address: "Coworking Space, Calle Mayor 10"
-    },
-    {
-      title: "CLUB DE LECTURA",
-      description: "Discusión sobre el libro del mes: 'Clean Code'. Trae tus notas y opiniones.",
-      image: "https://images.unsplash.com/photo-1491841550275-ad7854e35ca6?q=80&w=1974&auto=format&fit=crop",
-      participants: 8,
-      date: "Apr 3, 2025",
-      time: "4:00 PM",
-      category: "Educacion",
-      address: "Cafetería El Libro"
-    },
-    {
-      title: "CATA DE CERVEZAS",
-      description: "Descubre nuevos sabores y aprende sobre la elaboración de cerveza artesanal.",
-      image: "https://images.unsplash.com/photo-1575425186775-b8de9a427e67?q=80&w=1974&auto=format&fit=crop",
-      participants: 12,
-      date: "Apr 4, 2025",
-      time: "7:30 PM",
-      category: "Cocina",
-      address: "Cervecería Artesana, Plaza Mayor"
-    },
-    {
-      title: "SENDERISMO GRUPAL",
-      description: "Ruta por la montaña para desconectar y disfrutar de la naturaleza.",
-      image: "https://images.unsplash.com/photo-1551632811-561732d1e306?q=80&w=2070&auto=format&fit=crop",
-      participants: 25,
-      date: "Apr 5, 2025",
-      time: "8:00 AM",
-      category: "Deportes",
-      address: "Parking de la Sierra, Km 15"
-    }
-  ]);
+  const [uid, setUid] = useState<string | null>(null);
+  const [sig, setSig] = useState<string | null>(null);
 
-  const addEvent = (newEvent: any) => {
-    setEvents(prev => [...prev, newEvent]);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setUid(params.get("uid"));
+    setSig(params.get("sig"));
+  }, []);
+
+  useEffect(() => {
+    const fetchQuedadas = async () => {
+      try {
+        const res = await fetch("/api/quedadas");
+        if (!res.ok) throw new Error("Error al cargar quedadas");
+
+        const data = await res.json();
+
+        const formatted: Event[] = data.map((q: any) => ({
+          id_quedada: q.id_quedada,
+          title: q.titulo,
+          description: q.descripcion,
+          image: q.imagen_url,
+          participants: q.participants ?? 0,
+          date: new Date(q.fecha).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          }),
+          time: q.hora.slice(0, 5),
+          category: q.categoria,
+          address: q.direccion,
+        }));
+
+        setEvents(formatted);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchQuedadas();
+  }, []);
+
+  const addEvent = (newEvent: Omit<Event, "id_quedada">) => {
+    setEvents((prev) => [
+      {
+        ...newEvent,
+        id_quedada: Date.now(),
+      },
+      ...prev,
+    ]);
   };
+
+  if (!uid || !sig) return null;
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-lg text-muted-foreground">Cargando quedadas...</p>
+      </div>
+    );
+  }
 
   const handleEventClick = (event: any, index: number) => {
     setSelectedEvent({ ...event, index });
@@ -101,42 +111,42 @@ export default function Page() {
   };
 
   const handleRegister = () => {
-    if (selectedEvent) {
-      const eventIndex = selectedEvent.index;
-      if (!registeredEvents.includes(eventIndex)) {
-        setRegisteredEvents(prev => [...prev, eventIndex]);
-        setEvents(prev => prev.map((event, idx) =>
-          idx === eventIndex
-            ? { ...event, participants: event.participants + 1 }
-            : event
-        ));
-      }
+    if (!selectedEvent) return;
+
+    const index = selectedEvent.index;
+    if (!registeredEvents.includes(index)) {
+      setRegisteredEvents((prev) => [...prev, index]);
+      setEvents((prev) =>
+        prev.map((e, i) =>
+          i === index ? { ...e, participants: e.participants + 1 } : e
+        )
+      );
+
+      // 🔥 actualizar también el evento del modal
+      setSelectedEvent((prev: any) =>
+        prev ? { ...prev, participants: prev.participants + 1 } : prev
+      );
     }
   };
 
-  const filteredEvents = events.filter(event => {
-    const matchesCategory = selectedCategory ? event.category === selectedCategory : true;
-    const matchesSearch = event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  const filteredEvents = events.filter((event) => {
+    const matchesCategory = selectedCategory
+      ? event.category === selectedCategory
+      : true;
+
+    const matchesSearch =
+      event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       event.description.toLowerCase().includes(searchQuery.toLowerCase());
+
     return matchesCategory && matchesSearch;
   });
 
-  const [uid, setUid] = useState<string | null>(null);
-    const [sig, setSig] = useState<string | null>(null);
-  
-    useEffect(() => {
-      const params = new URLSearchParams(window.location.search);
-      setUid(params.get("uid"));
-      setSig(params.get("sig"));
-    }, []);
-  
-    if (!uid || !sig) return null;
+  const idUsuario = Number(uid);
 
   return (
     <SidebarProvider>
-      <AppSidebar uid={uid} sig={sig}/>
+      <AppSidebar uid={uid} sig={sig} />
       <SidebarInset>
-
         <div className="flex flex-1 flex-col gap-4 pt-0 min-h-screen">
           {!selectedCategory && !searchQuery && (
             <motion.div
@@ -148,7 +158,10 @@ export default function Page() {
             </motion.div>
           )}
 
-          <CategoriesCarousel onSelectCategory={setSelectedCategory} selectedCategory={selectedCategory} />
+          <CategoriesCarousel
+            onSelectCategory={setSelectedCategory}
+            selectedCategory={selectedCategory}
+          />
 
           {(selectedCategory || searchQuery) && (
             <div className="p-4">
@@ -158,7 +171,7 @@ export default function Page() {
                   setSearchQuery("");
                 }}
                 variant="ghost"
-                className="flex items-center gap-2 mb-4 hover:bg-[#D65A7E]/10 hover:text-[#D65A7E]"
+                className="flex items-center gap-2 mb-4"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Volver a inicio
@@ -175,33 +188,30 @@ export default function Page() {
               {searchQuery
                 ? `Resultados para "${searchQuery}"`
                 : selectedCategory
-                  ? `Quedadas de ${selectedCategory}`
-                  : "Top planes para estas semanas"}
+                ? `Quedadas de ${selectedCategory}`
+                : "Top planes para estas semanas"}
             </motion.h1>
 
             {filteredEvents.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
                 {filteredEvents.map((event, index) => {
-                  const originalIndex = events.findIndex(e => e === event);
+                  const originalIndex = events.findIndex((e) => e === event);
                   return (
                     <EventCard
-                      key={index}
+                      key={event.id_quedada}
                       {...event}
-                      onClick={() => handleEventClick(event, originalIndex)}
+                      onClick={() =>
+                        handleEventClick(event, originalIndex)
+                      }
                     />
                   );
                 })}
               </div>
             ) : (
               <div className="text-center py-20">
-                <p className="text-xl text-muted-foreground">No se encontraron eventos.</p>
-                <Button
-                  variant="link"
-                  onClick={() => setSearchQuery("")}
-                  className="mt-2 text-[#D65A7E]"
-                >
-                  Limpiar búsqueda
-                </Button>
+                <p className="text-xl text-muted-foreground">
+                  No se encontraron eventos.
+                </p>
               </div>
             )}
           </div>
@@ -209,37 +219,24 @@ export default function Page() {
           {!selectedCategory && !searchQuery && (
             <>
               <StatsSection />
-
-              <motion.div
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-              >
-                <HowItWorks />
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-              >
-                <Testimonials />
-              </motion.div>
-
+              <HowItWorks />
+              <Testimonials />
               <NewsletterSection />
             </>
           )}
-
         </div>
 
         <EventDetailsModal
           event={selectedEvent}
           open={modalOpen}
           onOpenChange={setModalOpen}
-          isRegistered={selectedEvent ? registeredEvents.includes(selectedEvent.index) : false}
+          isRegistered={
+            selectedEvent
+              ? registeredEvents.includes(selectedEvent.index)
+              : false
+          }
           onRegister={handleRegister}
+          id_usuario={idUsuario} 
         />
       </SidebarInset>
     </SidebarProvider>

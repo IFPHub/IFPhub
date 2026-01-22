@@ -18,6 +18,7 @@ interface EventCardProps {
 }
 
 export function EventCard({ title, description, image, participants, date, time, category, onClick }: EventCardProps) {
+    console.log(title, participants)
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
