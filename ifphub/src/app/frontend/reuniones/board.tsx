@@ -13,6 +13,7 @@ type CardItem = {
   professor?: string;
   videoUrl?: string;
   coverUrl?: string;
+  isFavorite?: boolean;
 };
 
 type Curso = {
@@ -24,6 +25,7 @@ type Curso = {
   } | null;
 };
 
+type OrderBy = "newest" | "oldest" | "favorites";
 
 const WEEKDAYS = ["L", "M", "X", "J", "V", "S", "D"];
 const MONTHS = [
@@ -423,7 +425,7 @@ function CreateModal({
                           addNewTag();
                         }
 
-                        toggleCat(value); // ✅ se añade a cats del modal
+                        toggleCat(value);
                         setNewTag("");
                       }
                     }}
@@ -668,7 +670,18 @@ function VideoModal({
 }
 
 /* -------------------- CARD -------------------- */
-function Card({ it, onOpen }: { it: CardItem; onOpen: (it: CardItem) => void }) {
+function Card({
+  it,
+  onOpen,
+  onToggleFavorite,
+}: {
+  it: CardItem;
+  onOpen: (it: CardItem) => void;
+  onToggleFavorite: (id: number) => void;
+}) {
+  const canFav = !!it.videoUrl;
+  const fav = !!it.isFavorite;
+
   return (
     <article
       onClick={() => onOpen(it)}
@@ -709,7 +722,18 @@ function Card({ it, onOpen }: { it: CardItem; onOpen: (it: CardItem) => void }) 
       <div className="mt-1 flex items-center justify-between text-xs text-zinc-600">
         <div className="flex items-center gap-3">
           <span title="descargar">↓</span>
-          <span title="favorito">☆</span>
+          <button
+            type="button"
+            title="favorito"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!canFav) return;
+              onToggleFavorite(it.id);
+            }}
+            className={canFav ? "hover:opacity-80" : "cursor-not-allowed opacity-30"}
+          >
+            {fav ? "★" : "☆"}
+          </button>
           <span title="guardado">🔖</span>
         </div>
 
@@ -797,9 +821,13 @@ export function Board() {
   const [openFilter, setOpenFilter] =
     useState<"fecha" | "curso" | "profesor" | null>(null);
 
+  const [orderBy, setOrderBy] = useState<OrderBy | null>(null);
+  const [openOrder, setOpenOrder] = useState(false);
+
   const fechaRef = useRef<HTMLDivElement>(null);
   const cursoRef = useRef<HTMLDivElement>(null);
   const profesorRef = useRef<HTMLDivElement>(null);
+  const orderRef = useRef<HTMLDivElement>(null);
 
   // BOTÓN CREAR
   const [isCreateOpen, setCreateOpen] = useState(false);
@@ -888,6 +916,7 @@ export function Board() {
           professor: r.profesor ?? undefined,
           videoUrl: r.video ?? undefined,
           coverUrl: undefined,
+          isFavorite: false,
         }));
 
         setItems(mapped);
@@ -928,6 +957,17 @@ export function Board() {
     document.addEventListener("mousedown", onDown);
     return () => document.removeEventListener("mousedown", onDown);
   }, [openFilter]);
+
+  useEffect(() => {
+    function onDown(e: MouseEvent) {
+      const target = e.target as Node;
+      if (!openOrder) return;
+      const ref = orderRef.current;
+      if (ref && !ref.contains(target)) setOpenOrder(false);
+    }
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, [openOrder]);
 
   const PROFESSORS = useMemo(() => {
     const setP = new Set(items.map((i) => i.professor ?? i.author));
@@ -983,6 +1023,40 @@ export function Board() {
     });
   }, [items, query, activeTag, selectedCourse, selectedProfessor, selectedDate]);
 
+  const ordered = useMemo(() => {
+    const arr = [...filtered];
+    const t = (d?: string) => (d ? new Date(d).getTime() : -Infinity);
+
+    if (orderBy === "newest") {
+      return arr.sort((a, b) => t(b.date) - t(a.date));
+    }
+
+    if (orderBy === "oldest") {
+      return arr.sort((a, b) => t(a.date) - t(b.date));
+    }
+
+    if (orderBy === "favorites") {
+      return arr.sort((a, b) => {
+        const fb = Number(Boolean(b.isFavorite) && Boolean(b.videoUrl));
+        const fa = Number(Boolean(a.isFavorite) && Boolean(a.videoUrl));
+        if (fb !== fa) return fb - fa;
+        return t(b.date) - t(a.date);
+      });
+    }
+
+    return arr;
+  }, [filtered, orderBy]);
+
+  const toggleFavorite = (id: number) => {
+    setItems((prev) =>
+      prev.map((it) =>
+        it.id === id
+          ? { ...it, isFavorite: Boolean(it.videoUrl) ? !it.isFavorite : it.isFavorite }
+          : it
+      )
+    );
+  };
+
   const saveNewItem = async () => {
     if (!newTitle.trim()) return;
 
@@ -1025,6 +1099,7 @@ export function Board() {
         professor: r.profesor ?? undefined,
         videoUrl: r.video ?? undefined,
         coverUrl: undefined,
+        isFavorite: false,
       }));
 
       setItems(mapped);
@@ -1067,7 +1142,7 @@ export function Board() {
               onClick={() =>
                 setOpenFilter(openFilter === "fecha" ? null : "fecha")
               }
-              className="flex h-9 w-36 items-center justify-between rounded-md border border-black/10 bg-[#D46D85] px-3 text-sm text-zinc-800"
+              className="flex h-9 w-36 items-center justify-between rounded-md border border-black/10 bg-gradient-to-b from-white to-[var(--soft)] px-3 text-sm text-zinc-800 hover:brightness-95"
             >
               <span className="text-white">
                 {selectedDate ? selectedDate.toLocaleDateString() : "Fecha"}
@@ -1094,7 +1169,7 @@ export function Board() {
               onClick={() =>
                 setOpenFilter(openFilter === "curso" ? null : "curso")
               }
-              className="flex h-9 w-36 items-center justify-between rounded-md border border-black/10 bg-[#D46D85] px-3 text-sm text-zinc-800"
+              className="flex h-9 w-36 items-center justify-between rounded-md border border-black/10 bg-gradient-to-b from-white to-[var(--soft)] px-3 text-sm text-zinc-800 hover:brightness-95"
             >
               <span className="text-white">{selectedCourse ?? "Curso"}</span>
               <span className="text-xs opacity-60">▾</span>
@@ -1133,7 +1208,7 @@ export function Board() {
               onClick={() =>
                 setOpenFilter(openFilter === "profesor" ? null : "profesor")
               }
-              className="flex h-9 w-36 items-center justify-between rounded-md border border-black/10 bg-[#D46D85] px-3 text-sm text-zinc-800"
+              className="flex h-9 w-36 items-center justify-between rounded-md border border-black/10 bg-gradient-to-b from-white to-[var(--soft)] px-3 text-sm text-zinc-800 hover:brightness-95"
             >
               <span className="text-white">
                 {selectedProfessor ?? "Profesor"}
@@ -1159,7 +1234,7 @@ export function Board() {
           {/* CREAR */}
           <button
             onClick={openCreateModal}
-            className="h-9 rounded-md border border-black/10 bg-[#D46D85] px-4 text-sm text-white hover:bg-black/[.04]"
+            className="flex h-9 w-36 items-center justify-between rounded-md border border-black/10 bg-gradient-to-b from-white to-[var(--soft)] px-3 text-sm text-white hover:brightness-95"
           >
             + Crear
           </button>
@@ -1177,9 +1252,55 @@ export function Board() {
             />
           </div>
 
-          <button className="h-10 w-32 shrink-0 rounded-md border border-black/10 bg-[#124D58] text-sm text-zinc-100 hover:bg-black/[.04]">
-            Ordenar por &nbsp;›
-          </button>
+          <div ref={orderRef} className="relative">
+            <button
+              onClick={() => setOpenOrder((v) => !v)}
+              className="h-10 w-32 shrink-0 rounded-md border border-black/10 bg-[#124D58] text-sm text-zinc-100 hover:bg-black/[.04]"
+            >
+              Ordenar por &nbsp;›
+            </button>
+
+            {openOrder && (
+              <div className="absolute right-0 top-11 z-50 w-48 rounded-lg border border-black/10 bg-white p-1 text-sm shadow-lg">
+                <button
+                  onClick={() => {
+                    setOrderBy("newest");
+                    setOpenOrder(false);
+                  }}
+                  className="w-full rounded-md px-3 py-2 text-left hover:bg-black/[.04]"
+                >
+                  Más nuevos
+                </button>
+                <button
+                  onClick={() => {
+                    setOrderBy("oldest");
+                    setOpenOrder(false);
+                  }}
+                  className="w-full rounded-md px-3 py-2 text-left hover:bg-black/[.04]"
+                >
+                  Más viejos
+                </button>
+                <button
+                  onClick={() => {
+                    setOrderBy("favorites");
+                    setOpenOrder(false);
+                  }}
+                  className="w-full rounded-md px-3 py-2 text-left hover:bg-black/[.04]"
+                >
+                  Favoritos
+                </button>
+                <button
+                  onClick={() => {
+                    setOrderBy(null);
+                    setOpenOrder(false);
+                  }}
+                  className="w-full rounded-md px-3 py-2 text-left opacity-60 hover:bg-black/[.04]"
+                >
+                  Quitar orden
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* TAGS FILTRO */}
@@ -1187,25 +1308,26 @@ export function Board() {
           {ALL_TAGS.map((tag) => {
             const active = activeTag === tag;
             return (
-              <button
-                key={tag}
-                onClick={() => setActiveTag(active ? null : tag)}
-                className={`h-8 rounded-md border px-3 text-sm text-white bg-[#D46D85] ${
-                  active
-                    ? "border-black/30"
-                    : "border-black/10"
-                } hover:bg-black/[.04]`}
-              >
-                {tag}
-              </button>
+          <button
+              key={tag}
+              onClick={() => setActiveTag(active ? null : tag)}
+              className={`h-8 rounded-md border px-3 text-sm text-black bg-gradient-to-b from-white to-[var(--soft)] transition hover:brightness-95 ${
+                active
+                  ? "border-black/30"
+                  : "border-black/10"
+              }`}
+            >
+              {tag}
+          </button>
+
             );
           })}
         </div>
 
         {/* GRID DE CARDS */}
         <section className="mt-8 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filtered.map((it) => (
-            <Card key={it.id} it={it} onOpen={openCard} />
+          {ordered.map((it) => (
+            <Card key={it.id} it={it} onOpen={openCard} onToggleFavorite={toggleFavorite} />
           ))}
         </section>
       </div>

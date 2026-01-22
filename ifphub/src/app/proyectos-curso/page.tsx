@@ -98,11 +98,19 @@ export default function Page() {
     const [uploadOpen, setUploadOpen] = useState(false);
     const [uid, setUid] = React.useState<string | null>(null);
     const [sig, setSig] = React.useState<string | null>(null);
+    const [cursoId, setCursoId] = React.useState<string | null>(null);
+    const cursosMap: Record<string, string> = {
+        "61": "1º Desarrollo de Aplicaciones Web",
+        "62": "2º Desarrollo de Aplicaciones Web",
+        "63": "1º Desarrollo de Aplicaciones Multiplataforma",
+    };
+    const cursoNombre = cursoId ? cursosMap[cursoId] : null;
 
     React.useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         setUid(params.get("uid"));
         setSig(params.get("sig"));
+        setCursoId(params.get("curso"));
     }, []);
 
   return (
@@ -133,13 +141,13 @@ export default function Page() {
                 Proyectos Estudiantiles
               </h1>
 
-              {/* ✅ CHANGE: arreglado typo de clases (faltaba espacio antes de leading-relaxed) */}
-              <p
-                className={`${montserrat.className} text-white text-sm sm:text-base md:text-lg max-w-full mx-auto lg:mx-0 leading-relaxed`}
-              >
-                Explora proyectos innovadores creados por estudiantes de diversas disciplinas académicas.
-                Descubre soluciones creativas e inspírate con el trabajo de tus compañeros.
-              </p>
+              {cursoNombre && (
+                <p
+                    className={`${montserrat.className} text-white/80 text-sm sm:text-base md:text-lg`}
+                >
+                    {cursoNombre}
+                </p>
+            )}
             </div>
 
             <div className="flex-shrink-0">

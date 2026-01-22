@@ -38,16 +38,30 @@ export function NavMain({
       <SidebarGroupLabel>Menu</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => {
-          const url = `${item.url}?uid=${uid}&sig=${sig}`
+          const url = `${item.url}?uid=${uid}&sig=${sig}`       
+          const isFP = item.title === "FP";
 
           return (
             <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip={item.title}>
-                  <a href={url}>
-                    <item.icon />
-                    <span>{item.title}</span>
-                  </a>
+                <SidebarMenuButton
+                  asChild={!isFP}
+                  tooltip={item.title}
+                >
+                  {isFP ? (
+                    <button
+                      type="button"
+                      className="flex w-full items-center gap-2"
+                    >
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </button>
+                  ) : (
+                    <a href={url}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </a>
+                  )}
                 </SidebarMenuButton>
 
                 {item.items?.length ? (

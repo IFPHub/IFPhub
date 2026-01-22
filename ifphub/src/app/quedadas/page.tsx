@@ -136,32 +136,6 @@ export default function Page() {
     <SidebarProvider>
       <AppSidebar uid={uid} sig={sig}/>
       <SidebarInset>
-        <header className="sticky top-4 z-50 px-4 md:px-8 w-full max-w-7xl mx-auto mb-6">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 px-6 py-3 flex items-center justify-between gap-4">
-            {/* Left: Logo & Name */}
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#124d58] rounded-md flex-shrink-0 shadow-sm" />
-              <div className="flex flex-col">
-                <span className="font-bold text-[#124d58] leading-tight text-sm"></span>
-                <span className="text-[10px] text-gray-400 font-medium"></span>
-              </div>
-            </div>
-
-            {/* Right: Search */}
-            <div className="w-48">
-              <div className="relative">
-                <Input
-                  type="search"
-                  placeholder="Buscar..."
-                  className="h-8 text-xs bg-gray-50 border-gray-100 rounded-md pl-3 pr-8 focus-visible:ring-[#124d58]/20"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <Search className="absolute right-2.5 top-2 h-3.5 w-3.5 text-gray-300" />
-              </div>
-            </div>
-          </div>
-        </header>
 
         <div className="flex flex-1 flex-col gap-4 pt-0 min-h-screen">
           {!selectedCategory && !searchQuery && (
@@ -258,7 +232,6 @@ export default function Page() {
             </>
           )}
 
-          <Footer />
         </div>
 
         <EventDetailsModal
