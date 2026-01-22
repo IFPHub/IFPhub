@@ -3,62 +3,7 @@ export default function Sidebar({ uid, sig }: { uid?: string; sig?: string }) {
   const query = uid && sig ? `?uid=${uid}&sig=${sig}` : "";
   
   return (
-    <aside className="bg-card rounded-[14px] p-6 shadow-md-custom flex flex-col gap-8">
-
-      {/* Sección: Categorías */}
-      <section>
-        <h3 className="text-accent uppercase tracking-widest text-sm font-libre mb-3 border-l-4 border-accent pl-3">
-          Categorías
-        </h3>
-
-        <ul className="space-y-2">
-          <li>
-            <a
-              href={`/compartir-proyectos${query}`}
-              className="block p-2 rounded-md hover:bg-[#f3f6f7] cursor-pointer transition-colors"
-            >
-              Proyectos
-            </a>
-          </li>
-
-          <li>
-            <a
-              href={`/reuniones${query}`}
-              className="block p-2 rounded-md hover:bg-[#f3f6f7] cursor-pointer transition-colors"
-            >
-              Reuniones
-            </a>
-          </li>
-
-          <li>
-            <a
-              href={`/quedadas${query}`}
-              className="block p-2 rounded-md hover:bg-[#f3f6f7] cursor-pointer transition-colors"
-            >
-              Quedadas
-            </a>
-          </li>
-
-          <li>
-            <a
-              href={`/citas${query}`}
-              className="block p-2 rounded-md hover:bg-[#f3f6f7] cursor-pointer transition-colors"
-            >
-              Citas
-            </a>
-          </li>
-
-          <li>
-            <a
-              href={`/incidencias${query}`}
-              className="block p-2 rounded-md hover:bg-[#f3f6f7] cursor-pointer transition-colors"
-            >
-              Incidencias
-            </a>
-          </li>
-        </ul>
-      </section>
-
+    <aside className="bg-card rounded-[14px] p-6 shadow-md-custom flex flex-col gap-8 sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto">
       {/* Últimas noticias */}
       <section>
         <h3 className="text-accent uppercase tracking-widest text-sm font-libre mb-3 border-l-4 border-accent pl-3">
