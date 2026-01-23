@@ -158,10 +158,12 @@ export default function Page() {
             </motion.div>
           )}
 
-          <CategoriesCarousel
-            onSelectCategory={setSelectedCategory}
-            selectedCategory={selectedCategory}
-          />
+          <div className="-mt-4">
+            <CategoriesCarousel
+              onSelectCategory={setSelectedCategory}
+              selectedCategory={selectedCategory}
+            />
+          </div>
 
           {(selectedCategory || searchQuery) && (
             <div className="p-4">
