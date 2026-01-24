@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Command, Folder, Calendar } from "lucide-react";
+import { Command, Folder, Calendar, Home, Video, Users, FileText } from "lucide-react";
 
 import { NavMain } from "@/app/frontend/compartir-proyectos/nav-main";
 import { NavSecondary } from "@/app/frontend/compartir-proyectos/nav-secondary";
@@ -28,12 +28,12 @@ const data = {
     avatar: "/avatars/shadcn.jpg",
   },
   navMain: [
-    { title: "Home", url: "/noticias", icon: Folder },
+    { title: "Home", url: "/noticias", icon: Home },
     { title: "Proyectos", url: "/proyectos-curso", icon: Folder },
-    { title: "Ofertas", url: "/ofertas", icon: Folder },
-    { title: "Vídeos Explicativos", url: "/reuniones", icon: Calendar },
+    { title: "Vídeos Explicativos", url: "/reuniones", icon: Video },
+    { title: "Quedadas", url: "/quedadas", icon: Users },
+    { title: "Ofertas", url: "/ofertas", icon: FileText },
     { title: "Secretaría", url: "/citas", icon: Calendar },
-    { title: "Quedadas", url: "/quedadas", icon: Calendar },
   ],
   navSecondary: [],
 };
