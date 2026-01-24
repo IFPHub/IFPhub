@@ -66,8 +66,8 @@ function AceptarDialog({ titulo }: { titulo: string }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="mt-2 w-full bg-[#D46D85] hover:bg-[#D46D85] text-white cursor-pointer font-family: var(--font-montserrat);">
-          Aceptar
+        <Button className="mt-2 w-full bg-[#D46D85] hover:bg-[#D46D85] text-white cursor-pointer border border-[#124d58]/30 font-family: var(--font-montserrat);">
+          Solicitar
         </Button>
       </DialogTrigger>
 
