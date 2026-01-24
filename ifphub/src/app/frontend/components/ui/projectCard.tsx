@@ -3,7 +3,8 @@
 import Image from "next/image";
 import { Card } from "@/app/frontend/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/app/frontend/components/ui/avatar";
-import { ArrowRight, CalendarDays } from "lucide-react";
+import { ArrowRight, Calendar } from "lucide-react";
+import { Badge } from "@/app/frontend/components/ui/badge";
 
 type ProjectCardProps = {
   title: string;
@@ -55,9 +56,9 @@ export function ProjectCard({
           priority
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#124d58] to-transparent opacity-60" />
-        <span className="absolute top-4 right-4 rounded-md bg-[#D65A7E] px-3 py-1 text-xs font-medium text-white shadow-lg">
+        <Badge className="absolute top-4 right-4 bg-[#D65A7E] hover:bg-[#b54666] text-white border-none shadow-lg">
           {cursoLabel}
-        </span>
+        </Badge>
       </div>
 
       <div className="p-6 flex flex-col flex-grow">
@@ -72,7 +73,7 @@ export function ProjectCard({
         <div className="space-y-3">
           <div className="flex items-center justify-between text-sm text-gray-300">
             <div className="flex items-center gap-2">
-              <CalendarDays className="w-4 h-4 text-[#D65A7E]" />
+              <Calendar className="w-4 h-4 text-[#D65A7E]" />
               <span>{date}</span>
             </div>
             <div className="flex items-center gap-2">
@@ -95,7 +96,7 @@ export function ProjectCard({
           </div>
 
           <div className="flex items-center justify-between pt-4 border-t border-[#1a6b7a]">
-            <span className="text-sm text-gray-300" />
+            <div className="flex items-center gap-2 text-sm text-gray-300" />
             <a
               href=""
               className="flex items-center gap-1 text-[#D65A7E] text-sm font-medium group-hover:translate-x-1 transition-transform"
