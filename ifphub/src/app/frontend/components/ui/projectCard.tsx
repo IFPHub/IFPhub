@@ -39,7 +39,7 @@ export function ProjectCard({
   cursoNombre,
 }: ProjectCardProps) {
   return (
-    <Card className="max-w-sm overflow-hidden rounded-3xl border-0 bg-[#00525b] text-white shadow-xl p-0 flex flex-col">
+    <Card className="max-w-sm overflow-hidden rounded-3xl border-0 bg-[#123d58] text-white shadow-xl p-0 flex flex-col">
       <div className="relative h-40 w-full">
         <Image
           src={coverImage}
