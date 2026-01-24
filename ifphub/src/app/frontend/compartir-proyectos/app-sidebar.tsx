@@ -30,8 +30,8 @@ const data = {
   navMain: [
     { title: "Home", url: "/noticias", icon: Folder },
     { title: "Proyectos", url: "/proyectos-curso", icon: Folder },
-    { title: "Reuniones", url: "/reuniones", icon: Calendar },
-    { title: "Citas", url: "/citas", icon: Calendar },
+    { title: "Vídeos Explicativos", url: "/reuniones", icon: Calendar },
+    { title: "Secretaría", url: "/citas", icon: Calendar },
     { title: "Quedadas", url: "/quedadas", icon: Calendar },
   ],
   navSecondary: [],
@@ -115,10 +115,15 @@ export function AppSidebar({
 
   const isProyectosCurso = pathname.startsWith("/proyectos-curso");
 
-  const baseNavMain = data.navMain.map((item) => ({
-    ...item,
-    url: `${item.url}${query}`,
-  }));
+  const baseNavMain = data.navMain.map((item) => {
+    const isActive =
+      pathname === item.url || pathname.startsWith(`${item.url}/`);
+    return {
+      ...item,
+      isActive,
+      url: `${item.url}${query}`,
+    };
+  });
 
   const navMainWithQuery = isProyectosCurso
     ? [

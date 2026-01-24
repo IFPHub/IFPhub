@@ -47,6 +47,7 @@ export function NavMain({
                 <SidebarMenuButton
                   asChild={!isFP}
                   tooltip={item.title}
+                  isActive={item.isActive}
                 >
                   {isFP ? (
                     <button
