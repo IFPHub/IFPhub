@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { Command, Folder, Calendar, Home, Video, Users, FileText } from "lucide-react";
+import { Folder, Calendar, Home, Video, Users, FileText } from "lucide-react";
+import Image from "next/image";
 
 import { NavMain } from "@/app/frontend/compartir-proyectos/nav-main";
 import { NavSecondary } from "@/app/frontend/compartir-proyectos/nav-secondary";
@@ -138,8 +139,14 @@ export function AppSidebar({
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <a href={`/noticias${query}`}>
-                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex size-8 items-center justify-center rounded-lg">
-                  <Command className="size-4" />
+                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex size-9 items-center justify-center rounded-lg overflow-hidden">
+                  <Image
+                    src="/imagenes/logo.png"
+                    alt="FProject"
+                    width={24}
+                    height={24}
+                    className="h-6 w-6 object-contain"
+                  />
                 </div>
                 <div className="grid text-left text-sm">
                   <span className="font-medium">FProject</span>
