@@ -681,65 +681,73 @@ function Card({
 }) {
   const canFav = !!it.videoUrl;
   const fav = !!it.isFavorite;
+  const badgeLabel = it.course ?? it.tag;
 
   return (
     <article
       onClick={() => onOpen(it)}
-      className="group flex cursor-pointer flex-col gap-2"
+      className="group cursor-pointer"
       style={bodyFont}
     >
-      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-md border border-black/10 bg-white">
-        {it.coverUrl ? (
-          <img
-            src={it.coverUrl}
-            alt={it.title}
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <div className="grid h-full w-full place-items-center text-xs opacity-60">
-            Sin portada
-          </div>
-        )}
+      <div className="flex h-full flex-col overflow-hidden rounded-xl border border-[#124d58] bg-[#124d58] shadow-xl">
+        <div className="relative aspect-[4/3] w-full overflow-hidden">
+          {it.coverUrl ? (
+            <img
+              src={it.coverUrl}
+              alt={it.title}
+              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+            />
+          ) : (
+            <div className="grid h-full w-full place-items-center text-xs text-white/70">
+              Sin portada
+            </div>
+          )}
 
-        {it.videoUrl && (
-          <div className="absolute bottom-2 left-2 rounded-md bg-black/70 px-2 py-1 text-xs text-white">
-            Reproducir vídeo
-          </div>
-        )}
-      </div>
+          <div className="absolute inset-0 bg-gradient-to-t from-[#124d58] to-transparent opacity-70" />
 
-      <h3
-        className="mt-2 text-[22px] leading-6 text-[#004B57]"
-        style={titleFont}
-      >
-        {it.title}
-      </h3>
+          {badgeLabel && (
+            <div className="absolute top-4 right-4 rounded-md bg-[#D65A7E] px-3 py-1 text-xs font-semibold text-white shadow-lg">
+              {badgeLabel}
+            </div>
+          )}
 
-      <p className="text-sm leading-5 text-zinc-700">
-        {it.description}
-      </p>
-
-      <div className="mt-1 flex items-center justify-between text-xs text-zinc-600">
-        <div className="flex items-center gap-3">
-          <span title="descargar">↓</span>
-          <button
-            type="button"
-            title="favorito"
-            onClick={(e) => {
-              e.stopPropagation();
-              if (!canFav) return;
-              onToggleFavorite(it.id);
-            }}
-            className={canFav ? "hover:opacity-80" : "cursor-not-allowed opacity-30"}
-          >
-            {fav ? "★" : "☆"}
-          </button>
-          <span title="guardado">🔖</span>
+          {it.videoUrl && (
+            <div className="absolute bottom-3 left-3 rounded-md bg-black/70 px-2 py-1 text-xs text-white">
+              Reproducir vídeo
+            </div>
+          )}
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="h-5 w-5 rounded-full border border-black/10"/>
-          <span>{it.author}</span>
+        <div className="flex flex-1 flex-col px-5 pt-4 pb-4">
+          <h3
+            className="mb-2 text-lg font-bold text-white line-clamp-2 group-hover:text-[#D65A7E] transition-colors"
+            style={titleFont}
+          >
+            {it.title}
+          </h3>
+
+          <p className="text-sm text-gray-300 line-clamp-2">
+            {it.description}
+          </p>
+
+          <div className="mt-4 flex items-center justify-between text-xs text-white/80">
+            <div className="flex items-center gap-2">
+              <span className="h-6 w-6 rounded-full border border-white/20" />
+              <span>{it.author}</span>
+            </div>
+            <button
+              type="button"
+              title="favorito"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (!canFav) return;
+                onToggleFavorite(it.id);
+              }}
+              className={canFav ? "text-base hover:opacity-80" : "cursor-not-allowed opacity-30"}
+            >
+              {fav ? "★" : "☆"}
+            </button>
+          </div>
         </div>
       </div>
     </article>
