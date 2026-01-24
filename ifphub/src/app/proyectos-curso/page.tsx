@@ -44,6 +44,7 @@ export default function Page() {
     const [cursoId, setCursoId] = React.useState<string | null>(null);
     const [proyectos, setProyectos] = React.useState<Proyecto[]>([]);
     const [loading, setLoading] = React.useState(true);
+    const [categoryFilter, setCategoryFilter] = React.useState("");
 
 
     React.useEffect(() => {
@@ -70,6 +71,13 @@ export default function Page() {
       fetchProyectos();
     }, []);
 
+    const normalizedFilter = categoryFilter.trim().toLowerCase();
+    const proyectosFiltrados = proyectos.filter((proyecto) => {
+      if (!normalizedFilter) return true;
+      const categoria = (proyecto.curso_nombre ?? "").toLowerCase();
+      return categoria.includes(normalizedFilter);
+    });
+
   return (
     <SidebarProvider>
       <AppSidebar uid={uid} sig={sig} />
@@ -90,8 +98,8 @@ export default function Page() {
             <div className="absolute inset-0 bg-black/50" />
           </div>
 
-          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12 max-w-7xl w-full px-4">
-            <div className="max-w-3xl w-full space-y-3 md:space-y-4 text-center lg:text-left">
+          <div className="relative z-10 flex flex-col lg:flex-row items-center lg:items-end justify-between gap-8 lg:gap-12 max-w-7xl w-full px-4">
+            <div className="max-w-3xl w-full space-y-4 text-center lg:text-left">
               <h1
                 className={`${baskervville.className} text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white`}
               >
@@ -99,7 +107,7 @@ export default function Page() {
               </h1>
             </div>
 
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 self-center lg:self-end">
               <LiquidButton
                 className={`${montserrat.className}
                     px-8 py-5 md:px-10 md:py-6
@@ -119,6 +127,21 @@ export default function Page() {
           </div>
         </div>
 
+        <div className="px-6 md:px-10 lg:px-16 mt-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex w-full justify-center lg:justify-start">
+              <input
+                type="text"
+                value={categoryFilter}
+                onChange={(event) => setCategoryFilter(event.target.value)}
+                placeholder="Filtrar por categoria"
+                className={`${montserrat.className} w-full max-w-md rounded-full bg-white/90 px-5 py-3 text-sm text-black placeholder-black/60 shadow-md outline-none ring-1 ring-white/40 focus:ring-2 focus:ring-white`}
+                aria-label="Filtrar proyectos por categoria"
+              />
+            </div>
+          </div>
+        </div>
+
         <div className="p-8 md:p-16">
           <div className="max-w-7xl mx-auto space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10 lg:gap-12">
@@ -127,11 +150,15 @@ export default function Page() {
               )}
 
               {!loading && proyectos.length === 0 && (
-                <p className="text-white/80">No hay proyectos todavía</p>
+                <p className="text-white/80">No hay proyectos todavia</p>
+              )}
+
+              {!loading && proyectos.length > 0 && proyectosFiltrados.length === 0 && (
+                <p className="text-white/80">No hay proyectos para esa categoria</p>
               )}
 
               {!loading &&
-                proyectos.map((proyecto) => (
+                proyectosFiltrados.map((proyecto) => (
                   <Link
                     key={proyecto.id_proyecto}
                     href={`/proyectos/${proyecto.id_proyecto}`}
