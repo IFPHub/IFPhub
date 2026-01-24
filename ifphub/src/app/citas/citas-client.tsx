@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { Montserrat } from "next/font/google"
 import { AppSidebar } from "@/app/frontend/compartir-proyectos/app-sidebar"
 import {
   Breadcrumb,
@@ -18,6 +19,8 @@ import {
 } from "@/app/frontend/components/ui/sidebar"
 import Calendar01, { type TimeSlot } from "@/app/frontend/components/calendar-01"
 import { useSearchParams } from "next/navigation"
+
+const montserrat = Montserrat({ subsets: ["latin"] })
 
 type Cita = {
   id_cita: number
@@ -182,16 +185,17 @@ export default function Page() {
         </header>
 
         {/* CONTENIDO */}
-        <main className="flex-1 p-4 md:p-6">
+        <main className="h-[calc(100vh-5rem)] p-4 md:p-6 overflow-auto lg:overflow-hidden">
           {/* CONTENEDOR PRINCIPAL */}
-          <div className="bg-white min-h-[calc(100vh-8rem)] rounded-xl shadow-sm p-4 md:p-10 flex flex-col">
+          <div className="bg-white rounded-xl shadow-sm px-4 pb-4 pt-1 md:px-10 md:pb-10 md:pt-3 flex flex-col h-auto lg:h-full lg:overflow-hidden">
             {/* CONTENEDOR CON FONDO OSCURO */}
-            <div className="bg-[#124d58] rounded-xl p-4 md:p-6 lg:p-10 border border-black shadow-lg w-full min-h-[500px] flex flex-col flex-1">
+            <div className="rounded-xl p-4 md:p-6 lg:p-10 w-full flex flex-col h-full">
               {/* TITULO */}
-              <div className="mb-6 md:mb-8 lg:mb-10 text-center md:text-left">
-                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold font-['Libre_Baskerville'] text-white">
+              <div className="mb-6 md:mb-8 lg:mb-10 mt-2">
+                <h1 className="px-4 md:px-6 lg:px-10 text-center md:text-left text-2xl md:text-3xl lg:text-4xl font-bold font-['Libre_Baskerville'] text-[#123d58]">
                   Citas de Secretaria
                 </h1>
+                <div className="mt-3 h-px w-[calc(100%+4rem)] bg-[#123d58]/40 -ml-8 md:w-[calc(100%+8rem)] md:-ml-16 lg:w-[calc(100%+10rem)] lg:-ml-20" />
               </div>
 
               {/* CONTENIDO RESPONSIVE - GRID */}
@@ -199,7 +203,7 @@ export default function Page() {
                 {/* CALENDARIO */}
                 <div className="order-2 lg:order-1 relative z-30 lg:flex lg:h-full lg:items-stretch lg:justify-start lg:pl-11">
                   <div className="flex justify-center lg:justify-start w-full h-full">
-                    <div className="w-full max-w-[380px] sm:max-w-[420px] lg:max-w-[420px] h-full max-h-[320px] sm:max-h-[380px] md:max-h-[500px] lg:max-h-[500px]">
+                    <div className="w-full max-w-[380px] sm:max-w-[420px] lg:max-w-[420px] h-[320px] sm:h-[380px] md:h-[500px] lg:h-[500px]">
                       <Calendar01
                         date={date}
                         setDate={setDate}
@@ -212,23 +216,25 @@ export default function Page() {
                 </div>
 
                 {/* REGISTRO DE CITAS */}
-                <div className="order-1 lg:order-2 relative z-10">
-                  <div className="bg-white/10 backdrop-blur-sm rounded-xl border border-black shadow-lg p-4 md:p-6 h-full max-h-[320px] sm:max-h-[380px] md:max-h-[500px] lg:max-h-[500px] overflow-y-auto">
-                    <h2 className="text-xl md:text-2xl font-bold font-['Libre_Baskerville'] text-white mb-4 md:mb-6">
-                      Registro de Citas
+                <div className="order-1 lg:order-2 relative z-10 h-[260px] sm:h-[320px] md:h-[420px] lg:h-[420px]">
+                  <div className="bg-white rounded-xl border border-[#123d58]/40 shadow-sm px-4 md:px-6 pb-4 md:pb-6 pt-0 h-full overflow-y-auto">
+                    <h2
+                      className={`${montserrat.className} sticky top-0 z-10 -mx-4 md:-mx-6 mb-4 md:mb-6 px-4 md:px-6 py-3 text-lg md:text-xl font-semibold text-[#123d58] bg-white border-b border-[#123d58]/40`}
+                    >
+                      Registro de citas
                     </h2>
 
                     <div className="flex flex-col gap-3 md:gap-4">
                       {isLoading && (
-                        <p className="text-white/80 text-sm">
+                        <p className="text-[#123d58]/70 text-sm">
                           Cargando citas...
                         </p>
                       )}
                       {!isLoading && error && (
-                        <p className="text-red-200 text-sm">{error}</p>
+                        <p className="text-red-600 text-sm">{error}</p>
                       )}
                       {!isLoading && !error && citasForDay.length === 0 && (
-                        <p className="text-white/80 text-sm">
+                        <p className="text-[#123d58]/70 text-sm">
                           No hay citas para este dia.
                         </p>
                       )}
@@ -239,22 +245,30 @@ export default function Page() {
                           const dateKey = cita.dia_cita ?? selectedDateKey
                           const formattedDate = formatDateKey(dateKey)
                           const dateTime = toDateTime(dateKey, timeValue)
-                          const status =
+                          const isPast =
                             dateTime && dateTime.getTime() < now.getTime()
-                              ? "Realizada"
-                              : "Pendiente"
+                          const status = isPast ? "Realizada" : "Pendiente"
 
                           return (
                             <div
                               key={cita.id_cita}
-                              className="p-3 md:p-4 bg-white/20 rounded-lg shadow-sm hover:bg-white/30 transition-colors duration-200"
+                              className="p-3 md:p-4 bg-white rounded-lg border border-black/10 shadow-sm hover:bg-black/5 transition-colors duration-200"
                             >
-                              <p className="font-semibold text-white text-sm md:text-base">
+                              <p className="font-semibold text-[#123d58] text-sm md:text-base">
                                 {formattedDate}
                                 {timeValue ? ` - ${timeValue}` : ""}
                               </p>
-                              <p className="text-white/90 text-sm">
-                                Estado: {status}
+                              <p className="text-sm text-[#123d58]/70">
+                                Estado:{" "}
+                                <span
+                                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${
+                                    isPast
+                                      ? "bg-[#123d58]/10 text-[#123d58]"
+                                      : "bg-[#F7D0D7] text-[#7A2E43]"
+                                  }`}
+                                >
+                                  {status}
+                                </span>
                               </p>
                             </div>
                           )
