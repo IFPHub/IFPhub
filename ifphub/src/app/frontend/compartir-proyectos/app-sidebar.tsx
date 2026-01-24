@@ -121,7 +121,6 @@ export function AppSidebar({
     return {
       ...item,
       isActive,
-      url: `${item.url}${query}`,
     };
   });
 
