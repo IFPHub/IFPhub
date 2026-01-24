@@ -40,7 +40,7 @@ export function Hero_quedadas({ onCreateEvent }: HeroProps) {
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, ease: "easeOut" }}
-                    className="text-4xl md:text-6xl font-bold text-white leading-tight drop-shadow-lg"
+                    className="text-4xl md:text-6xl font-normal text-white leading-tight drop-shadow-lg font-['Libre_Baskerville']"
                 >
                     Conecta con tus compañeros <br />
                     más allá de las clases.
@@ -54,7 +54,7 @@ export function Hero_quedadas({ onCreateEvent }: HeroProps) {
                     <CreateEventModal onCreateEvent={onCreateEvent}>
                         <Button
                             size="lg"
-                            className="bg-[#D65A7E] hover:bg-[#b54666] text-white font-bold text-lg px-8 py-6 rounded-md shadow-[0_0_15px_rgba(214,90,126,0.5)] transition-all hover:scale-105"
+                            className="border border-[#D65A7E]/70 bg-[#D65A7E]/15 text-white font-bold text-lg px-8 py-6 rounded-md backdrop-blur-sm transition-all hover:bg-[#D65A7E]/25 hover:border-[#D65A7E] hover:text-white/95 hover:scale-[1.01]"
                         >
                             Crear quedada
                         </Button>

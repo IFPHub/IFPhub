@@ -95,7 +95,7 @@ function MiniCalendar({
     a.getDate() === b.getDate();
 
   return (
-    <div className="w-[260px] rounded-lg border border-black/10 bg-[#D46D85] p-3 text-sm shadow-lg">
+    <div className="w-[260px] rounded-lg border border-black/20 bg-white p-3 text-sm text-black shadow-lg">
       <div className="mb-2 flex items-center justify-between">
         <button
           onClick={() => {
@@ -111,10 +111,10 @@ function MiniCalendar({
         </button>
 
         <div className="flex items-center gap-2 font-medium">
-          <span className="rounded-md border border-black/10 px-2 py-0.5">
+          <span className="rounded-md border border-black/20 px-2 py-0.5">
             {MONTHS[month]}
           </span>
-          <span className="rounded-md border border-black/10 px-2 py-0.5">
+          <span className="rounded-md border border-black/20 px-2 py-0.5">
             {year}
           </span>
         </div>
@@ -1142,9 +1142,9 @@ export function Board() {
               onClick={() =>
                 setOpenFilter(openFilter === "fecha" ? null : "fecha")
               }
-              className="flex h-9 w-36 items-center justify-between rounded-md border border-black/10 bg-gradient-to-b from-white to-[var(--soft)] px-3 text-sm text-zinc-800 hover:brightness-95"
+              className="flex h-9 w-36 items-center justify-between rounded-md border border-black/20 bg-white px-3 text-sm text-black transition hover:bg-black/[.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20"
             >
-              <span className="text-white">
+              <span className="text-black">
                 {selectedDate ? selectedDate.toLocaleDateString() : "Fecha"}
               </span>
               <span className="text-xs opacity-60">▾</span>
@@ -1169,24 +1169,24 @@ export function Board() {
               onClick={() =>
                 setOpenFilter(openFilter === "curso" ? null : "curso")
               }
-              className="flex h-9 w-36 items-center justify-between rounded-md border border-black/10 bg-gradient-to-b from-white to-[var(--soft)] px-3 text-sm text-zinc-800 hover:brightness-95"
+              className="flex h-9 w-60 items-center justify-between rounded-md border border-black/20 bg-white px-3 text-sm text-black transition hover:bg-black/[.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20"
             >
-              <span className="text-white">{selectedCourse ?? "Curso"}</span>
+              <span className="text-black">{selectedCourse ?? "Curso"}</span>
               <span className="text-xs opacity-60">▾</span>
             </button>
 
             {openFilter === "curso" && (
-              <div className="absolute left-0 top-11 z-50 w-56 rounded-lg border border-black/10 bg-white p-1 text-sm shadow-lg">
+              <div className="absolute left-0 top-11 z-50 w-80 max-h-32 overflow-auto rounded-lg border border-black/10 bg-white p-1 text-sm shadow-lg">
                 {courses.map((c) => (
                   <button
-                    key={c}
+                    key={c.id_curso}
                     onClick={() => {
-                      setSelectedCourse(c);
+                      setSelectedCourse(c.nombre);
                       setOpenFilter(null);
                     }}
                     className="w-full rounded-md px-3 py-2 text-left hover:bg-black/[.04]"
                   >
-                    {c}
+                    {c.nombre}
                   </button>
                 ))}
                 <button
@@ -1208,9 +1208,9 @@ export function Board() {
               onClick={() =>
                 setOpenFilter(openFilter === "profesor" ? null : "profesor")
               }
-              className="flex h-9 w-36 items-center justify-between rounded-md border border-black/10 bg-gradient-to-b from-white to-[var(--soft)] px-3 text-sm text-zinc-800 hover:brightness-95"
+              className="flex h-9 w-36 items-center justify-between rounded-md border border-black/20 bg-white px-3 text-sm text-black transition hover:bg-black/[.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20"
             >
-              <span className="text-white">
+              <span className="text-black">
                 {selectedProfessor ?? "Profesor"}
               </span>
               <span className="text-xs opacity-60">▾</span>
@@ -1234,7 +1234,7 @@ export function Board() {
           {/* CREAR */}
           <button
             onClick={openCreateModal}
-            className="flex h-9 w-36 items-center justify-between rounded-md border border-black/10 bg-gradient-to-b from-white to-[var(--soft)] px-3 text-sm text-white hover:brightness-95"
+            className="flex h-9 w-36 items-center justify-between rounded-md border border-[#124D58] bg-[#124D58] px-3 text-sm text-white transition hover:bg-[#0f3f47] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#124D58]/30"
           >
             + Crear
           </button>
@@ -1248,14 +1248,14 @@ export function Board() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Buscador"
-              className="h-10 w-full rounded-md border border-black/10 bg-[#124D58] pl-9 pr-3 text-sm text-zinc-100 placeholder:text-zinc-200"
+              className="h-10 w-full rounded-md border border-black/20 bg-white pl-9 pr-3 text-sm text-black placeholder:text-black/40 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20"
             />
           </div>
 
           <div ref={orderRef} className="relative">
             <button
               onClick={() => setOpenOrder((v) => !v)}
-              className="h-10 w-32 shrink-0 rounded-md border border-black/10 bg-[#124D58] text-sm text-zinc-100 hover:bg-black/[.04]"
+              className="h-10 w-32 shrink-0 rounded-md border border-black/20 bg-white text-sm text-black transition hover:bg-black/[.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20"
             >
               Ordenar por &nbsp;›
             </button>
@@ -1311,10 +1311,10 @@ export function Board() {
           <button
               key={tag}
               onClick={() => setActiveTag(active ? null : tag)}
-              className={`h-8 rounded-md border px-3 text-sm text-black bg-gradient-to-b from-white to-[var(--soft)] transition hover:brightness-95 ${
+              className={`h-8 rounded-md border px-3 text-sm transition hover:bg-black/[.04] ${
                 active
-                  ? "border-black/30"
-                  : "border-black/10"
+                  ? "border-[#124D58] bg-[#124D58] text-white"
+                  : "border-black/20 bg-white text-black"
               }`}
             >
               {tag}

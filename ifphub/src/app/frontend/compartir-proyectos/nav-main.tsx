@@ -38,7 +38,10 @@ export function NavMain({
       <SidebarGroupLabel>Menu</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => {
-          const url = `${item.url}?uid=${uid}&sig=${sig}`       
+          const url =
+            uid && sig && !item.url.includes("?")
+              ? `${item.url}?uid=${uid}&sig=${sig}`
+              : item.url
           const isFP = item.title === "FP";
 
           return (
@@ -47,6 +50,7 @@ export function NavMain({
                 <SidebarMenuButton
                   asChild={!isFP}
                   tooltip={item.title}
+                  isActive={item.isActive}
                 >
                   {isFP ? (
                     <button

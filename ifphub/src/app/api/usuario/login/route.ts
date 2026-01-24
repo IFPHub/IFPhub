@@ -31,12 +31,34 @@ export async function POST(req: Request) {
 
   const uid = user.id_usuario;
   const sig = encodeUserId(uid);
+  let profile = {
+    nombre: user.nombre ?? "",
+    apellido: user.apellido ?? "",
+    mail: user.mail ?? user.email ?? "",
+  };
+
+  const { data: perfil, error: perfilError } = await supabase
+    .from("usuario")
+    .select("nombre, apellido, mail")
+    .eq("id_usuario", uid)
+    .maybeSingle();
+
+  if (!perfilError && perfil) {
+    profile = {
+      nombre: perfil.nombre ?? profile.nombre,
+      apellido: perfil.apellido ?? profile.apellido,
+      mail: perfil.mail ?? profile.mail,
+    };
+  }
 
   return NextResponse.json({
     success: true,
     usuario: {
       uid,
-      sig
+      sig,
+      nombre: profile.nombre,
+      apellido: profile.apellido,
+      mail: profile.mail
     }
   });
 }

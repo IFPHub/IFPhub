@@ -22,7 +22,7 @@ export function HowItWorks() {
     return (
         <section className="py-16 bg-white">
             <div className="max-w-7xl mx-auto px-4">
-                <h2 className="text-4xl font-bold text-center mb-12 text-[#1a1a1a] font-serif">
+                <h2 className="text-4xl font-bold text-center mb-12 text-[#123d58] font-serif">
                     Dinámica de las quedadas
                 </h2>
 

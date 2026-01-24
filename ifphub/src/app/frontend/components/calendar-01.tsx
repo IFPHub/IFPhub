@@ -37,25 +37,34 @@ export default function Calendar01({
   const [appointmentDesc, setAppointmentDesc] = React.useState("")
   const [error, setError] = React.useState<string | null>(null)
   const [isSaving, setIsSaving] = React.useState(false)
+  const [now, setNow] = React.useState(() => new Date())
 
   const occupiedSet = React.useMemo(
     () => new Set(occupiedSlots),
     [occupiedSlots]
   )
 
-  const isSlotInPast = React.useCallback((day: Date, time: string) => {
-    const [hours, minutes] = time.split(":").map(Number)
-    const slotDate = new Date(
-      day.getFullYear(),
-      day.getMonth(),
-      day.getDate(),
-      hours,
-      minutes,
-      0,
-      0
-    )
-    return slotDate.getTime() < Date.now()
+  React.useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 60000)
+    return () => clearInterval(timer)
   }, [])
+
+  const isSlotInPast = React.useCallback(
+    (day: Date, time: string) => {
+      const [hours, minutes] = time.split(":").map(Number)
+      const slotDate = new Date(
+        day.getFullYear(),
+        day.getMonth(),
+        day.getDate(),
+        hours,
+        minutes,
+        0,
+        0
+      )
+      return slotDate.getTime() < now.getTime()
+    },
+    [now]
+  )
 
   const handleSelect = (day: Date | undefined) => {
     if (!day) return
@@ -74,7 +83,7 @@ export default function Calendar01({
   }
 
   const handleSelectHour = (time: string, available: boolean) => {
-    if (!available) return
+    if (!available || !selectedDay || isSlotInPast(selectedDay, time)) return
     setSelectedTime(time)
     setIsHourPopupOpen(false)
     setIsAppointmentPopupOpen(true)
@@ -116,10 +125,10 @@ export default function Calendar01({
     setSelectedTime(null)
   }
 
-  const calendarClass = "w-full h-full"
+  const calendarClass = "w-full"
 
   return (
-    <div className="relative rounded-lg border shadow-sm bg-white p-4 h-full min-h-[21rem] flex flex-col">
+    <div className="relative rounded-lg border shadow-sm bg-white p-4 h-auto min-h-[21rem] flex flex-col">
       <Calendar
         mode="single"
         required={false}
@@ -137,14 +146,14 @@ export default function Calendar01({
 
       {/* POPUP DE HORAS */}
       {isHourPopupOpen && selectedDay && (
-        <div className="absolute top-0 left-0 md:left-auto md:right-0 lg:top-0 lg:left-full lg:ml-4 w-72 max-h-80 bg-[#124d58] text-white rounded-xl border border-black shadow-xl p-4 overflow-y-auto scrollbar-hide z-50">
-          <div className="flex justify-between items-center mb-3">
+        <div className="absolute top-0 left-0 md:left-auto md:right-0 lg:top-0 lg:left-full lg:ml-4 w-72 max-h-80 bg-white text-[#123d58] rounded-xl border border-black/20 shadow-lg px-4 pb-4 pt-0 overflow-y-auto scrollbar-hide z-50">
+          <div className="sticky top-0 z-10 -mx-4 mb-3 flex items-center justify-between border-b border-[#123d58]/40 bg-white px-4 py-3">
             <h2 className="font-semibold text-lg">
               Horas para {selectedDay.toLocaleDateString()}
             </h2>
             <button
               onClick={() => setIsHourPopupOpen(false)}
-              className="text-white hover:text-gray-300"
+              className="text-[#123d58]/70 hover:text-[#123d58]"
             >
               x
             </button>
@@ -165,8 +174,10 @@ export default function Calendar01({
                   key={index}
                   className={`p-2 rounded transition-colors ${
                     isAvailable
-                      ? "bg-green-200 hover:bg-green-300 text-black cursor-pointer"
-                      : "bg-gray-300 text-gray-600 cursor-not-allowed"
+                      ? "bg-white hover:bg-black/5 text-[#123d58] cursor-pointer border border-black/10"
+                      : isOccupied
+                        ? "bg-[#F7D0D7] text-[#7A2E43] cursor-not-allowed border border-black/20"
+                        : "bg-black/5 text-[#123d58]/40 cursor-not-allowed border border-black/5"
                   }`}
                   onClick={() => handleSelectHour(slot.start, isAvailable)}
                 >
@@ -181,33 +192,33 @@ export default function Calendar01({
 
       {/* POPUP DE REGISTRO DE CITA */}
       {isAppointmentPopupOpen && selectedDay && selectedTime && (
-        <div className="absolute top-4 right-[calc(100%+1rem)] w-64 bg-[#124d58] rounded-xl border border-black shadow-xl p-4 z-50">
-          <h2 className="font-semibold text-lg mb-2 text-white">
+        <div className="absolute top-4 left-0 md:left-auto md:right-0 lg:top-4 lg:left-full lg:ml-4 w-64 bg-white rounded-xl border border-black/20 shadow-lg p-4 z-50 text-[#123d58]">
+          <h2 className="font-semibold text-lg mb-2 text-[#123d58]">
             Nueva cita - {selectedDay.toLocaleDateString()} {selectedTime}
           </h2>
           <input
             type="text"
             placeholder="Titulo de la cita"
-            className="w-full p-2 border rounded mb-2 bg-white text-black"
+            className="w-full p-2 border border-black/20 rounded mb-2 bg-white text-[#123d58] placeholder:text-[#123d58]/50"
             value={appointmentTitle}
             onChange={(e) => setAppointmentTitle(e.target.value)}
           />
           <textarea
             placeholder="Descripcion"
-            className="w-full p-2 border rounded mb-2 bg-white text-black"
+            className="w-full p-2 border border-black/20 rounded mb-2 bg-white text-[#123d58] placeholder:text-[#123d58]/50"
             value={appointmentDesc}
             onChange={(e) => setAppointmentDesc(e.target.value)}
           />
-          {error && <p className="text-sm text-red-200 mb-2">{error}</p>}
+          {error && <p className="text-sm text-red-600 mb-2">{error}</p>}
           <button
-            className="w-full px-4 py-2 bg-[#F7D0D7] text-black rounded hover:bg-[#d46d85] mb-2 disabled:opacity-70"
+            className="w-full px-4 py-2 bg-[#123d58] text-white border border-[#123d58] rounded hover:bg-[#123d58]/90 mb-2 disabled:opacity-70"
             onClick={handleSaveAppointment}
             disabled={isSaving}
           >
             {isSaving ? "Enviando..." : "Enviar"}
           </button>
           <button
-            className="w-full px-4 py-2 bg-[#F7D0D7] text-black rounded hover:bg-[#d46d85]"
+            className="w-full px-4 py-2 bg-white text-[#123d58] border border-[#123d58]/60 rounded hover:bg-[#123d58]/10"
             onClick={() => setIsAppointmentPopupOpen(false)}
           >
             Cancelar

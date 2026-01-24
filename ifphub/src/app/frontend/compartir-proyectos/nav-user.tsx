@@ -31,9 +31,7 @@ import {
 } from "@/app/frontend/components/ui/sidebar"
 
 export function NavUser({
-  user,
-  uid,
-  sig
+  user
 }: {
   user: { name: string; email: string; avatar: string },
   uid?: string | null,
@@ -62,7 +60,7 @@ export function NavUser({
           </DropdownMenuTrigger>
 
           <DropdownMenuContent
-            className="min-w-56 rounded-lg"
+            className="min-w-56 rounded-lg bg-white text-slate-900 border border-slate-200 shadow-xl"
             side={isMobile ? "bottom" : "right"}
             align="end"
             sideOffset={4}
@@ -94,7 +92,7 @@ export function NavUser({
             <DropdownMenuSeparator />
 
             <DropdownMenuItem asChild>
-              <a href={`/logout?uid=${uid}&sig=${sig}`}>
+              <a href="/">
                 <LogOut /> Log out
               </a>
             </DropdownMenuItem>

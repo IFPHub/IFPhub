@@ -22,10 +22,10 @@ export function CategoriesCarousel({ onSelectCategory, selectedCategory }: Categ
 
     const categories = [
         "Deportes",
-        "Educacion",
+        "Educación",
         "Ocio",
         "Idiomas",
-        "Tecnologia",
+        "Tecnología",
         "Arte",
         "Música",
         "Cocina"
@@ -46,7 +46,7 @@ export function CategoriesCarousel({ onSelectCategory, selectedCategory }: Categ
     }, { scope: containerRef });
 
     return (
-        <div ref={containerRef} className="w-full bg-[#124d58] py-8 border-y border-[#1a6b7a]">
+        <div ref={containerRef} className="w-full bg-transparent py-8 border-y border-[#123d58]">
             <div className="max-w-5xl mx-auto px-12 relative">
                 <Carousel
                     opts={{
@@ -69,8 +69,8 @@ export function CategoriesCarousel({ onSelectCategory, selectedCategory }: Categ
                                         className={cn(
                                             "text-xl font-bold transition-all duration-300 px-4 py-2 rounded-full",
                                             selectedCategory === category
-                                                ? "bg-white text-[#124d58] scale-110 shadow-lg"
-                                                : "text-white/80 hover:text-white hover:bg-white/10"
+                                                ? "bg-white text-[#123d58] scale-110 shadow-lg"
+                                                : "text-[#123d58] hover:text-[#123d58] hover:bg-[#123d58]/10"
                                         )}
                                     >
                                         {category}
@@ -79,8 +79,8 @@ export function CategoriesCarousel({ onSelectCategory, selectedCategory }: Categ
                             </CarouselItem>
                         ))}
                     </CarouselContent>
-                    <CarouselPrevious className="bg-white/10 border-none hover:bg-white/20 text-white hover:text-white -left-10" />
-                    <CarouselNext className="bg-white/10 border-none hover:bg-white/20 text-white hover:text-white -right-10" />
+                    <CarouselPrevious className="bg-[#123d58]/10 border border-[#123d58]/30 hover:bg-[#123d58]/20 text-[#123d58] hover:text-[#123d58] -left-10" />
+                    <CarouselNext className="bg-[#123d58]/10 border border-[#123d58]/30 hover:bg-[#123d58]/20 text-[#123d58] hover:text-[#123d58] -right-10" />
                 </Carousel>
             </div>
         </div>

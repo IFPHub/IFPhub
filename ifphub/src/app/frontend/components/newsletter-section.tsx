@@ -45,7 +45,7 @@ export function NewsletterSection() {
     }
 
     return (
-        <section className="py-20 bg-[#124d58] text-white relative overflow-hidden">
+        <section className="py-20 bg-[#123d58] text-white relative overflow-hidden">
             {/* Background Pattern */}
             <div className="absolute inset-0 opacity-10">
                 <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-white blur-3xl" />
