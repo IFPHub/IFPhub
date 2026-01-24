@@ -62,25 +62,27 @@ export default async function DetailPage(props: { params: Promise<{ id: string }
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_320px]">
         <article className="bg-card rounded-[14px] p-8 shadow-md-custom">
-          <h1
-            className={`${baskervville.className} mt-2 mb-4 text-2xl md:text-3xl font-bold leading-tight`}
-          >
-            {noticia.titulo}
-          </h1>
+          <div className="pl-4 pr-4 md:pl-8 md:pr-8 lg:pl-12 lg:pr-12">
+            <h1
+              className={`${baskervville.className} mt-2 mb-4 text-2xl md:text-3xl font-bold leading-tight`}
+            >
+              {noticia.titulo}
+            </h1>
 
-          <img
-            src={imagen}
-            alt={noticia.titulo}
-            className="h-80 w-full rounded-[14px] object-cover mb-6"
-          />
+            <img
+              src={imagen}
+              alt={noticia.titulo}
+              className="h-80 w-full rounded-[14px] object-cover mb-6"
+            />
 
-          <p className="text-gray-700">{firstParagraph}</p>
-          {secondParagraph && (
-            <p className="mt-4 text-gray-700">{secondParagraph}</p>
-          )}
-          {thirdParagraph && (
-            <p className="mt-4 text-gray-700">{thirdParagraph}</p>
-          )}
+            <p className="text-gray-700">{firstParagraph}</p>
+            {secondParagraph && (
+              <p className="mt-4 text-gray-700">{secondParagraph}</p>
+            )}
+            {thirdParagraph && (
+              <p className="mt-4 text-gray-700">{thirdParagraph}</p>
+            )}
+          </div>
 
           <footer className="mt-10 text-center text-sm text-muted border-t pt-4">
             © 2025 Portal Noticias — Diseño Pro++
