@@ -66,16 +66,16 @@ function AceptarDialog({ titulo }: { titulo: string }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="mt-2 w-full bg-[#D46D85] hover:bg-[#D46D85] text-white cursor-pointer font-family: var(--font-montserrat);">
-          Aceptar
+        <Button className="mt-2 w-full bg-[#D46D85] hover:bg-[#D46D85] text-white cursor-pointer border border-[#124d58]/30 font-family: var(--font-montserrat);">
+          Solicitar
         </Button>
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="font-title font-bold font-title text-[#124d58]">Aceptar oferta</DialogTitle>
+          <DialogTitle className="font-title font-bold font-title text-[#124d58]">Solicitar oferta</DialogTitle>
           <DialogDescription>
-            Introduce tu nombre y correo para aceptar la oferta de{" "}
+            Introduce tu nombre y correo para solicitar la oferta de{" "}
             <strong>{titulo}.</strong>
           </DialogDescription>
         </DialogHeader>
@@ -109,7 +109,7 @@ function AceptarDialog({ titulo }: { titulo: string }) {
             <Button variant="outline" className="cursor-pointer">Cancelar</Button>
           </DialogClose>
           <DialogClose asChild>
-            <Button className=" bg-[#D46D85] hover:bg-[#D46D85] cursor-pointer">Aceptar oferta</Button>
+            <Button className=" bg-[#D46D85] hover:bg-[#D46D85] cursor-pointer">Solicitar oferta</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>
