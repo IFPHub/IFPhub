@@ -2,7 +2,7 @@ import { Facebook, Instagram, Twitter, Linkedin, Heart } from "lucide-react";
 
 export function Footer() {
     return (
-        <footer className="bg-white text-[#124d58] py-8 mt-auto border-t border-gray-100">
+        <footer className="bg-white text-[#123d58] py-8 mt-auto border-t border-gray-100">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center gap-6">
 
                 {/* Navigation Links */}

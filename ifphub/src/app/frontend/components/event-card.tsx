@@ -30,7 +30,7 @@ export function EventCard({ title, description, image, participants, date, time,
         >
             <Card
                 onClick={onClick}
-                className="border border-[#124d58] bg-[#124d58] overflow-hidden shadow-xl group cursor-pointer h-full flex flex-col relative"
+                className="border border-[#123d58] bg-[#123d58] overflow-hidden shadow-xl group cursor-pointer h-full flex flex-col relative p-0"
             >
                 {/* Image */}
                 <div className="w-full h-[220px] overflow-hidden relative">
@@ -41,7 +41,7 @@ export function EventCard({ title, description, image, participants, date, time,
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#124d58] to-transparent opacity-60" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#123d58] to-transparent opacity-60" />
                     <Badge className="absolute top-4 right-4 bg-[#D65A7E] hover:bg-[#b54666] text-white border-none shadow-lg">
                         {category}
                     </Badge>

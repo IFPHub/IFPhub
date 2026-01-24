@@ -181,12 +181,17 @@ export default function Page() {
             </div>
           )}
 
-          <div className="p-5 mt-8 container mx-auto">
+          <div className="p-5 mt-6 container mx-auto">
             <motion.h1
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-3xl font-bold mb-8 flex justify-center text-center"
+              className="text-4xl font-bold mb-10 text-left font-['Libre_Baskerville']"
             >
+              <span
+                className="text-[#D65A7E] mr-2 [text-shadow:0_0_0_#2b2b2b]"
+              >
+                ★
+              </span>
               {searchQuery
                 ? `Resultados para "${searchQuery}"`
                 : selectedCategory

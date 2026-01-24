@@ -54,7 +54,7 @@ export function Hero_quedadas({ onCreateEvent }: HeroProps) {
                     <CreateEventModal onCreateEvent={onCreateEvent}>
                         <Button
                             size="lg"
-                            className="bg-[#D65A7E] hover:bg-[#b54666] text-white font-bold text-lg px-8 py-6 rounded-md transition-all hover:scale-[1.01]"
+                            className="border border-[#D65A7E]/70 bg-[#D65A7E]/15 text-white font-bold text-lg px-8 py-6 rounded-md backdrop-blur-sm transition-all hover:bg-[#D65A7E]/25 hover:border-[#D65A7E] hover:text-white/95 hover:scale-[1.01]"
                         >
                             Crear quedada
                         </Button>

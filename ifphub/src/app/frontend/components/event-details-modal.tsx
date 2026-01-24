@@ -110,8 +110,8 @@ export function EventDetailsModal({
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="flex items-start gap-3">
-                            <div className="p-2 bg-[#124d58]/10 rounded-lg">
-                                <Calendar className="w-5 h-5 text-[#124d58]" />
+                            <div className="p-2 bg-[#123d58]/10 rounded-lg">
+                                <Calendar className="w-5 h-5 text-[#123d58]" />
                             </div>
                             <div>
                                 <p className="text-xs text-gray-500 uppercase font-semibold">Fecha</p>
@@ -120,8 +120,8 @@ export function EventDetailsModal({
                         </div>
 
                         <div className="flex items-start gap-3">
-                            <div className="p-2 bg-[#124d58]/10 rounded-lg">
-                                <Clock className="w-5 h-5 text-[#124d58]" />
+                            <div className="p-2 bg-[#123d58]/10 rounded-lg">
+                                <Clock className="w-5 h-5 text-[#123d58]" />
                             </div>
                             <div>
                                 <p className="text-xs text-gray-500 uppercase font-semibold">Hora</p>
@@ -155,7 +155,7 @@ export function EventDetailsModal({
                                 </div>
                                 <Button
                                     variant="outline"
-                                    className="w-full text-[#124d58] border-[#124d58] hover:bg-[#124d58]/5"
+                                    className="w-full text-[#123d58] border-[#123d58] hover:bg-[#123d58]/5"
                                     onClick={() => window.open(googleMapsUrl, "_blank")}
                                 >
                                     Cómo llegar (Google Maps)

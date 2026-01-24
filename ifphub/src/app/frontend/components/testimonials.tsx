@@ -26,7 +26,7 @@ export function Testimonials() {
             role: "Marketing y Publicidad 1",
             quote: "Los partidos de los viernes son sagrados. Es la mejor forma de conocer gente de otros grados.",
             avatar: "CR",
-            color: "#124d58"
+            color: "#123d58"
         },
         {
             name: "Lucía Méndez",
@@ -40,7 +40,7 @@ export function Testimonials() {
             role: "DAW 2",
             quote: "El hackathon fue increíble. Aprendí más en una noche que en todo el semestre.",
             avatar: "MT",
-            color: "#124d58"
+            color: "#123d58"
         },
         {
             name: "Sara Jiménez",
@@ -54,7 +54,7 @@ export function Testimonials() {
             role: "Marketing y Publicidad 2",
             quote: "Conocí a mi mejor amigo en una quedada de fútbol. Ahora organizamos eventos juntos.",
             avatar: "DL",
-            color: "#124d58"
+            color: "#123d58"
         }
     ];
 
@@ -108,7 +108,7 @@ export function Testimonials() {
     return (
         <section ref={containerRef} className="py-20 bg-gradient-to-b from-white to-gray-50 overflow-hidden">
             <div className="max-w-7xl mx-auto px-4">
-                <h2 className="text-4xl font-bold text-center mb-4 text-[#124d58] font-serif">
+                <h2 className="text-4xl font-bold text-center mb-4 text-[#123d58] font-serif">
                     Experiencias de compañeros
                 </h2>
                 <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
