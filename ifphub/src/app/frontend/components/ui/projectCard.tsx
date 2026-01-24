@@ -45,7 +45,7 @@ export function ProjectCard({
       : "Proyecto";
 
   return (
-    <Card className="border border-[#124d58] bg-[#124d58] overflow-hidden shadow-xl group h-full flex flex-col relative">
+    <Card className="border border-[#124d58] bg-[#124d58] overflow-hidden shadow-xl group h-full flex flex-col relative py-0">
       <div className="w-full h-[220px] overflow-hidden relative">
         <Image
           src={coverImage}
@@ -61,7 +61,7 @@ export function ProjectCard({
         </Badge>
       </div>
 
-      <div className="p-6 flex flex-col flex-grow">
+      <div className="pt-6 px-6 pb-3 flex flex-col flex-grow">
         <h3 className="text-xl font-bold text-white mb-2 line-clamp-1 group-hover:text-[#D65A7E] transition-colors">
           {title}
         </h3>
