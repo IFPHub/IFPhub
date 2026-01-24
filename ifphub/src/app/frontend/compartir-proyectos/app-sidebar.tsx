@@ -30,9 +30,10 @@ const data = {
   navMain: [
     { title: "Home", url: "/noticias", icon: Folder },
     { title: "Proyectos", url: "/proyectos-curso", icon: Folder },
+    { title: "Ofertas", url: "/ofertas", icon: Folder },
     { title: "Reuniones", url: "/reuniones", icon: Calendar },
     { title: "Citas", url: "/citas", icon: Calendar },
-    { title: "Quedadas", url: "/quedadas", icon: Calendar },
+    { title: "Quedadas", url: "/quedadas", icon: Calendar }
   ],
   navSecondary: [],
 };
