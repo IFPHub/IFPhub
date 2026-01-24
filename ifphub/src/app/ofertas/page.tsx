@@ -124,7 +124,7 @@ function NuevaOfertaDialog({ onSubmit }: { onSubmit: (oficio: any) => void }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-[#D46D85] hover:bg-[#D46D85] text-white cursor-pointer font-family: var(--font-montserrat);">
+        <Button className="border border-[#D65A7E]/70 bg-[#D65A7E]/30 text-white font-medium text-lg px-8 py-6 rounded-md backdrop-blur-sm transition-all hover:bg-[#D65A7E]/40 hover:border-[#D65A7E] hover:text-white/95 hover:scale-[1.01] cursor-pointer font-family: var(--font-montserrat);">
           Crear oferta
         </Button>
       </DialogTrigger>
@@ -241,8 +241,8 @@ export default function LoginPage() {
             </div>
 
             {/* contenido hero */}
-            <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12 max-w-7xl w-full px-4">
-                <div className="max-w-3xl w-full space-y-3 md:space-y-4 text-center lg:text-left">
+            <div className="relative z-10 flex flex-col items-center justify-center gap-6 max-w-7xl w-full px-4">
+                <div className="max-w-3xl w-full space-y-3 md:space-y-4 text-center">
                 <h1
                     className={`${baskervville.className} text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white`}
                 >
@@ -250,7 +250,7 @@ export default function LoginPage() {
                 </h1>
                 </div>
 
-                <div className="flex-shrink-0">
+                <div className="flex-shrink-0 mt-6">
                 <NuevaOfertaDialog onSubmit={handleNuevaOferta} />
                 </div>
             </div>
@@ -259,10 +259,6 @@ export default function LoginPage() {
             {/* CONTENIDO */}
             <div className="p-8 md:p-16">
             <div className="max-w-7xl mx-auto space-y-8">
-
-                <h2 className="text-2xl font-bold font-title text-[#124d58]">
-                Ofertas actuales
-                </h2>
 
                 {/* GRID */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10 lg:gap-12">

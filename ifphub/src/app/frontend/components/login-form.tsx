@@ -88,7 +88,7 @@ export function LoginForm({ className, onSubmit }: LoginFormProps) {
               />
             </Field>
             <Field className="flex-1">
-              <FieldLabel htmlFor="precio">Precio</FieldLabel>
+              <FieldLabel htmlFor="precio">Salario/h</FieldLabel>
               <Input
                 id="precio"
                 value={precio}
