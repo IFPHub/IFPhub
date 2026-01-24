@@ -97,12 +97,11 @@ export function ProjectCard({
 
           <div className="flex items-center justify-between pt-4 border-t border-[#1a6b7a]">
             <div className="flex items-center gap-2 text-sm text-gray-300" />
-            <a
-              href=""
+            <span
               className="flex items-center gap-1 text-[#D65A7E] text-sm font-medium group-hover:translate-x-1 transition-transform"
             >
               Ver proyecto <ArrowRight className="w-4 h-4" />
-            </a>
+            </span>
           </div>
         </div>
       </div>

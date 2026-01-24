@@ -55,7 +55,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   return (
     <SidebarProvider>
-      <AppSidebar uid={uid} sig={sig} />
+      {uid && sig && <AppSidebar uid={uid} sig={sig} />}
 
       <SidebarInset>
         {/* HEADER */}

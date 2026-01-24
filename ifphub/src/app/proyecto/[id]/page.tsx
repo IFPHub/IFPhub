@@ -37,19 +37,21 @@ type Proyecto = {
   fecha: string | null;
   imagen: string | null;
   id_usuario: number | null;
+  nombre_usuario: string | null;
 };
 
 export default async function Page({
   params,
   searchParams,
 }: {
-  params: any;
-  searchParams: any;
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ uid?: string; sig?: string }>;
 }) {
+  const { id } = await params;
+  const { uid = null, sig = null } = await searchParams;
+
+  const proyectoId = Number(id);
   const supabase = createClient();
-  const proyectoId = Number(params?.id);
-  const uid = searchParams?.uid ?? null;
-  const sig = searchParams?.sig ?? null;
 
   // Obtener proyecto
   const { data: proyectoData, error } = await supabase.rpc(
@@ -63,7 +65,7 @@ export default async function Page({
   }
 
   const proyecto: Proyecto = proyectoData[0];
-  const imagen = "/imagenes/placeholder.webp";
+  const imagen = "/imagenes/sistema operativo.jpg";
 
   // Obtener comentarios del proyecto
   const { data: comentarios, error: errorComentarios } =
@@ -125,7 +127,7 @@ export default async function Page({
 
                 <div className="mt-4">
                   <span className="text-sm text-red-400 font-semibold">
-                    Usuario {proyecto.id_usuario ?? "Desconocido"}
+                    {proyecto.nombre_usuario ?? "Desconocido"}
                   </span>
 
                   <h3 className="text-xl font-bold mt-1">
@@ -199,8 +201,8 @@ export default async function Page({
                 >
                   <input type="hidden" name="id_proyecto" value={proyectoId} />
                   <input type="hidden" name="id_usuario" value={uid || ""} />
-                  <input type="hidden" name="uid" value={uid} />
-                  <input type="hidden" name="sig" value={sig} />
+                  <input type="hidden" name="uid" value={uid ?? ""} />
+                  <input type="hidden" name="sig" value={sig ?? ""} />
 
                   <input
                     type="text"

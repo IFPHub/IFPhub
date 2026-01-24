@@ -218,7 +218,7 @@ export default function LoginPage() {
 
   return (
     <SidebarProvider>
-        <AppSidebar uid={uid} sig={sig} />
+        {uid && sig && <AppSidebar uid={uid} sig={sig} />}
         <SidebarInset>
 
             {/* SidebarTrigger flotante */}

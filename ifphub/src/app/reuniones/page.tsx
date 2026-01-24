@@ -35,7 +35,7 @@ export default function Page() {
 
   return (
     <SidebarProvider>
-      <AppSidebar uid={uid} sig={sig} />
+      {uid && sig && <AppSidebar uid={uid} sig={sig} />}
 
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2">

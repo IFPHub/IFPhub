@@ -162,7 +162,7 @@ export default function Page() {
 
   return (
     <SidebarProvider>
-      <AppSidebar uid={uid} sig={sig} />
+      {uid && sig && <AppSidebar uid={uid} sig={sig} />}
 
       <SidebarInset>
         {/* HEADER */}

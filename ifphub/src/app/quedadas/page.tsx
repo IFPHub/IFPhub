@@ -145,7 +145,7 @@ export default function Page() {
 
   return (
     <SidebarProvider>
-      <AppSidebar uid={uid} sig={sig} />
+      {uid && sig && <AppSidebar uid={uid} sig={sig} />}
       <SidebarInset>
         <div className="flex flex-1 flex-col gap-4 pt-0 min-h-screen">
           {!selectedCategory && !searchQuery && (

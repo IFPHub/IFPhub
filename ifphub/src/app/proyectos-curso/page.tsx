@@ -36,6 +36,12 @@ type Proyecto = {
   curso_grado: number | null;
 };
 
+type Curso = {
+  id_curso: number;
+  nombre: string;
+  grado: number | null;
+};
+
 function getCursoSiglas(nombreCurso: string | null) {
   if (!nombreCurso) return "";
 
@@ -48,6 +54,12 @@ function getCursoSiglas(nombreCurso: string | null) {
   return nombreCurso.toLowerCase();
 }
 
+function getCursoLabel(curso: Curso) {
+  return curso.grado
+    ? `${curso.nombre} (${curso.grado})`
+    : curso.nombre;
+}
+
 export default function Page() {
     const [uploadOpen, setUploadOpen] = useState(false);
     const [uid, setUid] = React.useState<string | null>(null);
@@ -56,7 +68,7 @@ export default function Page() {
     const [proyectos, setProyectos] = React.useState<Proyecto[]>([]);
     const [loading, setLoading] = React.useState(true);
     const [categoryFilter, setCategoryFilter] = React.useState("");
-
+    const [cursos, setCursos] = React.useState<Curso[]>([]);
 
     React.useEffect(() => {
       const params = new URLSearchParams(window.location.search);
@@ -70,7 +82,6 @@ export default function Page() {
           if (!res.ok) throw new Error("Error al cargar proyectos");
 
           const data: Proyecto[] = await res.json();
-          console.log(data)
           setProyectos(data);
         } catch (error) {
           console.error(error);
@@ -79,7 +90,20 @@ export default function Page() {
         }
       }
 
+      async function fetchCursos() {
+        try {
+          const res = await fetch("/api/cursos");
+          if (!res.ok) throw new Error("Error al cargar cursos");
+          const data: Curso[] = await res.json();
+          setCursos(data);
+          console.log(cursos);
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
       fetchProyectos();
+      fetchCursos();
     }, []);
 
     const normalizedFilter = categoryFilter.trim().toLowerCase();
@@ -99,7 +123,7 @@ export default function Page() {
 
   return (
     <SidebarProvider>
-      <AppSidebar uid={uid} sig={sig} />
+      {uid && sig && <AppSidebar uid={uid} sig={sig} />}
       <SidebarInset>
         <div className="absolute top-4 left-4 z-50">
           <SidebarTrigger className="bg-white/20 backdrop-blur-sm hover:bg-white/30 border border-white/20" />
@@ -151,12 +175,22 @@ export default function Page() {
             <div className="flex w-full justify-center lg:justify-start">
               <input
                 type="text"
+                list="cursos-list"   // 👈 ESTO ES LA CLAVE
                 value={categoryFilter}
                 onChange={(event) => setCategoryFilter(event.target.value)}
                 placeholder="Filtrar por categoria"
                 className={`${montserrat.className} w-full max-w-md rounded-full bg-white/90 px-5 py-3 text-sm text-black placeholder-black/60 shadow-md outline-none ring-1 ring-white/40 focus:ring-2 focus:ring-white`}
                 aria-label="Filtrar proyectos por categoria"
               />
+
+              <datalist id="cursos-list">
+                {cursos.map((curso) => (
+                  <option
+                    key={curso.id_curso}
+                    value={getCursoLabel(curso)}
+                  />
+                ))}
+              </datalist>
             </div>
           </div>
         </div>
@@ -180,7 +214,7 @@ export default function Page() {
                 proyectosFiltrados.map((proyecto) => (
                   <Link
                     key={proyecto.id_proyecto}
-                    href={`/proyectos/${proyecto.id_proyecto}`}
+                    href={`/proyecto/${proyecto.id_proyecto}`}
                   >
                     <ProjectCard
                       title={proyecto.titulo}
