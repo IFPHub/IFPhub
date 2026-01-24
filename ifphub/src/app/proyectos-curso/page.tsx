@@ -36,6 +36,17 @@ type Proyecto = {
   curso_grado: number | null;
 };
 
+function getCursoSiglas(nombreCurso: string | null) {
+  if (!nombreCurso) return "";
+
+  const curso = nombreCurso.toLowerCase();
+
+  if (curso.includes("multiplataforma")) return "dam";
+  if (curso.includes("web")) return "daw";
+  if (curso.includes("sistemas")) return "asix";
+
+  return nombreCurso.toLowerCase();
+}
 
 export default function Page() {
     const [uploadOpen, setUploadOpen] = useState(false);
@@ -74,8 +85,16 @@ export default function Page() {
     const normalizedFilter = categoryFilter.trim().toLowerCase();
     const proyectosFiltrados = proyectos.filter((proyecto) => {
       if (!normalizedFilter) return true;
-      const categoria = (proyecto.curso_nombre ?? "").toLowerCase();
-      return categoria.includes(normalizedFilter);
+      const cursoNombre = proyecto.curso_nombre ?? "";
+      const cursoGrado = proyecto.curso_grado !== null ? String(proyecto.curso_grado) : "";
+      const cursoSiglas = getCursoSiglas(cursoNombre);
+      const etiqueta = `${cursoGrado} ${cursoSiglas}`.trim();
+      const categoria = cursoNombre.toLowerCase();
+      return (
+        categoria.includes(normalizedFilter) ||
+        etiqueta.includes(normalizedFilter) ||
+        cursoSiglas.includes(normalizedFilter)
+      );
     });
 
   return (
