@@ -19,7 +19,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/app/frontend/components/ui/sidebar";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 const data = {
   user: {
@@ -46,6 +46,69 @@ export function AppSidebar({
   sig: string | null;
 }) {
   if (!uid || !sig) return null;
+
+  const [user, setUser] = React.useState(data.user);
+
+  React.useEffect(() => {
+    let isActive = true;
+
+    const storedName = sessionStorage.getItem("ifphub_user_name");
+    const storedEmail = sessionStorage.getItem("ifphub_user_email");
+
+    if (storedName || storedEmail) {
+      setUser((prev) => ({
+        ...prev,
+        name: storedName || prev.name,
+        email: storedEmail || prev.email,
+      }));
+    }
+
+    const userId = Number(uid);
+
+    const loadUser = async () => {
+      try {
+        if (!Number.isFinite(userId)) return;
+
+        const res = await fetch("/api/usuario");
+        if (!res.ok) return;
+
+        const users = await res.json();
+        const matchById = Array.isArray(users)
+          ? users.find((item) => Number(item.id_usuario) === userId)
+          : null;
+        const matchByEmail =
+          !matchById && storedEmail && Array.isArray(users)
+            ? users.find(
+                (item) =>
+                  String(item.mail ?? item.email ?? "").toLowerCase() ===
+                  storedEmail.toLowerCase()
+              )
+            : null;
+        const match = matchById ?? matchByEmail;
+
+        if (!match) return;
+
+        const name = [match.nombre, match.apellido].filter(Boolean).join(" ");
+        const email = match.mail ?? match.email ?? "";
+
+        if (isActive) {
+          setUser({
+            name: name || data.user.name,
+            email: email || data.user.email,
+            avatar: data.user.avatar,
+          });
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    loadUser();
+
+    return () => {
+      isActive = false;
+    };
+  }, [uid]);
 
   const query = `?uid=${uid}&sig=${sig}`;
   const pathname = usePathname();
@@ -91,7 +154,7 @@ export function AppSidebar({
       </SidebarContent>
 
       <SidebarFooter>
-        <NavUser user={data.user} uid={uid} sig={sig} />
+        <NavUser user={user} uid={uid} sig={sig} />
       </SidebarFooter>
     </Sidebar>
   );

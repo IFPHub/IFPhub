@@ -72,6 +72,11 @@ export default function Page() {
   const searchParams = useSearchParams()
   const uid = searchParams.get("uid")
   const sig = searchParams.get("sig")
+  const idUsuario = React.useMemo(() => {
+    if (!uid) return null
+    const parsed = Number(uid)
+    return Number.isFinite(parsed) ? parsed : null
+  }, [uid])
 
   const loadCitas = React.useCallback(async () => {
     setIsLoading(true)
@@ -137,6 +142,7 @@ export default function Page() {
           dia_cita: toDateKey(payload.date),
           hora,
           descripcion: payload.description,
+          id_usuario: idUsuario,
         }),
       })
 
@@ -148,7 +154,7 @@ export default function Page() {
       await loadCitas()
       return { ok: true }
     },
-    [loadCitas]
+    [idUsuario, loadCitas]
   )
 
   return (

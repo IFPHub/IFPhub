@@ -37,6 +37,22 @@ export default function AuthPage() {
 
         const uid = result.usuario.uid;
         const sig = result.usuario.sig;
+        const nombre = result.usuario.nombre ?? "";
+        const apellido = result.usuario.apellido ?? "";
+        const mail =
+          result.usuario.mail ??
+          result.usuario.email ??
+          email ??
+          "";
+        const fullName = [nombre, apellido].filter(Boolean).join(" ").trim();
+
+        if (fullName) {
+          sessionStorage.setItem("ifphub_user_name", fullName);
+        }
+
+        if (mail) {
+          sessionStorage.setItem("ifphub_user_email", mail);
+        }
 
         // Redirigimos con verificación incluida
         window.location.href = `/noticias?uid=${uid}&sig=${sig}`;
