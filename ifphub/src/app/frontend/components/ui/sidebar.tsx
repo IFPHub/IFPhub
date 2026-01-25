@@ -187,7 +187,12 @@ function Sidebar({
           data-sidebar="sidebar"
           data-slot="sidebar"
           data-mobile="true"
-          className="bg-sidebar text-sidebar-foreground w-(--sidebar-width) p-0 [&>button]:hidden"
+          className={cn(
+            "bg-[#F5F5F5] text-sidebar-foreground w-(--sidebar-width) p-0 [&>button]:hidden data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:duration-200 data-[state=closed]:duration-200",
+            side === "left"
+              ? "data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left"
+              : "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right"
+          )}
           style={
             {
               "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
