@@ -41,6 +41,9 @@ type Proyecto = {
   nombre_usuario: string | null;
 };
 
+const getPicsum = (seed: string | number, w: number, h: number) =>
+  `https://picsum.photos/seed/${encodeURIComponent(String(seed))}/${w}/${h}`;
+
 export default async function Page({
   params,
   searchParams,
@@ -67,7 +70,9 @@ export default async function Page({
   }
 
   const proyecto: Proyecto = proyectoData[0];
-  const imagen = "/imagenes/sistema operativo.jpg";
+  const imagen =
+    proyecto.imagen ??
+    getPicsum(proyecto.id_proyecto, 800, 500);
 
   // Obtener comentarios del proyecto
   const { data: comentarios, error: errorComentarios } =

@@ -23,6 +23,8 @@ import UploadDialog from "@/app/frontend/components/upload";
 
 const baskervville = Baskervville({ weight: "400", subsets: ["latin"] });
 const montserrat = Montserrat({ subsets: ["latin"] });
+const getPicsum = (seed: string | number, w: number, h: number) =>
+  `https://picsum.photos/seed/${encodeURIComponent(String(seed))}/${w}/${h}`;
 
 type Proyecto = {
   id_proyecto: number;
@@ -111,7 +113,7 @@ export default function Page() {
       .replace(/\(\d+\)/g, "") // quita (1), (2), etc
       .trim()
       .toLowerCase();
-      
+
     const proyectosFiltrados = proyectos.filter((proyecto) => {
       if (!normalizedFilter) return true;
       const cursoNombre = proyecto.curso_nombre ?? "";
@@ -270,9 +272,8 @@ export default function Page() {
                         year: "numeric",
                       })}
                       coverImage={
-                        proyecto.imagen
-                          ? proyecto.imagen
-                          : "/imagenes/sistema operativo.jpg"
+                        proyecto.imagen ??
+                        getPicsum(proyecto.id_proyecto, 600, 400)
                       }
                       cursoNombre={proyecto.curso_nombre}
                       cursoGrado={

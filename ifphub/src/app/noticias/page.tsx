@@ -38,6 +38,8 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   console.log("SIG:", sig);
 
   const noticias = await getNoticias();
+  console.log("Noticias obtenidas en Page:", noticias);
+  const noticiasArray = Array.isArray(noticias) ? noticias : noticias?.data ?? [];
 
   const shuffle = <T,>(arr: T[]) => {
     const a = [...arr];
@@ -48,7 +50,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
     return a;
   };
   
-  const randomNoticias = shuffle(noticias).slice(0, 8);
+  const randomNoticias = shuffle(noticiasArray).slice(0, 8);
 
   const getPicsum = (seed: string | number, w: number, h: number) =>
     `https://picsum.photos/seed/${encodeURIComponent(String(seed))}/${w}/${h}`;
