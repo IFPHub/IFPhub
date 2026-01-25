@@ -26,6 +26,19 @@ type Curso = {
 };
 
 type OrderBy = "newest" | "oldest" | "favorites";
+const ALLOWED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/jpg",
+];
+
+const ALLOWED_VIDEO_TYPES = [
+  "video/mp4",
+  "video/webm",
+  "video/ogg",
+  "video/quicktime", // .mov
+];
 
 const WEEKDAYS = ["L", "M", "X", "J", "V", "S", "D"];
 const MONTHS = [
@@ -58,6 +71,62 @@ function pickFirstNonEmpty(
   );
   return found?.trim();
 }
+
+function normalizeUrl(url?: string) {
+  if (!url) return undefined;
+  const trimmed = url.trim();
+
+  if (
+    trimmed.startsWith("http://") ||
+    trimmed.startsWith("https://")
+  ) {
+    return trimmed;
+  }
+
+  // 👉 Si el usuario pone youtube.com/...
+  return "https://" + trimmed;
+}
+
+function isYouTube(url?: string) {
+  if (!url) return false;
+
+  try {
+    const u = new URL(url);
+    return (
+      u.hostname.includes("youtube.com") ||
+      u.hostname.includes("youtu.be")
+    );
+  } catch {
+    return false;
+  }
+}
+
+function getYouTubeEmbedUrl(url: string) {
+  try {
+    const u = new URL(url);
+
+    // youtu.be/ID
+    if (u.hostname.includes("youtu.be")) {
+      return `https://www.youtube.com/embed/${u.pathname.slice(1)}`;
+    }
+
+    // youtube.com/watch?v=ID
+    const v = u.searchParams.get("v");
+    if (v) {
+      return `https://www.youtube.com/embed/${v}`;
+    }
+
+    // youtube.com/embed/ID
+    if (u.pathname.startsWith("/embed/")) {
+      return url;
+    }
+
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 
 function MiniCalendar({
   value,
@@ -235,9 +304,16 @@ function CreateModal({
 }) {
   const panelRef = useRef<HTMLDivElement>(null);
   const fallbackCoverSeedRef = useRef(Date.now());
-  const previewCoverSrc =
-    pickFirstNonEmpty(coverUrl) ??
-    getPicsum(`reunion-new-${fallbackCoverSeedRef.current}`);
+  const previewCoverSrc = useMemo(() => {
+    if (coverFile) {
+      return URL.createObjectURL(coverFile);
+    }
+
+    return (
+      pickFirstNonEmpty(coverUrl) ??
+      getPicsum(`reunion-new-${fallbackCoverSeedRef.current}`)
+    );
+  }, [coverFile, coverUrl]);
 
   useEffect(() => {
     function onDown(e: MouseEvent) {
@@ -266,6 +342,21 @@ function CreateModal({
       .join(" · ")
   : "Curso";
   const [showAllCourses, setShowAllCourses] = useState(false);
+
+  const isValid =
+    title.trim().length > 0 &&
+    desc.trim().length > 0 &&
+    newCourse !== null &&
+    cats.length > 0;
+
+  const missingFields = [];
+
+  if (!title.trim()) missingFields.push("Título");
+  if (!desc.trim()) missingFields.push("Descripción");
+  if (!newCourse) missingFields.push("Curso");
+  if (cats.length === 0) missingFields.push("Etiquetas");
+
+  const missingText = missingFields.join(", ");
 
   return (
     <div className="fixed inset-0 z-[100] overflow-y-auto bg-black/30 p-4 sm:p-8">
@@ -469,61 +560,89 @@ function CreateModal({
                   placeholder="https://tuservidor.com/portada.png"
                 />
 
-                <label className="mt-1 flex flex-col gap-1 text-xs text-zinc-700">
-                  Subir imagen de portada
+                <div className="mt-2">
                   <input
+                    id="cover-upload"
                     type="file"
                     accept="image/*"
-                    className="text-xs"
-                    onChange={(e) => setCoverFile(e.target.files?.[0] ?? null)}
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+
+                      if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+                        alert("❌ Solo se permiten imágenes (JPG, PNG, WEBP)");
+                        e.target.value = "";
+                        return;
+                      }
+
+                      setCoverFile(file);
+                    }}
                   />
+
+                  <label
+                    htmlFor="cover-upload"
+                    className="flex cursor-pointer items-center justify-center gap-2 rounded-md border border-dashed border-[#124D58] bg-[#124D58]/5 px-4 py-3 text-sm font-medium text-[#124D58] transition hover:bg-[#124D58]/10"
+                  >
+                    {coverFile ? "Cambiar imagen" : "Subir imagen de portada"}
+                  </label>
+
                   {coverFile && (
-                    <span className="text-[11px] opacity-80">
-                      Archivo seleccionado: {coverFile.name}
-                    </span>
+                    <p className="mt-1 text-[11px] text-zinc-600">
+                      Archivo seleccionado: <span className="font-medium">{coverFile.name}</span>
+                    </p>
                   )}
-                </label>
-
-                <div className="mt-3 aspect-[4/3] w-full overflow-hidden rounded-md border border-black/15 bg-zinc-100">
-                  <img
-                    src={previewCoverSrc}
-                    alt="Portada"
-                    className="h-full w-full object-cover"
-                  />
                 </div>
-              </div>
-            </div>
-
-            {/* VIDEO */}
-            <div className="grid gap-4 md:grid-cols-2">
-              <div>
-                <span className="mb-2 block text-sm font-medium text-[#D46D85]">
-                  Vídeo (URL)
-                </span>
-                <input
-                  type="url"
-                  value={videoUrl}
-                  onChange={(e) => setVideoUrl(e.target.value)}
-                  className="h-10 w-full rounded-md border border-black/20 bg-white px-3 text-xs text-zinc-800 placeholder:text-zinc-400"
-                  placeholder="https://tuservidor.com/video.mp4"
-                />
-              </div>
-
-              <div>
-                <span className="mb-1 block text-sm font-medium text-[#D46D85]">
-                  Subir archivo de vídeo
-                </span>
-                <input
-                  type="file"
-                  accept="video/*"
-                  className="text-xs"
-                  onChange={(e) => setVideoFile(e.target.files?.[0] ?? null)}
-                />
-                {videoFile && (
-                  <span className="mt-1 block text-[11px] text-zinc-700 opacity-80">
-                    Archivo seleccionado: {videoFile.name}
+                {/* ───── VÍDEO ───── */}
+                <div className="grid gap-3 mt-4">
+                  <span className="text-sm font-medium text-[#D46D85]">
+                    Vídeo
                   </span>
-                )}
+
+                  <input
+                    type="url"
+                    value={videoUrl}
+                    onChange={(e) => setVideoUrl(e.target.value)}
+                    className="h-10 w-full rounded-md border border-black/20 bg-white px-3 text-xs text-zinc-800 placeholder:text-zinc-400"
+                    placeholder="https://tuservidor.com/video.mp4"
+                  />
+
+                  <div>
+                    <input
+                      id="video-upload"
+                      type="file"
+                      accept="video/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+
+                        if (!ALLOWED_VIDEO_TYPES.includes(file.type)) {
+                          alert("❌ Solo se permiten vídeos (MP4, WEBM, MOV)");
+                          e.target.value = "";
+                          return;
+                        }
+
+                        setVideoFile(file);
+                        setVideoUrl("");
+                      }}
+                    />
+
+                    <label
+                      htmlFor="video-upload"
+                      className="flex cursor-pointer items-center justify-center gap-2 rounded-md border border-dashed border-[#D46D85] bg-[#D46D85]/10 px-4 py-3 text-sm font-medium text-[#D46D85] transition hover:bg-[#D46D85]/20"
+                    >
+                      {videoFile ? "Cambiar vídeo" : "Subir vídeo"}
+                    </label>
+
+                    {videoFile && (
+                      <p className="mt-1 text-[11px] text-zinc-600">
+                        Archivo seleccionado:{" "}
+                        <span className="font-medium">{videoFile.name}</span>
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -589,12 +708,30 @@ function CreateModal({
           >
             Cancelar
           </button>
+          <div className="relative group">
           <button
-            onClick={onSave}
-            className="h-9 rounded-md border border-black/20 bg-[#D46D85] px-6 text-sm font-medium text-white hover:bg-[#c55c77]"
+            onClick={() => {
+              if (!isValid) return;
+              onSave();
+            }}
+            disabled={!isValid}
+            className={`h-9 rounded-md border border-black/20 px-6 text-sm font-medium text-white transition
+              ${
+                isValid
+                  ? "bg-[#D46D85] hover:bg-[#c55c77]"
+                  : "bg-[#D46D85]/40 cursor-not-allowed"
+              }
+            `}
           >
             Siguiente
           </button>
+
+          {!isValid && (
+            <div className="pointer-events-none absolute bottom-full right-0 mb-2 w-max max-w-xs rounded-md bg-black px-3 py-2 text-xs text-white opacity-0 transition group-hover:opacity-100">
+              Falta completar: <span className="font-semibold">{missingText}</span>
+            </div>
+          )}
+        </div>
         </div>
       </div>
     </div>
@@ -627,7 +764,12 @@ function VideoModal({
     };
   }, [onClose]);
 
-  const hasVideo = !!item.videoUrl;
+  const normalizedVideoUrl = normalizeUrl(item.videoUrl);
+  const hasVideo = !!normalizedVideoUrl;
+  const isYT = isYouTube(normalizedVideoUrl);
+  const ytEmbed = normalizedVideoUrl
+    ? getYouTubeEmbedUrl(normalizedVideoUrl)
+    : null;
 
   return (
     <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/60 px-4">
@@ -654,12 +796,21 @@ function VideoModal({
         </div>
 
         {hasVideo ? (
-          <video
-            src={item.videoUrl}
-            controls
-            autoPlay
-            className="mt-4 w-full rounded-md bg-black"
-          />
+          isYT && ytEmbed ? (
+            <iframe
+              src={ytEmbed}
+              className="mt-4 aspect-video w-full rounded-md"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          ) : (
+            <video
+              src={item.videoUrl}
+              controls
+              autoPlay
+              className="mt-4 w-full rounded-md bg-black"
+            />
+          )
         ) : (
           <div className="mt-4 rounded-md border border-dashed border-black/20 p-6 text-sm text-zinc-600">
             <p>Esta clase todavía no tiene ningún vídeo asociado.</p>
@@ -813,7 +964,10 @@ function ProfessorPopover({
   );
 }
 
-export function Board() {
+export const Board = React.forwardRef<
+  { openCreate: () => void },
+  {}
+>(function Board(_, ref) {
   const [courses, setCourses] = useState<any[]>([]);
   const [items, setItems] = useState<CardItem[]>([]);
   const [query, setQuery] = useState("");
@@ -1093,59 +1247,78 @@ export function Board() {
   };
 
   const saveNewItem = async () => {
-    if (!newTitle.trim()) return;
-
-    const payload = {
-      titulo: newTitle.trim(),
-      descripcion: newDesc.trim() || null,
-      tag: newCats[0] ?? null,
-      profesor: currentUserName,
-      date: selectedDate
-        ? selectedDate.toISOString().slice(0, 10)
-        : null,
-      video: newVideoUrl.trim() || null,
-      id_usuario: currentUserId,
-      id_curso: newCourse?.id_curso ?? null,
-    };
+    if (!newTitle.trim() || !newCourse || newCats.length === 0) return;
 
     try {
-      const res = await fetch("/api/reuniones/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const formData = new FormData();
 
-      if (!res.ok) {
-        throw new Error("Error al insertar reunión");
+      formData.append("titulo", newTitle);
+      formData.append("descripcion", newDesc);
+      formData.append("tag", newCats[0]);
+      formData.append("profesor", currentUserName);
+      formData.append(
+        "date",
+        selectedDate?.toISOString().slice(0, 10) ?? ""
+      );
+      formData.append("id_usuario", String(currentUserId));
+      formData.append("id_curso", String(newCourse.id_curso));
+
+      if (newCoverFile) formData.append("cover", newCoverFile);
+      if (newCoverUrl.trim()) {
+        formData.append("cover_url", newCoverUrl.trim());
       }
 
-      // 🔄 RECARGAR REUNIONES (simple y limpio)
+      if (newVideoUrl.trim()) {
+        formData.append("video_url", newVideoUrl.trim());
+      }
+
+      const res = await fetch("/api/reuniones/create", {
+        method: "POST",
+        body: formData, // ✅ SIN headers
+      });
+
+      if (!res.ok) throw new Error("Error al crear reunión");
+
+      const { id_reunion } = await res.json();
+
+      if (newVideoFile) {
+        const videoForm = new FormData();
+        videoForm.append("id_reunion", String(id_reunion));
+        videoForm.append("video", newVideoFile);
+
+        const videoRes = await fetch("/api/reuniones/upload-video", {
+          method: "POST",
+          body: videoForm,
+        });
+
+        if (!videoRes.ok) {
+          throw new Error("Error subiendo el vídeo");
+        }
+      }
+
+      // 🔄 Recargar reuniones
       const reload = await fetch("/api/reuniones");
       const data = await reload.json();
 
-      const mapped = data.map((r: any) => ({
-        id: r.id_reuniones,
-        title: r.titulo ?? "Sin título",
-        description: r.descripcion ?? "Sin descripción",
-        author: r.profesor ?? "Profesor",
-        tag: r.tag ?? "",
-        date: r.date ?? undefined,
-        course: undefined,
-        professor: r.profesor ?? undefined,
-        videoUrl: r.video ?? undefined,
-        coverUrl: pickFirstNonEmpty(
-          r.portada,
-          r.portada_url,
-          r.cover,
-          r.imagen,
-          r.imagen_url
-        ),
-        isFavorite: false,
-      }));
+      setItems(
+        data.map((r: any) => ({
+          id: r.id_reuniones,
+          title: r.titulo ?? "Sin título",
+          description: r.descripcion ?? "",
+          author: r.profesor ?? "Profesor",
+          tag: r.tag ?? "",
+          date: r.date ?? undefined,
+          videoUrl: r.video ?? undefined,
+          coverUrl: pickFirstNonEmpty(
+            r.portada,
+            r.portada_url,
+            r.imagen_url
+          ),
+          isFavorite: false,
+        }))
+      );
 
-      setItems(mapped);
-
-      // ✅ CERRAR MODAL Y LIMPIAR
+      // 🧹 limpiar
       setCreateOpen(false);
       setNewTitle("");
       setNewDesc("");
@@ -1155,7 +1328,6 @@ export function Board() {
       setNewCoverFile(null);
       setNewVideoFile(null);
       setNewCourse(null);
-
     } catch (err) {
       console.error(err);
       alert("No se pudo guardar la reunión");
@@ -1170,6 +1342,10 @@ export function Board() {
     setNewCourse(null);
     setCreateOpen(true);
   };
+
+  React.useImperativeHandle(ref, () => ({
+    openCreate: openCreateModal,
+  }));
 
   return (
     
@@ -1271,14 +1447,6 @@ export function Board() {
               />
             )}
           </div>
-
-          {/* CREAR */}
-          <button
-            onClick={openCreateModal}
-            className="flex h-9 w-36 items-center justify-between rounded-md border border-[#123d58] bg-[#123d58] px-3 text-sm text-white transition hover:bg-[#0f3f47] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#123d58]/30"
-          >
-            + Crear
-          </button>
         </div>
 
         {/* BUSCADOR */}
@@ -1411,4 +1579,4 @@ export function Board() {
       )}
     </div>
   );
-}
+});

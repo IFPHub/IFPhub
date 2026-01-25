@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { AppSidebar } from "@/app/frontend/compartir-proyectos/app-sidebar";
 import { Board } from "@/app/frontend/reuniones/board";
+import { Hero_reuniones } from "@/app/frontend/components/hero-reuniones";
 
 import {
   SidebarInset,
@@ -30,7 +31,8 @@ export default function Page() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-
+  const boardRef = useRef<{ openCreate: () => void }>(null);
+  
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     setUid(params.get("uid"));
@@ -66,30 +68,19 @@ export default function Page() {
       {uid && sig && <AppSidebar uid={uid} sig={sig} />}
 
       <SidebarInset>
+        <Hero_reuniones
+          onCreate={() => boardRef.current?.openCreate()}
+        />
         <header className="flex h-16 shrink-0 items-center gap-2">
           <div className="flex items-center gap-2 px-4">
-            <SidebarTrigger className="-ml-1" />
-            <Separator
-              orientation="vertical"
-              className="mr-2 data-[orientation=vertical]:h-4"
-            />
-
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">Panel</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Reuniones</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
+            <div className="absolute top-4 left-4 z-50">
+              <SidebarTrigger className="bg-white/20 backdrop-blur-sm hover:bg-white/30 border border-white/20" />
+            </div>
           </div>
         </header>
 
         <div className="flex flex-1 flex-col">
-          <Board />
+          <Board ref={boardRef} />
         </div>
       </SidebarInset>
     </SidebarProvider>
