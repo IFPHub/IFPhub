@@ -15,6 +15,7 @@ type ProjectCardProps = {
   coverImage: string;
   cursoNombre?: string | null;
   cursoGrado?: string | null;
+  isPrivate?: boolean;
 };
 
 function getCursoSiglas(nombreCurso: string | null) {
@@ -36,8 +37,9 @@ export function ProjectCard({
   authorAvatar,
   date,
   coverImage,
-  cursoGrado,
   cursoNombre,
+  cursoGrado,
+  isPrivate = false, // 👈 default
 }: ProjectCardProps) {
   const cursoLabel =
     cursoNombre && cursoGrado
@@ -59,6 +61,11 @@ export function ProjectCard({
         <Badge className="absolute top-4 right-4 bg-[#D65A7E] hover:bg-[#b54666] text-white border-none shadow-lg">
           {cursoLabel}
         </Badge>
+        {isPrivate && (
+          <span className="absolute top-14 right-4 rounded-full bg-black/60 px-2 py-1 text-[11px] text-white backdrop-blur">
+            🔒 Privado
+          </span>
+        )}
       </div>
 
       <div className="pt-6 px-6 pb-3 flex flex-col flex-grow">

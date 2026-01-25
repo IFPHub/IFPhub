@@ -231,22 +231,6 @@ export default async function Page({
               </div>
             </div>
           </section>
-
-          {/* FOOTER */}
-          <footer className="w-full mt-8 pt-6 border-t">
-            <div className="max-w-6xl mx-auto text-center px-4">
-              <nav className="flex flex-wrap justify-center gap-6 text-sm text-[#0E4A54] font-medium mb-3">
-                <a href="#">Home / News</a>
-                <a href="/compartir-proyectos">Proyectos</a>
-                <a href="/quedadas">Quedadas</a>
-                <a href="/incidencias">Incidencias</a>
-              </nav>
-
-              <p className="text-sm text-gray-500 mt-1 mb-6">
-                © 2025 Name -- Portal Campus
-              </p>
-            </div>
-          </footer>
         </SidebarInset>
       </AuthGuard>
     </SidebarProvider>

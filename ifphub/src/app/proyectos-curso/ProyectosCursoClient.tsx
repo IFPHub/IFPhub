@@ -35,6 +35,8 @@ type Proyecto = {
   autor_avatar: string | null;
   curso_nombre: string | null;
   curso_grado: number | null;
+  visibilidad: "public" | "private";
+  id_usuario: number | null;
 };
 
 type Curso = {
@@ -136,12 +138,19 @@ export default function Page() {
     fetchCursos();
   }, []);
 
+  const proyectosPermitidos = proyectos.filter((proyecto) => {
+    if (proyecto.visibilidad === "public") return true;
+
+    // private → solo si es del usuario logeado
+    return uid && String(proyecto.id_usuario) === uid;
+  });
+
   const normalizedFilter = categoryFilter
     .replace(/\(\d+\)/g, "") // quita (1), (2), etc
     .trim()
     .toLowerCase();
 
-  const proyectosFiltrados = proyectos.filter((proyecto) => {
+  const proyectosFiltrados = proyectosPermitidos.filter((proyecto) => {
     if (!normalizedFilter) return true;
     const cursoNombre = proyecto.curso_nombre ?? "";
     const cursoGrado = proyecto.curso_grado !== null ? String(proyecto.curso_grado) : "";
@@ -325,6 +334,7 @@ export default function Page() {
                           ? String(proyecto.curso_grado)
                           : null
                       }
+                      isPrivate={proyecto.visibilidad === "private"}
                     />
                   </Link>
                 ))}
