@@ -19,8 +19,6 @@ import { Button } from "@/app/frontend/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-
 
 type Event = {
   id_quedada: number;
@@ -54,13 +52,13 @@ export default function Page() {
     setSig(params.get("sig"));
   }, []);
 
-  const router = useRouter();
-
   useEffect(() => {
-    if (!uid || !sig) {
-      router.replace("/"); // LOGIN
-    }
-  }, [uid, sig, router]);
+    const storedUid = sessionStorage.getItem("uid");
+    const storedSig = sessionStorage.getItem("sig");
+
+    setUid(storedUid);
+    setSig(storedSig);
+  }, []);
 
   useEffect(() => {
     const fetchQuedadas = async () => {
