@@ -161,7 +161,9 @@ export function AppSidebar({
       <SidebarContent>
         {/* ✅ PASAMOS uid y sig */}
         <NavMain items={navMainWithQuery} uid={uid} sig={sig} />
-        <AddItemDialog />
+        <div className="px-3 md:px-0">
+          <AddItemDialog />
+        </div>
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
 
