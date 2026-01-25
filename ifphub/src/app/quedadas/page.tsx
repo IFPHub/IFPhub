@@ -4,6 +4,7 @@ import { AppSidebar } from "@/app/frontend/compartir-proyectos/app-sidebar";
 import {
   SidebarInset,
   SidebarProvider,
+  SidebarTrigger,
 } from "@/app/frontend/components/ui/sidebar";
 import { Hero_quedadas } from "@/app/frontend/components/hero-quedadas";
 import { EventCard } from "@/app/frontend/components/event-card";
@@ -147,6 +148,9 @@ export default function Page() {
     <SidebarProvider>
       {uid && sig && <AppSidebar uid={uid} sig={sig} />}
       <SidebarInset>
+        <div className="absolute top-4 left-4 z-50">
+          <SidebarTrigger className="bg-white/20 backdrop-blur-sm hover:bg-white/30 border border-white/20" />
+        </div>
         <div className="flex flex-1 flex-col gap-4 pt-0 min-h-screen">
           {!selectedCategory && !searchQuery && (
             <motion.div
