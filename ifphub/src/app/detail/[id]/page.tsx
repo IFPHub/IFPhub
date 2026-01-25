@@ -1,18 +1,38 @@
-import Header from "@/app/frontend/components/header";
 import Sidebar from "@/app/frontend/components/sidebar-noticias";
 import { createClient } from "@/app/backend/utils/supabase/client";
 import { Baskervville } from "next/font/google";
 
-const baskervville = Baskervville({ weight: "700", subsets: ["latin"] });
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+  BreadcrumbPage,
+} from "@/app/frontend/components/ui/breadcrumb";
 
-export default async function DetailPage(props: { params: Promise<{ id: string }> }) {
-  const { params } = props;
-  const { id } = await params;
+import { Separator } from "@/app/frontend/components/ui/separator";
+
+import {
+  SidebarProvider,
+  SidebarInset,
+  SidebarTrigger,
+} from "@/app/frontend/components/ui/sidebar";
+
+const baskervville = Baskervville({
+  weight: "700",
+  subsets: ["latin"],
+});
+
+export default async function DetailPage(
+  props: { params: Promise<{ id: string }> }
+) {
+  const { id } = await props.params;
 
   const supabase = createClient();
 
   const { data, error } = await supabase.rpc("fn_get_noticia_por_id", {
-    p_id: Number(id)
+    p_id: Number(id),
   });
 
   if (error) {
@@ -30,8 +50,10 @@ export default async function DetailPage(props: { params: Promise<{ id: string }
     noticia.imagen && noticia.imagen.trim() !== ""
       ? noticia.imagen
       : "/imagenes/default_image.webp";
+
   const descripcion = noticia.descripcion ?? "";
   const descriptionParts = descripcion.split(/\n\s*\n/);
+
   let firstParagraph = descriptionParts[0] ?? "";
   let secondParagraph = "";
   let thirdParagraph = "";
@@ -47,52 +69,70 @@ export default async function DetailPage(props: { params: Promise<{ id: string }
       firstParagraph = `${sentences[0]}.`;
       secondParagraph = `${sentences[1]}.`;
       thirdParagraph = sentences.slice(2).join(". ");
-      if (thirdParagraph && !thirdParagraph.endsWith(".")) {
-        thirdParagraph = `${thirdParagraph}.`;
-      }
-    } else if (sentences.length === 2) {
-      firstParagraph = `${sentences[0]}.`;
-      secondParagraph = `${sentences[1]}.`;
     }
   }
 
   return (
-    <main className="wrap">
-      <Header />
+    <SidebarProvider>
+      <SidebarInset>
+        <main className="wrap">
+          {/* HEADER */}
+          <header className="flex h-16 shrink-0 items-center gap-2 px-4">
+            <SidebarTrigger className="-ml-1" />
+            <Separator orientation="vertical" className="mr-2" />
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_320px]">
-        <article className="bg-card rounded-[14px] p-8 shadow-md-custom">
-          <div className="pl-4 pr-4 md:pl-8 md:pr-8 lg:pl-12 lg:pr-12">
-            <h1
-              className={`${baskervville.className} mt-2 mb-4 text-2xl md:text-3xl font-bold leading-tight`}
-            >
-              {noticia.titulo}
-            </h1>
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem className="hidden md:block">
+                  <BreadcrumbLink href="/noticias">
+                    Noticias
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator className="hidden md:block" />
 
-            <img
-              src={imagen}
-              alt={noticia.titulo}
-              className="h-80 w-full rounded-[14px] object-cover mb-6"
-            />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>{noticia.titulo}</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </header>
 
-            <p className="text-gray-700">{firstParagraph}</p>
-            {secondParagraph && (
-              <p className="mt-4 text-gray-700">{secondParagraph}</p>
-            )}
-            {thirdParagraph && (
-              <p className="mt-4 text-gray-700">{thirdParagraph}</p>
-            )}
+          {/* CONTENIDO */}
+          <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_320px] px-4">
+            <article className="bg-card rounded-[14px] p-8 shadow-md-custom">
+              <h1
+                className={`${baskervville.className} mb-4 text-2xl md:text-3xl font-bold leading-tight`}
+              >
+                {noticia.titulo}
+              </h1>
+
+              <img
+                src={imagen}
+                alt={noticia.titulo}
+                className="h-80 w-full rounded-[14px] object-cover mb-6"
+              />
+
+              <p className="text-gray-700">{firstParagraph}</p>
+
+              {secondParagraph && (
+                <p className="mt-4 text-gray-700">{secondParagraph}</p>
+              )}
+
+              {thirdParagraph && (
+                <p className="mt-4 text-gray-700">{thirdParagraph}</p>
+              )}
+
+              <footer className="mt-10 text-center text-sm text-muted border-t pt-4">
+                © 2025 Portal Noticias
+              </footer>
+            </article>
+
+            <aside className="sidebar">
+              <Sidebar />
+            </aside>
           </div>
-
-          <footer className="mt-10 text-center text-sm text-muted border-t pt-4">
-            © 2025 Portal Noticias — Diseño Pro++
-          </footer>
-        </article>
-
-        <aside className="sidebar">
-          <Sidebar />
-        </aside>
-      </div>
-    </main>
+        </main>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

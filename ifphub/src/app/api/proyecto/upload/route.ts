@@ -18,19 +18,7 @@ export async function POST(req: Request) {
     const uid = formData.get("uid");
 
     const idUsuario = Number(uid);
-
-    console.log("[UPLOAD] FormData", {
-        titulo,
-        descripcion,
-        visibilidad,
-        idCurso,
-        hasFile: !!file,
-        fileName: file?.name,
-        fileType: file?.type,
-        fileSize: file?.size,
-        uid,
-    });
- 
+    
     if (Number.isNaN(idUsuario)) {
     return NextResponse.json(
         { error: "ID de usuario inválido" },
@@ -65,19 +53,10 @@ export async function POST(req: Request) {
       );
     }
 
-    console.log("[UPLOAD] Proyecto creado", {
-        idProyecto,
-    });
-
     // 3️⃣ Subir imagen a Storage
     const extension = file.name.split(".").pop();
     const filePath = `${idProyecto}/portada.${extension}`;
-
-    console.log("[UPLOAD] Subiendo archivo a Storage", {
-        bucket: "proyectos",
-        path: filePath,
-    });
-
+    
     const { error: uploadError } = await supabase.storage
       .from("proyectos")
       .upload(filePath, file, { upsert: true });

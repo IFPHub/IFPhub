@@ -29,9 +29,6 @@ import {
 import { Separator } from "@/app/frontend/components/ui/separator";
 import { cn } from "@/lib/utils";
 
-// Si Dialog01 es tu confirmación (p.ej. “subida ok”), lo dejamos.
-import Dialog01 from "@/app/frontend/components/dialog-01";
-
 // ✅ CHANGE: props opcionales para que el componente pueda cerrar el modal/avisar al padre sin acoplarse.
 type FileUpload03Props = {
   cursos: Curso[];

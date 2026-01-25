@@ -25,6 +25,7 @@ import { Baskervville, Montserrat } from "next/font/google";
 import Image from "next/image";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 
 interface Oficio {
   id_oferta: number;
@@ -73,10 +74,11 @@ function AceptarDialog({ titulo }: { titulo: string }) {
 
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="font-title font-bold font-title text-[#124d58]">Solicitar oferta</DialogTitle>
+          <DialogTitle className="font-title text-[#124d58]">
+            Crear nueva oferta
+          </DialogTitle>
           <DialogDescription>
-            Introduce tu nombre y correo para solicitar la oferta de{" "}
-            <strong>{titulo}.</strong>
+            Rellena los datos para publicar una oferta
           </DialogDescription>
         </DialogHeader>
 
@@ -131,11 +133,9 @@ function NuevaOfertaDialog({ onSubmit }: { onSubmit: (oficio: any) => void }) {
 
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          {/* Puedes descomentar esto si quieres título en el diálogo */}
-          {/* <DialogTitle className="font-title">Crear nueva oferta</DialogTitle> */}
-          {/* <DialogDescription>
-            Rellena los datos de la oferta para publicarla.
-          </DialogDescription> */}
+          <VisuallyHidden.Root>
+            <DialogTitle>Crear nueva oferta</DialogTitle>
+          </VisuallyHidden.Root>
         </DialogHeader>
 
         <div className="py-4">
