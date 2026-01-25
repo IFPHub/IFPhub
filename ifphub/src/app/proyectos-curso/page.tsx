@@ -1,5 +1,3 @@
-// proyectos.tsx
-// ✅ CHANGE: Este archivo ahora SOLO contiene la página (antes estaba mezclado con FileUpload03).
 "use client";
 
 import * as React from "react";
@@ -177,7 +175,7 @@ export default function Page() {
               <h1
                 className={`${baskervville.className} text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white`}
               >
-                Proyectos Estudiantiles
+                Proyectos de estudios
               </h1>
             </div>
 
@@ -243,7 +241,7 @@ export default function Page() {
               )}
 
               {!loading &&
-                proyectosFiltrados.map((proyecto) => (
+                proyectosFiltrados.slice(0, 6).map((proyecto) => (
                   <Link
                     key={proyecto.id_proyecto}
                     href={{
@@ -282,7 +280,13 @@ export default function Page() {
         </div>
 
         {/* ✅ CHANGE: Dialog extraído a componente dedicado */}
-        <UploadDialog open={uploadOpen} onOpenChange={setUploadOpen} title="Subir archivo" />
+        <UploadDialog
+          open={uploadOpen}
+          onOpenChange={setUploadOpen}
+          title="Subir archivo"
+          cursos={cursosUnicos}
+          uid={uid}
+        />
       </SidebarInset>
     </SidebarProvider>
   );
