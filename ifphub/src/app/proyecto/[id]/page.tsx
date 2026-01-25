@@ -27,6 +27,7 @@ type Comentario = {
   likes: number;
   id_usuario: number;
   nombre_usuario: string | null;
+  avatar: string | null;
   entity_type: string;
   entity_id: number;
 };
@@ -173,19 +174,22 @@ export default async function Page({
                     `}
                   </style>
 
-                  {(comentarios as Comentario[] | null)?.map(
-                    (c: Comentario) => (
-                      <div
-                        key={c.id_comentario}
-                        className="flex items-center gap-4"
-                      >
+                  {(comentarios as Comentario[] | null)?.map((c) => {
+                    const avatarSrc =
+                      c.avatar && c.avatar.trim() !== ""
+                        ? c.avatar
+                        : `https://api.dicebear.com/7.x/avataaars/png?seed=comment-${c.id_usuario}`;
+
+                    return (
+                      <div key={c.id_comentario} className="flex items-center gap-4">
                         <Image
-                          src="/imagenes/placeholder.webp"
+                          src={avatarSrc}
                           width={50}
                           height={50}
-                          alt="Avatar"
+                          alt={c.nombre_usuario ?? "Usuario"}
                           className="rounded-full object-cover"
                         />
+
                         <div>
                           <span className="text-sm text-gray-500">
                             {c.nombre_usuario || "Usuario desconocido"}
@@ -193,8 +197,8 @@ export default async function Page({
                           <p className="text-gray-800">{c.texto}</p>
                         </div>
                       </div>
-                    )
-                  )}
+                    );
+                  })}
 
                   {(!comentarios || comentarios.length === 0) && (
                     <p className="text-gray-500 text-sm">

@@ -49,7 +49,15 @@ export function AppSidebar({
 }) {
   if (!uid || !sig) return null;
 
-  const [user, setUser] = React.useState(data.user);
+  const [user, setUser] = React.useState<{
+    name: string;
+    email: string;
+    avatar: string | null;
+  }>({
+    name: data.user.name,
+    email: data.user.email,
+    avatar: null,
+  });
 
   React.useEffect(() => {
     let isActive = true;
@@ -97,7 +105,7 @@ export function AppSidebar({
           setUser({
             name: name || data.user.name,
             email: email || data.user.email,
-            avatar: data.user.avatar,
+            avatar: match.avatar ?? null,
           });
         }
       } catch (err) {

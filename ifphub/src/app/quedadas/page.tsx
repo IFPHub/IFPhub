@@ -30,6 +30,7 @@ type Event = {
   time: string;
   category: string;
   address: string;
+  visualizaciones: number;
 };
 
 export default function Page() {
@@ -58,6 +59,7 @@ export default function Page() {
         if (!res.ok) throw new Error("Error al cargar quedadas");
 
         const data = await res.json();
+        console.log(data);
 
         const formatted: Event[] = data.map((q: any) => ({
           id_quedada: q.id_quedada,
@@ -65,6 +67,7 @@ export default function Page() {
           description: q.descripcion,
           image: q.imagen_url,
           participants: q.participants ?? 0,
+          visualizaciones: q.visualizaciones ?? 0,
           date: new Date(q.fecha).toLocaleDateString("en-US", {
             month: "short",
             day: "numeric",
@@ -106,7 +109,19 @@ export default function Page() {
     );
   }
 
-  const handleEventClick = (event: any, index: number) => {
+  const handleEventClick = async (event: any, index: number) => {
+    try {
+      fetch("/api/quedadas/visualizacion", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id_quedada: event.id_quedada }),
+      });
+    } catch (err) {
+      console.error(err);
+    }
+
     setSelectedEvent({ ...event, index });
     setModalOpen(true);
   };
@@ -141,6 +156,26 @@ export default function Page() {
 
     return matchesCategory && matchesSearch;
   });
+
+  const now = new Date();
+  const oneMonthFromNow = new Date();
+  oneMonthFromNow.setMonth(oneMonthFromNow.getMonth() + 1);
+
+  const eventsToShow =
+    !selectedCategory && !searchQuery
+      ? filteredEvents
+          .filter((event) => {
+            const eventDate = new Date(`${event.date} ${event.time}`);
+            return eventDate >= now && eventDate <= oneMonthFromNow;
+          })
+          .sort((a, b) => {
+            if (b.participants !== a.participants) {
+              return b.participants - a.participants; // 1️⃣ prioridad
+            }
+            return b.visualizaciones - a.visualizaciones; // 2️⃣ desempate
+          })
+          .slice(0, 6)
+      : filteredEvents;
 
   const idUsuario = Number(uid);
 
@@ -200,12 +235,12 @@ export default function Page() {
                 ? `Resultados para "${searchQuery}"`
                 : selectedCategory
                 ? `Quedadas de ${selectedCategory}`
-                : "Top planes para estas semanas"}
+                : "Top planes para este mes"}
             </motion.h1>
 
             {filteredEvents.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
-                {filteredEvents.slice(0, 6).map((event, index) => {
+                {eventsToShow.map((event, index) => {
                   const originalIndex = events.findIndex((e) => e === event);
                   return (
                     <EventCard

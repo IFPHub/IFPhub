@@ -18,7 +18,7 @@ export function Testimonials() {
             name: "Ana García",
             role: "DAM 2",
             quote: "Gracias a la quedada de Java conocí a gente de 4º que me ayudó muchísimo con las prácticas.",
-            avatar: "AG",
+            avatar: "CR",
             color: "#D65A7E"
         },
         {

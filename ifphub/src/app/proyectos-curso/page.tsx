@@ -126,6 +126,11 @@ export default function Page() {
       );
     });
 
+    const proyectosVisibles =
+      categoryFilter.trim() === ""
+        ? proyectosFiltrados.slice(0, 6)
+        : proyectosFiltrados;
+
     const cursosUnicos = React.useMemo(() => {
       const map = new Map<string, Curso>();
 
@@ -161,7 +166,7 @@ export default function Page() {
         <div className="relative flex items-center justify-center p-4 md:p-8 lg:p-16 min-h-[50vh]">
           <div className="absolute inset-0 z-0">
             <Image
-              src="/imagenes/sistema operativo.jpg"
+              src="/imagenes/proyectos_home.png"
               alt="Sistema Operativo Background"
               fill
               className="object-cover"
@@ -202,8 +207,22 @@ export default function Page() {
                 onBlur={() => setIsFocused(false)}
                 onChange={(e) => setCategoryFilter(e.target.value)}
                 placeholder="Filtrar por categoria"
-                className={`${montserrat.className} w-full rounded-full bg-white/90 px-5 py-3 text-sm text-black shadow-md outline-none ring-1 ring-white/40 focus:ring-2 focus:ring-white`}
+                className={`${montserrat.className} w-full rounded-full bg-white/90 px-5 py-3 pr-12 text-sm text-black shadow-md outline-none ring-1 ring-white/40 focus:ring-2 focus:ring-white`}
               />
+
+              {categoryFilter && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCategoryFilter("");
+                    setIsFocused(false);
+                  }}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+                  aria-label="Limpiar filtro"
+                >
+                  ✕
+                </button>
+              )}
 
               {isFocused && sugerencias.length > 0 && (
                 <ul className="absolute left-0 top-full mt-2 w-full rounded-xl bg-[#0E4A54] shadow-xl overflow-hidden z-50">
@@ -227,6 +246,11 @@ export default function Page() {
 
         <div className="p-8 md:p-16">
           <div className="max-w-7xl mx-auto space-y-8">
+            {categoryFilter.trim() === "" && !loading && (
+              <p className="text-lg text-[#0E4A54]/70 font-medium">
+                Ultimos proyectos subidos
+              </p>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10 lg:gap-12">
               {loading && (
                 <p className="text-white/80">Cargando proyectos...</p>
@@ -241,7 +265,7 @@ export default function Page() {
               )}
 
               {!loading &&
-                proyectosFiltrados.slice(0, 6).map((proyecto) => (
+                proyectosVisibles.map((proyecto) => (
                   <Link
                     key={proyecto.id_proyecto}
                     href={{

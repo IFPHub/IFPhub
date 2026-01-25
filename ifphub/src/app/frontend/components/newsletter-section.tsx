@@ -15,7 +15,7 @@ export function NewsletterSection() {
         return emailRegex.test(email)
     }
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
         if (!email.trim()) {
@@ -34,14 +34,29 @@ export function NewsletterSection() {
 
         setIsLoading(true)
 
-        // Simulación de envío (aquí conectarías con tu backend)
-        setTimeout(() => {
+        try {
+            const res = await fetch("/api/newsletter/subscribe", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email }),
+            })
+
+            if (!res.ok) throw new Error()
+
             toast.success("¡Suscripción exitosa! 🎉", {
                 description: `Te hemos enviado un correo de confirmación a ${email}`
             })
+
             setEmail("")
+        } catch {
+            toast.error("Error al suscribirse", {
+                description: "Inténtalo más tarde"
+            })
+        } finally {
             setIsLoading(false)
-        }, 1000)
+        }
     }
 
     return (
