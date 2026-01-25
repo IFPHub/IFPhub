@@ -46,6 +46,19 @@ const MONTHS = [
 const bodyFont = { fontFamily: '"Montserrat", system-ui, sans-serif' };
 const titleFont = { fontFamily: '"Libre Baskerville", serif' };
 
+// Misma API de fotos que se usa en home/noticias
+const getPicsum = (seed: string | number, w = 800, h = 600) =>
+  `https://picsum.photos/seed/${encodeURIComponent(String(seed))}/${w}/${h}`;
+
+function pickFirstNonEmpty(
+  ...values: Array<string | null | undefined>
+): string | undefined {
+  const found = values.find(
+    (v) => typeof v === "string" && v.trim() !== ""
+  );
+  return found?.trim();
+}
+
 function MiniCalendar({
   value,
   onChange,
@@ -221,6 +234,10 @@ function CreateModal({
   addNewTag: () => void;
 }) {
   const panelRef = useRef<HTMLDivElement>(null);
+  const fallbackCoverSeedRef = useRef(Date.now());
+  const previewCoverSrc =
+    pickFirstNonEmpty(coverUrl) ??
+    getPicsum(`reunion-new-${fallbackCoverSeedRef.current}`);
 
   useEffect(() => {
     function onDown(e: MouseEvent) {
@@ -468,17 +485,11 @@ function CreateModal({
                 </label>
 
                 <div className="mt-3 aspect-[4/3] w-full overflow-hidden rounded-md border border-black/15 bg-zinc-100">
-                  {coverUrl ? (
-                    <img
-                      src={coverUrl}
-                      alt="Portada"
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <div className="grid h-full w-full place-items-center text-xs opacity-60">
-                      Sin portada
-                    </div>
-                  )}
+                  <img
+                    src={previewCoverSrc}
+                    alt="Portada"
+                    className="h-full w-full object-cover"
+                  />
                 </div>
               </div>
             </div>
@@ -521,17 +532,11 @@ function CreateModal({
           <div className="flex flex-col items-center gap-4">
             <div className="w-full max-w-sm">
               <div className="aspect-[4/3] w-full overflow-hidden rounded-md border border-black/15 bg-zinc-100">
-                {coverUrl ? (
-                  <img
-                    src={coverUrl}
-                    alt="Portada preview"
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="grid h-full w-full place-items-center text-xs opacity-60">
-                    Sin portada
-                  </div>
-                )}
+                <img
+                  src={previewCoverSrc}
+                  alt="Portada preview"
+                  className="h-full w-full object-cover"
+                />
               </div>
 
               <h3
@@ -682,6 +687,8 @@ function Card({
   const canFav = !!it.videoUrl;
   const fav = !!it.isFavorite;
   const badgeLabel = it.course ?? it.tag;
+  const coverSrc =
+    pickFirstNonEmpty(it.coverUrl) ?? getPicsum(`reunion-${it.id}`);
 
   return (
     <article
@@ -691,17 +698,11 @@ function Card({
     >
       <div className="flex h-full flex-col overflow-hidden rounded-xl border border-[#123d58] bg-[#123d58] shadow-xl">
         <div className="relative aspect-[4/3] w-full overflow-hidden">
-          {it.coverUrl ? (
-            <img
-              src={it.coverUrl}
-              alt={it.title}
-              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-            />
-          ) : (
-            <div className="grid h-full w-full place-items-center text-xs text-white/70">
-              Sin portada
-            </div>
-          )}
+          <img
+            src={coverSrc}
+            alt={it.title}
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+          />
 
           <div className="absolute inset-0 bg-gradient-to-t from-[#123d58] to-transparent opacity-70" />
 
@@ -847,9 +848,24 @@ export function Board() {
   const [newCoverFile, setNewCoverFile] = useState<File | null>(null);
   const [newVideoFile, setNewVideoFile] = useState<File | null>(null);
   const [newCourse, setNewCourse] = useState<Curso | null>(null);
+  const [currentUserName, setCurrentUserName] = useState("Profesor");
+  const [currentUserId, setCurrentUserId] = useState(1);
 
   // MODAL VIDEO
   const [activeVideoItem, setActiveVideoItem] = useState<CardItem | null>(null);
+
+  useEffect(() => {
+    const storedName = sessionStorage.getItem("ifphub_user_name")?.trim();
+    if (storedName) {
+      setCurrentUserName(storedName);
+    }
+
+    const storedUid = sessionStorage.getItem("uid");
+    const parsedUid = storedUid ? Number(storedUid) : NaN;
+    if (Number.isFinite(parsedUid)) {
+      setCurrentUserId(parsedUid);
+    }
+  }, []);
   
   useEffect(() => {
     if (isCreateOpen) {
@@ -908,6 +924,11 @@ export function Board() {
           video: string | null;
           id_usuario: number | null;
           id_curso: number | null;
+          portada?: string | null;
+          portada_url?: string | null;
+          cover?: string | null;
+          imagen?: string | null;
+          imagen_url?: string | null;
           // si luego en el RPC devuelves nombre de curso, lo añades aquí
           // curso_nombre?: string | null;
         };
@@ -923,7 +944,13 @@ export function Board() {
           course: undefined,
           professor: r.profesor ?? undefined,
           videoUrl: r.video ?? undefined,
-          coverUrl: undefined,
+          coverUrl: pickFirstNonEmpty(
+            r.portada,
+            r.portada_url,
+            r.cover,
+            r.imagen,
+            r.imagen_url
+          ),
           isFavorite: false,
         }));
 
@@ -1072,12 +1099,12 @@ export function Board() {
       titulo: newTitle.trim(),
       descripcion: newDesc.trim() || null,
       tag: newCats[0] ?? null,
-      profesor: "Jorge Aguirre",
+      profesor: currentUserName,
       date: selectedDate
         ? selectedDate.toISOString().slice(0, 10)
         : null,
       video: newVideoUrl.trim() || null,
-      id_usuario: 1, // ✅ fijo por ahora
+      id_usuario: currentUserId,
       id_curso: newCourse?.id_curso ?? null,
     };
 
@@ -1106,7 +1133,13 @@ export function Board() {
         course: undefined,
         professor: r.profesor ?? undefined,
         videoUrl: r.video ?? undefined,
-        coverUrl: undefined,
+        coverUrl: pickFirstNonEmpty(
+          r.portada,
+          r.portada_url,
+          r.cover,
+          r.imagen,
+          r.imagen_url
+        ),
         isFavorite: false,
       }));
 
