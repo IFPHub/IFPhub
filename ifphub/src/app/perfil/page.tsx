@@ -44,7 +44,7 @@ const initialProfile: Profile = {
   notifications: true,
 };
 
-export default function PerfilPage() {
+function PerfilPageInner() {
   const searchParams = useSearchParams();
   const uid = searchParams.get("uid");
   const sig = searchParams.get("sig");
@@ -412,5 +412,13 @@ export default function PerfilPage() {
         </main>
       </SidebarInset>
     </SidebarProvider>
+  );
+}
+
+export default function PerfilPage() {
+  return (
+    <React.Suspense fallback={null}>
+      <PerfilPageInner />
+    </React.Suspense>
   );
 }
