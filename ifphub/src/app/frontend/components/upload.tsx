@@ -6,16 +6,26 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/app/frontend/components/ui/dialog";
 import FileUpload03 from "@/app/frontend/components/file-upload-03";
 
+type Curso = {
+  id_curso: number;
+  nombre: string;
+  grado: number | null;
+};
+
 type UploadDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title?: string;
+  cursos: Curso[];
+  uid: string | null;
 };
 
 export default function UploadDialog({
   open,
   onOpenChange,
   title = "Subir archivo",
+  cursos,
+  uid,
 }: UploadDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -29,9 +39,9 @@ export default function UploadDialog({
         {/* ✅ CHANGE: scroll solo dentro del contenido */}
         <div className="flex-1 overflow-y-auto p-6">
           <FileUpload03
-            // ✅ CHANGE: conectamos Cancelar con el cierre del modal
+            cursos={cursos}
+            uid={uid}
             onCancel={() => onOpenChange(false)}
-            // ✅ CHANGE: si haces submit real luego, puedes cerrar aquí también
             onUploaded={() => onOpenChange(false)}
           />
         </div>

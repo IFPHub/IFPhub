@@ -34,13 +34,20 @@ import Dialog01 from "@/app/frontend/components/dialog-01";
 
 // ✅ CHANGE: props opcionales para que el componente pueda cerrar el modal/avisar al padre sin acoplarse.
 type FileUpload03Props = {
+  cursos: Curso[];
+  uid: string | null;
   onCancel?: () => void;
   onUploaded?: () => void;
 };
 
+type Curso = {
+  id_curso: number;
+  nombre: string;
+  grado: number | null;
+};
 
+const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
-const MAX_FILE_SIZE = 50 * 1024 * 1024; // ✅ CHANGE: límite real 50MB
 
 function formatBytes(bytes: number) {
   // ✅ CHANGE: helper para mostrar tamaño humano
@@ -55,16 +62,26 @@ function formatBytes(bytes: number) {
 }
 
 export default function FileUpload03({
+  cursos,
+  uid,
   onCancel,
   onUploaded,
 }: FileUpload03Props) {
   const [files, setFiles] = React.useState<File[]>([]);
   const [error, setError] = React.useState<string | null>(null);
+  const [cursoId, setCursoId] = React.useState<string>("");
+  const [titulo, setTitulo] = React.useState("");
+  const [descripcion, setDescripcion] = React.useState("");
+  const [visibilidad, setVisibilidad] = React.useState<"public" | "private">("private");
+  const [subiendo, setSubiendo] = React.useState(false);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     // ✅ CHANGE: acepta múltiples archivos
     multiple: true,
     maxSize: MAX_FILE_SIZE,
+    accept: {
+      "image/*": []
+    },
     onDrop: (acceptedFiles) => {
       setError(null);
       setFiles(acceptedFiles);
@@ -83,12 +100,55 @@ export default function FileUpload03({
       }
     },
   });
+  
+  const handleSubmit = async () => {
+    if (!titulo || !cursoId || files.length === 0) {
+      setError("Faltan datos obligatorios");
+      return;
+    }
 
+    if (!uid) {
+      setError("Usuario no identificado");
+      return;
+    }
 
-  const handleBackToDashboard = () => {
-    setFiles([]);
+    setSubiendo(true);
     setError(null);
-    onCancel?.(); // cierra el modal grande
+
+    try {
+      const formData = new FormData();
+      formData.append("titulo", titulo);
+      formData.append("descripcion", descripcion);
+      formData.append("visibilidad", visibilidad);
+      formData.append("id_curso", cursoId);
+      formData.append("file", files[0]);
+      formData.append("uid", uid);
+
+      const res = await fetch("/api/proyecto/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        let message = "Error al subir el proyecto";
+
+        try {
+          const data = await res.json();
+          message = data.error || message;
+        } catch {
+          // la respuesta no tiene JSON
+        }
+
+        throw new Error(message);
+      }
+
+      onUploaded?.();
+    } catch (err) {
+      console.error(err);
+      setError("Error al subir el proyecto");
+    } finally {
+      setSubiendo(false);
+    }
   };
 
   const removeFile = (name: string) => {
@@ -152,9 +212,9 @@ export default function FileUpload03({
                 </Label>
                 <Input
                   id="project-name"
-                  name="project-name"
+                  value={titulo}
+                  onChange={(e) => setTitulo(e.target.value)}
                   placeholder="Nombre del proyecto"
-                  className="mt-2"
                 />
               </div>
 
@@ -164,7 +224,12 @@ export default function FileUpload03({
                     Visibilidad
                   </Label>
                   {/* ✅ CHANGE: defaultValue consistente con valores (private/public) */}
-                  <Select defaultValue="private">
+                  <Select
+                    value={visibilidad}
+                    onValueChange={(value) =>
+                      setVisibilidad(value as "public" | "private")
+                    }
+                  >
                     <SelectTrigger
                       id="visibility"
                       name="visibility"
@@ -183,28 +248,30 @@ export default function FileUpload03({
                 </div>
 
                 <div>
-                  <Label htmlFor="category" className="font-medium">
-                    Categoría
+                  <Label htmlFor="curso" className="font-medium">
+                    Curso
                   </Label>
 
-                  {/* ✅ CHANGE: defaultValue en minúsculas para que coincida con los value */}
-                  <Select defaultValue="daw">
-                    <SelectTrigger
-                      id="category"
-                      name="category"
-                      className="mt-2 w-full"
-                    >
-                      <SelectValue placeholder="Escoge una categoría" />
+                  <Select value={cursoId} onValueChange={setCursoId}>
+                    <SelectTrigger id="curso" className="mt-2 w-full">
+                      <SelectValue placeholder="Selecciona un curso" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="daw">DAW</SelectItem>
-                      <SelectItem value="dam">DAM</SelectItem>
-                      <SelectItem value="smx">SMX</SelectItem>
+
+                    <SelectContent className="max-h-48 overflow-y-auto">
+                      {cursos.map((curso) => (
+                        <SelectItem
+                          key={`${curso.id_curso}-${curso.grado}`}
+                          value={String(curso.id_curso)}
+                        >
+                          {curso.nombre}
+                          {curso.grado ? ` (${curso.grado})` : ""}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
 
                   <p className="mt-2 text-sm text-muted-foreground">
-                    Escoge una categoría.
+                    Asocia el proyecto a un curso
                   </p>
                 </div>
               </div>
@@ -215,8 +282,8 @@ export default function FileUpload03({
                 </Label>
                 <Textarea
                   id="description"
-                  className="mt-2 min-h-[130px]"
-                  placeholder="Añade una descripción a tu proyecto..."
+                  value={descripcion}
+                  onChange={(e) => setDescripcion(e.target.value)}
                 />
               </div>
             </div>
@@ -275,7 +342,7 @@ export default function FileUpload03({
                 </div>
 
                 <div className="mt-2 text-sm text-muted-foreground flex items-center justify-between gap-4">
-                  <span>Puedes cargar todo tipo de archivos</span>
+                  <span>Puedes cargar cualquier imágen</span>
                   <span>Tamaño max. del archivo: 50MB</span>
                 </div>
               </div>
@@ -314,11 +381,13 @@ export default function FileUpload03({
             </Button>
 
             {/* ✅ CHANGE: mantenemos tu Dialog01, pero al “confirmar subida” puedes cerrar el modal */}
-            <Dialog01
-              trigger={<Button type="button">Subir</Button>}
-              onBackToDashboard={handleBackToDashboard}
-              to="#" // cambia esto si tu ruta es otra
-            />
+            <Button
+              type="button"
+              onClick={handleSubmit}
+              disabled={subiendo}
+            >
+              {subiendo ? "Subiendo..." : "Subir"}
+            </Button>
           </div>
         </form>
       </CardContent>

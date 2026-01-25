@@ -64,12 +64,15 @@ export default async function Page({
     { p_id: proyectoId }
   );
 
+  console.log(proyectoData);
+
   if (error || !proyectoData?.length) {
     console.error(error);
     return <div>Error al cargar el proyecto o no existe.</div>;
   }
 
   const proyecto: Proyecto = proyectoData[0];
+  console.log(proyecto);
   const imagen =
     proyecto.imagen ??
     getPicsum(proyecto.id_proyecto, 800, 500);
