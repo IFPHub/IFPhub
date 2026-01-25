@@ -7,7 +7,11 @@ type Noticia = {
   titulo: string;
   fecha_hora: string;
   id_noticia: number;
+  imagen?: string | null;
 };
+
+const getPicsum = (seed: string | number, w = 200, h = 200) =>
+  `https://picsum.photos/seed/${encodeURIComponent(String(seed))}/${w}/${h}`;
 
 export default function Sidebar({ uid, sig }: { uid?: string; sig?: string }) {
   const [noticias, setNoticias] = useState<Noticia[]>([]);
@@ -35,7 +39,19 @@ export default function Sidebar({ uid, sig }: { uid?: string; sig?: string }) {
               href={`/detail/${n.id_noticia}${query}`}
               className="flex gap-3 items-center p-2 rounded-md hover:bg-[#f3f6f7] transition-colors"
             >
-              <div className="w-14 h-14 rounded-md bg-gradient-to-b from-[var(--soft)] to-[#ffeaf0] flex-shrink-0" />
+              <div className="relative w-14 h-14 rounded-md overflow-hidden shrink-0">
+                <Image
+                  src={
+                    n.imagen && n.imagen.trim() !== ""
+                      ? n.imagen
+                      : getPicsum(n.id_noticia, 56, 56)
+                  }
+                  alt={n.titulo}
+                  fill
+                  className="object-cover"
+                  sizes="56px"
+                />
+              </div>
               <div className="text-sm leading-tight">
                 <p className="font-semibold line-clamp-1">{n.titulo}</p>
                 <p className="text-muted text-xs mt-1">
