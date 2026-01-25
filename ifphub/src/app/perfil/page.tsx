@@ -185,7 +185,7 @@ function PerfilPageInner() {
           <div className="w-full max-w-none">
             <div className="mb-6">
               <h1 className="text-3xl md:text-4xl font-semibold font-['Libre_Baskerville'] text-[#123d58]">
-                Bienvenido, {profile.name || "usuario"}
+                Bienvenid@, {profile.name || "usuario"}
               </h1>
               <p className="mt-1 text-sm text-[#123d58]/60">
                 Administra tu perfil y preferencias.
@@ -447,30 +447,30 @@ function PerfilPageInner() {
                       className="mt-1 h-10 border-[#dbe2e8]"
                     />
                   </div>
+                  <div>
+                    <label className="text-sm font-medium text-[#123d58]">
+                      Género
+                    </label>
+                    <select
+                      value={profile.genero}
+                      onChange={(e) =>
+                        setProfile((prev) => ({
+                          ...prev,
+                          genero: e.target.value,
+                        }))
+                      }
+                      className="mt-1 h-10 w-full rounded-md border border-[#dbe2e8] bg-white px-3 text-sm text-[#123d58] focus:outline-none focus:ring-2 focus:ring-[#123d58]/20"
+                    >
+                      <option value="">Prefiero no decirlo</option>
+                      <option value="mujer">Mujer</option>
+                      <option value="hombre">Hombre</option>
+                      <option value="no_binario">No binario</option>
+                      <option value="genero_fluido">Género fluido</option>
+                      <option value="otro">Otro</option>
+                    </select>
+                  </div>
                 </div>
 
-                <div>
-                  <label className="text-sm font-medium text-[#123d58]">
-                    Género
-                  </label>
-                  <select
-                    value={profile.genero}
-                    onChange={(e) =>
-                      setProfile((prev) => ({
-                        ...prev,
-                        genero: e.target.value,
-                      }))
-                    }
-                    className="mt-1 h-10 w-full rounded-md border border-[#dbe2e8] bg-white px-3 text-sm text-[#123d58] focus:outline-none focus:ring-2 focus:ring-[#123d58]/20"
-                  >
-                    <option value="">Prefiero no decirlo</option>
-                    <option value="mujer">Mujer</option>
-                    <option value="hombre">Hombre</option>
-                    <option value="no_binario">No binario</option>
-                    <option value="genero_fluido">Género fluido</option>
-                    <option value="otro">Otro</option>
-                  </select>
-                </div>
 
                 <div className="mt-4">
                   <label className="text-sm font-medium text-[#123d58]">
@@ -486,7 +486,7 @@ function PerfilPageInner() {
                     }
                     placeholder="Cuéntanos algo sobre ti…"
                     rows={4}
-                    className="mt-1 w-full rounded-md border border-[#dbe2e8] px-3 py-2 text-sm text-[#123d58] focus:outline-none focus:ring-2 focus:ring-[#123d58]/20"
+                    className="mt-1 w-full rounded-md border border-[#dbe2e8] px-3 py-2 text-sm text-[#123d58] focus:outline-none focus:ring-2 focus:ring-[#123d58]/20 resize-none"
                   />
                 </div>
 
