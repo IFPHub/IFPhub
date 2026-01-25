@@ -18,7 +18,7 @@ import {
   SidebarTrigger,
 } from "@/app/frontend/components/ui/sidebar"
 import Calendar01, { type TimeSlot } from "@/app/frontend/components/calendar-01"
-import { useSearchParams } from "next/navigation"
+import { useRouter, usePathname, useSearchParams } from "next/navigation" 
 
 const montserrat = Montserrat({ subsets: ["latin"] })
 
@@ -89,6 +89,8 @@ export default function Page() {
     const parsed = Number(uid)
     return Number.isFinite(parsed) ? parsed : null
   }, [uid])
+  const router = useRouter()
+  const pathname = usePathname()
 
   const loadCitas = React.useCallback(async () => {
     setIsLoading(true)
@@ -110,6 +112,25 @@ export default function Page() {
       setIsLoading(false)
     }
   }, [])
+
+  React.useEffect(() => {
+    const storedUid = sessionStorage.getItem("uid")
+    const storedSig = sessionStorage.getItem("sig")
+
+    if (!storedUid || !storedSig) return
+
+    const urlUid = searchParams.get("uid")
+    const urlSig = searchParams.get("sig")
+
+    // 🔁 Añadir o corregir params en la URL
+    if (urlUid !== storedUid || urlSig !== storedSig) {
+      const params = new URLSearchParams(searchParams.toString())
+      params.set("uid", storedUid)
+      params.set("sig", storedSig)
+
+      router.replace(`${pathname}?${params.toString()}`)
+    }
+  }, [pathname, router, searchParams])
 
   React.useEffect(() => {
     loadCitas()
