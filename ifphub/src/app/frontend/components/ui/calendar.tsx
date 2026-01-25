@@ -6,6 +6,8 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
 } from "lucide-react"
+import { format } from "date-fns"
+import { es } from "date-fns/locale"
 import { DayButton, DayPicker, getDefaultClassNames } from "react-day-picker"
 
 import { cn } from "@/lib/utils"
@@ -24,6 +26,8 @@ function Calendar({
   buttonVariant?: React.ComponentProps<typeof Button>["variant"]
 }) {
   const defaultClassNames = getDefaultClassNames()
+  const capitalizeFirst = (value: string) =>
+    value ? `${value.charAt(0).toUpperCase()}${value.slice(1)}` : value
 
   return (
     <DayPicker
@@ -34,10 +38,13 @@ function Calendar({
         String.raw`rtl:**:[.rdp-button\_previous>svg]:rotate-180`,
         className
       )}
+      locale={es}
       captionLayout={captionLayout}
       formatters={{
         formatMonthDropdown: (date) =>
-          date.toLocaleString("default", { month: "short" }),
+          capitalizeFirst(format(date, "MMM", { locale: es })),
+        formatCaption: (date) =>
+          capitalizeFirst(format(date, "MMMM yyyy", { locale: es })),
         ...formatters,
       }}
       classNames={{

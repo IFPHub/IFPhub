@@ -39,6 +39,28 @@ export async function POST(req: Request) {
 
     const supabase = createClient();
 
+    if (id_usuario !== null) {
+      const { count, error: countError } = await supabase
+        .from("cita")
+        .select("id_cita", { count: "exact", head: true })
+        .eq("id_usuario", id_usuario);
+
+      if (countError) {
+        console.error(countError);
+        return NextResponse.json(
+          { error: "Error al validar limite de citas" },
+          { status: 500 }
+        );
+      }
+
+      if ((count ?? 0) >= 3) {
+        return NextResponse.json(
+          { error: "Maximo de 3 citas por usuario" },
+          { status: 409 }
+        );
+      }
+    }
+
     const { data: occupiedRows, error: occupiedError } = await supabase
       .from("cita")
       .select("id_cita")
@@ -91,6 +113,39 @@ export async function POST(req: Request) {
       console.error(error);
       return NextResponse.json(
         { error: "Error al insertar cita" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: "Error inesperado" }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: Request) {
+  try {
+    const body = await req.json();
+    const id_cita =
+      body.id_cita === null || body.id_cita === undefined
+        ? null
+        : Number(body.id_cita);
+
+    if (id_cita === null || !Number.isFinite(id_cita)) {
+      return NextResponse.json(
+        { error: "Id de cita invalido" },
+        { status: 400 }
+      );
+    }
+
+    const supabase = createClient();
+    const { error } = await supabase.from("cita").delete().eq("id_cita", id_cita);
+
+    if (error) {
+      console.error(error);
+      return NextResponse.json(
+        { error: "Error al cancelar cita" },
         { status: 500 }
       );
     }
