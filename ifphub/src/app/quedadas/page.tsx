@@ -19,6 +19,7 @@ import { Button } from "@/app/frontend/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 type Event = {
   id_quedada: number;
@@ -46,6 +47,10 @@ export default function Page() {
   const [uid, setUid] = useState<string | null>(null);
   const [sig, setSig] = useState<string | null>(null);
 
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     setUid(params.get("uid"));
@@ -56,8 +61,22 @@ export default function Page() {
     const storedUid = sessionStorage.getItem("uid");
     const storedSig = sessionStorage.getItem("sig");
 
+    if (!storedUid || !storedSig) return;
+
     setUid(storedUid);
     setSig(storedSig);
+
+    const urlUid = searchParams.get("uid");
+    const urlSig = searchParams.get("sig");
+
+    // 🔁 Si no están en la URL, los añadimos
+    if (!urlUid || !urlSig) {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("uid", storedUid);
+      params.set("sig", storedSig);
+
+      router.replace(`${pathname}?${params.toString()}`);
+    }
   }, []);
 
   useEffect(() => {

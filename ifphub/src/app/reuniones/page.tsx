@@ -21,11 +21,15 @@ import {
 
 import { Separator } from "@/app/frontend/components/ui/separator";
 
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 export default function Page() {
   const [uid, setUid] = useState<string | null>(null);
   const [sig, setSig] = useState<string | null>(null);
+  
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -33,13 +37,27 @@ export default function Page() {
     setSig(params.get("sig"));
   }, []);
 
-  const router = useRouter();
-
   useEffect(() => {
-    if (!uid || !sig) {
-      router.replace("/"); // LOGIN
+    const storedUid = sessionStorage.getItem("uid");
+    const storedSig = sessionStorage.getItem("sig");
+
+    if (!storedUid || !storedSig) return;
+
+    setUid(storedUid);
+    setSig(storedSig);
+
+    const urlUid = searchParams.get("uid");
+    const urlSig = searchParams.get("sig");
+
+    // 🔁 Si no están en la URL, los añadimos
+    if (!urlUid || !urlSig) {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("uid", storedUid);
+      params.set("sig", storedSig);
+
+      router.replace(`${pathname}?${params.toString()}`);
     }
-  }, [uid, sig, router]);
+  }, []);
 
   if (!uid || !sig) return null;
 
