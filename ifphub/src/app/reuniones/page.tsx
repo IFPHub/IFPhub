@@ -21,7 +21,7 @@ import {
 
 import { Separator } from "@/app/frontend/components/ui/separator";
 
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function Page() {
   const [uid, setUid] = useState<string | null>(null);
@@ -29,13 +29,12 @@ export default function Page() {
   
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     setUid(params.get("uid"));
     setSig(params.get("sig"));
-  }, []);
+  }, [pathname, router]);
 
   useEffect(() => {
     const storedUid = sessionStorage.getItem("uid");
@@ -46,12 +45,12 @@ export default function Page() {
     setUid(storedUid);
     setSig(storedSig);
 
-    const urlUid = searchParams.get("uid");
-    const urlSig = searchParams.get("sig");
+    const params = new URLSearchParams(window.location.search);
+    const urlUid = params.get("uid");
+    const urlSig = params.get("sig");
 
     // 🔁 Si no están en la URL, los añadimos
     if (!urlUid || !urlSig) {
-      const params = new URLSearchParams(searchParams.toString());
       params.set("uid", storedUid);
       params.set("sig", storedSig);
 
