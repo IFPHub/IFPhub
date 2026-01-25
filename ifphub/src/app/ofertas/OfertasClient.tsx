@@ -24,6 +24,7 @@ import {
 import { Baskervville, Montserrat } from "next/font/google";
 import Image from "next/image";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { motion } from "framer-motion";
 
 interface Oficio {
   id_oferta: number;
@@ -254,17 +255,25 @@ export default function OfertasClient() {
           <div className="absolute inset-0 bg-black/50" />
         </div>
 
-        <div className="relative z-10 flex flex-col items-center justify-center gap-6 max-w-7xl w-full px-4">
+        <div className="relative z-10 flex flex-col items-center justify-center gap-8 max-w-7xl w-full px-4">
           <div className="max-w-3xl w-full space-y-3 md:space-y-4 text-center">
-            <h1
-                className={`${baskervville.className} text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white`}
+            <motion.h1
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className={`${baskervville.className} text-4xl md:text-6xl font-normal text-white leading-tight drop-shadow-lg`}
             >
                 Ofertas de trabajo
-            </h1>
+            </motion.h1>
           </div>
-          <div className="flex-shrink-0 mt-6">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="flex-shrink-0"
+          >
             <NuevaOfertaDialog onSubmit={handleNuevaOferta} />
-            </div>
+          </motion.div>
           </div>
         </div>
 

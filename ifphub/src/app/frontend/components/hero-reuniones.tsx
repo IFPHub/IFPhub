@@ -30,9 +30,9 @@ export function Hero_reuniones({ onCreate }: HeroReunionesProps) {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="text-4xl md:text-6xl text-white leading-tight drop-shadow-lg font-['Libre_Baskerville']"
+          className="text-4xl md:text-6xl font-normal text-white leading-tight drop-shadow-lg font-['Libre_Baskerville']"
         >
-          Organiza y colabora diferido.
+          Aprende y colabora en comunidad
         </motion.h1>
 
         {onCreate && (

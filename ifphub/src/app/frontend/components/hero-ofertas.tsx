@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { Button } from "@/app/frontend/components/ui/button";
 import { CreateEventModal } from "@/app/frontend/components/create-event-modal";

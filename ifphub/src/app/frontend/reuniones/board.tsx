@@ -59,6 +59,25 @@ const MONTHS = [
 const bodyFont = { fontFamily: '"Montserrat", system-ui, sans-serif' };
 const titleFont = { fontFamily: '"Libre Baskerville", serif' };
 
+const BLOCKED_TAGS = new Set([
+  'audiovisual',
+  'db',
+  'edicion',
+  'ia',
+  'musica',
+  'prog',
+  'salud',
+  'test',
+  'web',
+]);
+
+const normalizeTag = (value: string) =>
+  value
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+
 // Misma API de fotos que se usa en home/noticias
 const getPicsum = (seed: string | number, w = 800, h = 600) =>
   `https://picsum.photos/seed/${encodeURIComponent(String(seed))}/${w}/${h}`;
@@ -362,13 +381,13 @@ function CreateModal({
     <div className="fixed inset-0 z-[100] overflow-y-auto bg-black/30 p-4 sm:p-8">
       <div
         ref={panelRef}
-        className="mx-auto flex w-full max-w-5xl flex-col gap-6 rounded-xl bg-[#F5F5F5] p-6 shadow-xl"
+        className="mx-auto flex w-full max-w-5xl flex-col rounded-xl border border-black/10 bg-white shadow-xl overflow-hidden"
         style={bodyFont}
       >
         {/* PARTE ARRIBA */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between border-b px-6 py-4">
           <h2
-            className="text-xl font-semibold text-[#D46D85]"
+            className="text-xl font-semibold text-[#123d58]"
             style={titleFont}
           >
             Crear contenido
@@ -381,6 +400,7 @@ function CreateModal({
           </button>
         </div>
 
+        <div className="flex flex-col gap-6 px-6 pb-6">
         {/* GRID PRINCIPAL */}
         <div className="grid gap-8 md:grid-cols-[1.4fr_1.1fr]">
           {/* COLUMNA IZQUIERDA */}
@@ -388,7 +408,7 @@ function CreateModal({
             {/* TÍTULO */}
             <div>
               <h3
-                className="mb-2 text-lg font-semibold text-[#D46D85]"
+                className="mb-2 text-lg font-semibold text-[#123d58]"
                 style={titleFont}
               >
                 Título
@@ -396,7 +416,7 @@ function CreateModal({
               <input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="h-12 w-full rounded-md border border-black/20 bg-[#124D58] px-4 text-sm text-white placeholder:text-zinc-200"
+                className="h-11 w-full rounded-md border border-[#dbe2e8] bg-white px-4 text-sm text-[#123d58] placeholder:text-[#123d58]/50 focus:outline-none focus:ring-2 focus:ring-[#123d58]/15"
                 placeholder="Introduce un título..."
               />
             </div>
@@ -404,7 +424,7 @@ function CreateModal({
             {/* DESCRIPCIÓN */}
             <div>
               <h3
-                className="mb-2 text-lg font-semibold text-[#D46D85]"
+                className="mb-2 text-lg font-semibold text-[#123d58]"
                 style={titleFont}
               >
                 Descripción
@@ -412,7 +432,7 @@ function CreateModal({
               <textarea
                 value={desc}
                 onChange={(e) => setDesc(e.target.value)}
-                className="min-h-[120px] w-full rounded-md border border-black/20 bg-[#124D58] p-4 text-sm text-white placeholder:text-zinc-200"
+                className="min-h-[120px] w-full rounded-md border border-[#dbe2e8] bg-white p-4 text-sm text-[#123d58] placeholder:text-[#123d58]/50 focus:outline-none focus:ring-2 focus:ring-[#123d58]/15"
                 placeholder="Describe el contenido..."
               />
             </div>
@@ -422,14 +442,14 @@ function CreateModal({
               {/* CURSO + TAGS */}
               <div>
                 <h3
-                  className="mb-3 text-lg font-semibold text-[#D46D85]"
+                  className="mb-3 text-lg font-semibold text-[#123d58]"
                   style={titleFont}
                 >
                   Categorías
                 </h3>
 
                 {/* CURSO */}
-                <p className="mb-2 text-sm font-medium text-[#004B57]">
+                <p className="mb-2 text-sm font-medium text-[#123d58]">
                   Curso
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -441,10 +461,10 @@ function CreateModal({
                         key={c.id_curso}
                         type="button"
                         onClick={() => setNewCourse(c)}
-                        className={`flex items-center justify-between gap-2 rounded-full border px-3 py-1 text-xs ${
+                        className={`flex items-center justify-between gap-2 rounded-full border px-3 py-1 text-xs transition ${
                           active
-                            ? "border-[#124D58] bg-[#124D58] text-white"
-                            : "border-[#124D58] text-[#124D58]"
+                            ? "border-[#123d58] bg-[#123d58] text-white"
+                            : "border-[#dbe2e8] bg-white text-[#123d58] hover:bg-[#f1f5f9]"
                         }`}
                       >
                         <span className="max-w-[160px] truncate">
@@ -462,7 +482,7 @@ function CreateModal({
                     <button
                       type="button"
                       onClick={() => setShowAllCourses((v) => !v)}
-                      className="flex overflow-hidden items-center gap-2 rounded-full border border-dashed px-3 py-1 text-xs text-[#124D58] hover:bg-[#124D58]/5"
+                      className="flex overflow-hidden items-center gap-2 rounded-full border border-dashed border-[#dbe2e8] px-3 py-1 text-xs text-[#123d58] hover:bg-[#f1f5f9]"
                     >
                       {newCourse ? (
                         <>
@@ -497,7 +517,7 @@ function CreateModal({
                 )}
 
                 {/* TAGS */}
-                <p className="mt-4 mb-2 text-sm font-medium text-[#004B57]">
+                <p className="mt-4 mb-2 text-sm font-medium text-[#123d58]">
                   Etiquetas
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -510,8 +530,8 @@ function CreateModal({
                         onClick={() => toggleCat(c)}
                         className={`rounded-full border px-3 py-1 text-xs ${
                           active
-                            ? "border-black/40 bg-[#D46D85] text-white"
-                            : "border-[#D46D85]/60 bg-transparent text-[#D46D85]"
+                            ? "border-[#123d58] bg-[#123d58] text-white"
+                            : "border-[#dbe2e8] bg-white text-[#123d58] hover:bg-[#f1f5f9]"
                         }`}
                       >
                         {c}
@@ -538,7 +558,7 @@ function CreateModal({
                       }
                     }}
                     placeholder="+"
-                    className="h-8 w-20 rounded-md border border-dashed border-black/30 bg-transparent px-2 text-sm text-[#D46D85]"
+                    className="h-8 w-20 rounded-md border border-dashed border-[#dbe2e8] bg-white px-2 text-sm text-[#123d58]"
                   />
                 </div>
               </div>
@@ -546,7 +566,7 @@ function CreateModal({
               {/* PORTADA */}
               <div>
                 <h3
-                  className="mb-3 text-lg font-semibold text-[#D46D85]"
+                  className="mb-3 text-lg font-semibold text-[#123d58]"
                   style={titleFont}
                 >
                   Portada
@@ -556,7 +576,7 @@ function CreateModal({
                   type="url"
                   value={coverUrl}
                   onChange={(e) => setCoverUrl(e.target.value)}
-                  className="mb-2 h-10 w-full rounded-md border border-black/20 bg-white px-3 text-xs text-zinc-800 placeholder:text-zinc-400"
+                  className="mb-2 h-10 w-full rounded-md border border-[#dbe2e8] bg-white px-3 text-xs text-[#123d58] placeholder:text-[#123d58]/50"
                   placeholder="https://tuservidor.com/portada.png"
                 />
 
@@ -582,20 +602,20 @@ function CreateModal({
 
                   <label
                     htmlFor="cover-upload"
-                    className="flex cursor-pointer items-center justify-center gap-2 rounded-md border border-dashed border-[#124D58] bg-[#124D58]/5 px-4 py-3 text-sm font-medium text-[#124D58] transition hover:bg-[#124D58]/10"
+                    className="flex cursor-pointer items-center justify-center gap-2 rounded-md border border-dashed border-[#dbe2e8] bg-[#f8fafc] px-4 py-3 text-sm font-medium text-[#123d58] transition hover:bg-[#eef2f5]"
                   >
                     {coverFile ? "Cambiar imagen" : "Subir imagen de portada"}
                   </label>
 
                   {coverFile && (
-                    <p className="mt-1 text-[11px] text-zinc-600">
+                    <p className="mt-1 text-[11px] text-[#123d58]/60">
                       Archivo seleccionado: <span className="font-medium">{coverFile.name}</span>
                     </p>
                   )}
                 </div>
                 {/* ───── VÍDEO ───── */}
                 <div className="grid gap-3 mt-4">
-                  <span className="text-sm font-medium text-[#D46D85]">
+                  <span className="text-sm font-medium text-[#123d58]">
                     Vídeo
                   </span>
 
@@ -603,7 +623,7 @@ function CreateModal({
                     type="url"
                     value={videoUrl}
                     onChange={(e) => setVideoUrl(e.target.value)}
-                    className="h-10 w-full rounded-md border border-black/20 bg-white px-3 text-xs text-zinc-800 placeholder:text-zinc-400"
+                    className="h-10 w-full rounded-md border border-[#dbe2e8] bg-white px-3 text-xs text-[#123d58] placeholder:text-[#123d58]/50"
                     placeholder="https://tuservidor.com/video.mp4"
                   />
 
@@ -630,13 +650,13 @@ function CreateModal({
 
                     <label
                       htmlFor="video-upload"
-                      className="flex cursor-pointer items-center justify-center gap-2 rounded-md border border-dashed border-[#D46D85] bg-[#D46D85]/10 px-4 py-3 text-sm font-medium text-[#D46D85] transition hover:bg-[#D46D85]/20"
+                      className="flex cursor-pointer items-center justify-center gap-2 rounded-md border border-dashed border-[#dbe2e8] bg-[#f8fafc] px-4 py-3 text-sm font-medium text-[#123d58] transition hover:bg-[#eef2f5]"
                     >
                       {videoFile ? "Cambiar vídeo" : "Subir vídeo"}
                     </label>
 
                     {videoFile && (
-                      <p className="mt-1 text-[11px] text-zinc-600">
+                      <p className="mt-1 text-[11px] text-[#123d58]/60">
                         Archivo seleccionado:{" "}
                         <span className="font-medium">{videoFile.name}</span>
                       </p>
@@ -650,7 +670,7 @@ function CreateModal({
           {/* COLUMNA DERECHA: PREVIEW */}
           <div className="flex flex-col items-center gap-4">
             <div className="w-full max-w-sm">
-              <div className="aspect-[4/3] w-full overflow-hidden rounded-md border border-black/15 bg-zinc-100">
+              <div className="aspect-[4/3] w-full overflow-hidden rounded-md border border-[#dbe2e8] bg-[#f8fafc]">
                 <img
                   src={previewCoverSrc}
                   alt="Portada preview"
@@ -659,21 +679,21 @@ function CreateModal({
               </div>
 
               <h3
-                className="mt-3 text-lg font-semibold text-[#004B57]"
+                className="mt-3 text-lg font-semibold text-[#123d58]"
                 style={titleFont}
               >
                 {title || "Ejemplo"}
               </h3>
-              <p className="mt-1 text-sm text-zinc-800">
+              <p className="mt-1 text-sm text-[#123d58]/80">
                 {desc ||
                   "Descripción de ejemplo del contenido que se mostrará en esta clase."}
               </p>
 
-              <p className="mt-2 text-[11px] text-zinc-600">
+              <p className="mt-2 text-[11px] text-[#123d58]/60">
                 {courseLabel}
               </p>
 
-              <div className="mt-3 flex items-center gap-3 text-sm text-[#D46D85]">
+              <div className="mt-3 flex items-center gap-3 text-sm text-[#123d58]/70">
                 <button
                   type="button"
                   title="Descargar"
@@ -704,7 +724,7 @@ function CreateModal({
         <div className="mt-2 flex items-center justify-end gap-3">
           <button
             onClick={onClose}
-            className="h-9 rounded-md border border-black/20 bg-white px-5 text-sm text-[#D46D85] hover:bg-black/[.04]"
+            className="h-9 rounded-md border border-[#dbe2e8] bg-white px-5 text-sm text-[#123d58] hover:bg-[#f8fafc]"
           >
             Cancelar
           </button>
@@ -715,11 +735,11 @@ function CreateModal({
               onSave();
             }}
             disabled={!isValid}
-            className={`h-9 rounded-md border border-black/20 px-6 text-sm font-medium text-white transition
+            className={`h-9 rounded-md border border-[#123d58]/20 px-6 text-sm font-medium text-white transition
               ${
                 isValid
-                  ? "bg-[#D46D85] hover:bg-[#c55c77]"
-                  : "bg-[#D46D85]/40 cursor-not-allowed"
+                  ? "bg-[#123d58] hover:bg-[#0f344b]"
+                  : "bg-[#123d58]/40 cursor-not-allowed"
               }
             `}
           >
@@ -734,6 +754,7 @@ function CreateModal({
         </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }
@@ -1128,7 +1149,9 @@ export const Board = React.forwardRef<
 
     const ALL_TAGS = useMemo(() => {
       const set = new Set([...TAGS, ...customTags]);
-      return Array.from(set).sort();
+      return Array.from(set)
+        .filter((tag) => !BLOCKED_TAGS.has(normalizeTag(tag)))
+        .sort();
     }, [TAGS, customTags]);
 
   useEffect(() => {
@@ -1351,192 +1374,213 @@ export const Board = React.forwardRef<
     
     <div className="w-full px-4 sm:px-6 lg:px-10" style={bodyFont}>
       <div className="mx-auto w-full max-w-6xl">
-        {/* BOTONES ARRIBA */}
-        <div className="flex w-full flex-wrap items-center gap-3">
-          {/* FECHA */}
-          <div ref={fechaRef} className="relative">
-            <button
-              onClick={() =>
-                setOpenFilter(openFilter === "fecha" ? null : "fecha")
-              }
-              className="flex h-9 w-36 items-center justify-between rounded-md border border-black/20 bg-white px-3 text-sm text-black transition hover:bg-black/[.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20"
-            >
-              <span className="text-black">
-                {selectedDate ? selectedDate.toLocaleDateString() : "Fecha"}
-              </span>
-              <span className="text-xs opacity-60">▾</span>
-            </button>
+        {/* CONTROLES */}
+        <div className="w-full space-y-4">
+          {/* BUSCADOR + ORDEN */}
+          <div className="flex w-full flex-wrap items-center gap-3">
+            <div className="relative flex-1 min-w-[220px]">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm opacity-60" />
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Buscador"
+                className="h-11 w-full rounded-lg border border-[#123d58]/20 bg-white/90 pl-10 pr-3 text-sm text-[#123d58] placeholder:text-[#123d58]/50 shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#123d58]/20"
+              />
+            </div>
 
-            {openFilter === "fecha" && (
-              <div className="absolute left-0 top-11 z-50">
-                <MiniCalendar
-                  value={selectedDate}
-                  onChange={(d) => {
-                    setSelectedDate(d);
-                    setOpenFilter(null);
-                  }}
-                />
-              </div>
-            )}
-          </div>
+            <div ref={orderRef} className="relative">
+              <button
+                onClick={() => setOpenOrder((v) => !v)}
+                className="h-10 w-36 shrink-0 rounded-lg border border-[#123d58]/25 bg-[#f5f7f9] text-sm text-[#123d58] transition hover:bg-[#eef2f5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#123d58]/15"
+              >
+                Ordenar por &nbsp;›
+              </button>
 
-          {/* CURSO */}
-          <div ref={cursoRef} className="relative">
-            <button
-              onClick={() =>
-                setOpenFilter(openFilter === "curso" ? null : "curso")
-              }
-              className="flex h-9 w-60 items-center justify-between rounded-md border border-black/20 bg-white px-3 text-sm text-black transition hover:bg-black/[.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20"
-            >
-              <span className="text-black">{selectedCourse ?? "Curso"}</span>
-              <span className="text-xs opacity-60">▾</span>
-            </button>
-
-            {openFilter === "curso" && (
-              <div className="absolute left-0 top-11 z-50 w-80 max-h-32 overflow-auto rounded-lg border border-black/10 bg-white p-1 text-sm shadow-lg">
-                {courses.map((c) => (
+              {openOrder && (
+                <div className="absolute right-0 top-11 z-50 w-48 rounded-lg border border-black/10 bg-white p-1 text-sm shadow-lg">
                   <button
-                    key={c.id_curso}
                     onClick={() => {
-                      setSelectedCourse(c.nombre);
-                      setOpenFilter(null);
+                      setOrderBy("newest");
+                      setOpenOrder(false);
                     }}
                     className="w-full rounded-md px-3 py-2 text-left hover:bg-black/[.04]"
                   >
-                    {c.nombre}
+                    Más nuevos
                   </button>
-                ))}
+                  <button
+                    onClick={() => {
+                      setOrderBy("oldest");
+                      setOpenOrder(false);
+                    }}
+                    className="w-full rounded-md px-3 py-2 text-left hover:bg-black/[.04]"
+                  >
+                    Más viejos
+                  </button>
+                  <button
+                    onClick={() => {
+                      setOrderBy("favorites");
+                      setOpenOrder(false);
+                    }}
+                    className="w-full rounded-md px-3 py-2 text-left hover:bg-black/[.04]"
+                  >
+                    Favoritos
+                  </button>
+                  <button
+                    onClick={() => {
+                      setOrderBy(null);
+                      setOpenOrder(false);
+                    }}
+                    className="w-full rounded-md px-3 py-2 text-left opacity-60 hover:bg-black/[.04]"
+                  >
+                    Quitar orden
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* FILTROS */}
+          <div className="flex w-full flex-wrap items-center gap-3">
+            {/* FECHA */}
+            <div ref={fechaRef} className="relative flex items-center gap-2">
+              <button
+                onClick={() =>
+                  setOpenFilter(openFilter === "fecha" ? null : "fecha")
+                }
+                className="flex h-9 w-36 items-center justify-between rounded-lg border border-[#123d58]/25 bg-[#f5f7f9] px-3 text-sm text-[#123d58] transition hover:bg-[#eef2f5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#123d58]/15"
+              >
+                <span className="text-black">
+                  {selectedDate ? selectedDate.toLocaleDateString() : "Fecha"}
+                </span>
+                <span className="text-xs opacity-60">▾</span>
+              </button>
+
+              {selectedDate && (
                 <button
+                  type="button"
                   onClick={() => {
-                    setSelectedCourse(null);
+                    setSelectedDate(null);
                     setOpenFilter(null);
                   }}
-                  className="w-full rounded-md px-3 py-2 text-left opacity-60 hover:bg-black/[.04]"
+                  className="h-8 w-8 rounded-lg border border-[#123d58]/20 bg-white text-sm text-[#123d58]/70 transition hover:bg-[#eef2f5] hover:text-[#123d58]"
+                  aria-label="Quitar filtro de fecha"
                 >
-                  Quitar filtro
+                  ✕
                 </button>
-              </div>
-            )}
+              )}
+
+              {openFilter === "fecha" && (
+                <div className="absolute left-0 top-11 z-50">
+                  <MiniCalendar
+                    value={selectedDate}
+                    onChange={(d) => {
+                      setSelectedDate(d);
+                      setOpenFilter(null);
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* CURSO */}
+            <div ref={cursoRef} className="relative">
+              <button
+                onClick={() =>
+                  setOpenFilter(openFilter === "curso" ? null : "curso")
+                }
+                className="flex h-9 w-60 items-center justify-between rounded-lg border border-[#123d58]/25 bg-[#f5f7f9] px-3 text-sm text-[#123d58] transition hover:bg-[#eef2f5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#123d58]/15"
+              >
+                <span className="text-black">{selectedCourse ?? "Curso"}</span>
+                <span className="text-xs opacity-60">▾</span>
+              </button>
+
+              {openFilter === "curso" && (
+                <div className="absolute left-0 top-11 z-50 w-80 max-h-32 overflow-auto rounded-lg border border-black/10 bg-white p-1 text-sm shadow-lg">
+                  {courses.map((c) => (
+                    <button
+                      key={c.id_curso}
+                      onClick={() => {
+                        setSelectedCourse(c.nombre);
+                        setOpenFilter(null);
+                      }}
+                      className="w-full rounded-md px-3 py-2 text-left hover:bg-black/[.04]"
+                    >
+                      {c.nombre}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => {
+                      setSelectedCourse(null);
+                      setOpenFilter(null);
+                    }}
+                    className="w-full rounded-md px-3 py-2 text-left opacity-60 hover:bg-black/[.04]"
+                  >
+                    Quitar filtro
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* PROFESOR */}
+            <div ref={profesorRef} className="relative">
+              <button
+                onClick={() =>
+                  setOpenFilter(openFilter === "profesor" ? null : "profesor")
+                }
+                className="flex h-9 w-36 items-center justify-between rounded-lg border border-[#123d58]/25 bg-[#f5f7f9] px-3 text-sm text-[#123d58] transition hover:bg-[#eef2f5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#123d58]/15"
+              >
+                <span className="text-black">
+                  {selectedProfessor ?? "Profesor"}
+                </span>
+                <span className="text-xs opacity-60">▾</span>
+              </button>
+
+              {openFilter === "profesor" && (
+                <ProfessorPopover
+                  professors={PROFESSORS}
+                  onPick={(p) => {
+                    setSelectedProfessor(p);
+                    setOpenFilter(null);
+                  }}
+                  onClear={() => {
+                    setSelectedProfessor(null);
+                    setOpenFilter(null);
+                  }}
+                />
+              )}
+            </div>
           </div>
 
-          {/* PROFESOR */}
-          <div ref={profesorRef} className="relative">
-            <button
-              onClick={() =>
-                setOpenFilter(openFilter === "profesor" ? null : "profesor")
-              }
-              className="flex h-9 w-36 items-center justify-between rounded-md border border-black/20 bg-white px-3 text-sm text-black transition hover:bg-black/[.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20"
-            >
-              <span className="text-black">
-                {selectedProfessor ?? "Profesor"}
-              </span>
-              <span className="text-xs opacity-60">▾</span>
-            </button>
-
-            {openFilter === "profesor" && (
-              <ProfessorPopover
-                professors={PROFESSORS}
-                onPick={(p) => {
-                  setSelectedProfessor(p);
-                  setOpenFilter(null);
-                }}
-                onClear={() => {
-                  setSelectedProfessor(null);
-                  setOpenFilter(null);
-                }}
-              />
-            )}
+          {/* TAGS FILTRO */}
+          <div className="flex flex-wrap gap-2">
+            {ALL_TAGS.map((tag) => {
+              const active = activeTag === tag;
+              return (
+                <button
+                  key={tag}
+                  onClick={() => setActiveTag(active ? null : tag)}
+                  className={`h-8 rounded-md border px-3 text-sm transition hover:bg-black/[.04] ${
+                    active
+                      ? "border-[#124D58] bg-[#124D58] text-white"
+                      : "border-black/20 bg-white text-black"
+                  }`}
+                >
+                  {tag}
+                </button>
+              );
+            })}
           </div>
-        </div>
-
-        {/* BUSCADOR */}
-        <div className="mt-4 flex w-full items-center gap-3">
-          <div className="relative flex-1">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm opacity-60" />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Buscador"
-              className="h-10 w-full rounded-md border border-black/20 bg-white pl-9 pr-3 text-sm text-black placeholder:text-black/40 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20"
-            />
-          </div>
-
-          <div ref={orderRef} className="relative">
-            <button
-              onClick={() => setOpenOrder((v) => !v)}
-              className="h-10 w-32 shrink-0 rounded-md border border-black/20 bg-white text-sm text-black transition hover:bg-black/[.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20"
-            >
-              Ordenar por &nbsp;›
-            </button>
-
-            {openOrder && (
-              <div className="absolute right-0 top-11 z-50 w-48 rounded-lg border border-black/10 bg-white p-1 text-sm shadow-lg">
-                <button
-                  onClick={() => {
-                    setOrderBy("newest");
-                    setOpenOrder(false);
-                  }}
-                  className="w-full rounded-md px-3 py-2 text-left hover:bg-black/[.04]"
-                >
-                  Más nuevos
-                </button>
-                <button
-                  onClick={() => {
-                    setOrderBy("oldest");
-                    setOpenOrder(false);
-                  }}
-                  className="w-full rounded-md px-3 py-2 text-left hover:bg-black/[.04]"
-                >
-                  Más viejos
-                </button>
-                <button
-                  onClick={() => {
-                    setOrderBy("favorites");
-                    setOpenOrder(false);
-                  }}
-                  className="w-full rounded-md px-3 py-2 text-left hover:bg-black/[.04]"
-                >
-                  Favoritos
-                </button>
-                <button
-                  onClick={() => {
-                    setOrderBy(null);
-                    setOpenOrder(false);
-                  }}
-                  className="w-full rounded-md px-3 py-2 text-left opacity-60 hover:bg-black/[.04]"
-                >
-                  Quitar orden
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* TAGS FILTRO */}
-        <div className="mt-4 flex flex-wrap gap-2">
-          {ALL_TAGS.map((tag) => {
-            const active = activeTag === tag;
-            return (
-          <button
-              key={tag}
-              onClick={() => setActiveTag(active ? null : tag)}
-              className={`h-8 rounded-md border px-3 text-sm transition hover:bg-black/[.04] ${
-                active
-                  ? "border-[#124D58] bg-[#124D58] text-white"
-                  : "border-black/20 bg-white text-black"
-              }`}
-            >
-              {tag}
-          </button>
-
-            );
-          })}
         </div>
 
         {/* GRID DE CARDS */}
         <section className="mt-8 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {ordered.map((it) => (
-            <Card key={it.id} it={it} onOpen={openCard} onToggleFavorite={toggleFavorite} />
+            <Card
+              key={it.id}
+              it={it}
+              onOpen={openCard}
+              onToggleFavorite={toggleFavorite}
+            />
           ))}
         </section>
       </div>

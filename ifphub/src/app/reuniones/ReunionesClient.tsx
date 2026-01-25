@@ -71,7 +71,7 @@ export default function Page() {
         <Hero_reuniones
           onCreate={() => boardRef.current?.openCreate()}
         />
-        <header className="flex h-16 shrink-0 items-center gap-2">
+        <header className="flex h-10 shrink-0 items-center gap-2">
           <div className="flex items-center gap-2 px-4">
             <div className="absolute top-4 left-4 z-50">
               <SidebarTrigger className="bg-white/20 backdrop-blur-sm hover:bg-white/30 border border-white/20" />

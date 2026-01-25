@@ -15,6 +15,7 @@ import Image from "next/image";
 import { ProjectCard } from "@/app/frontend/components/ui/projectCard";
 import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { motion } from "framer-motion";
 
 // ✅ CHANGE: En vez de renderizar el Dialog aquí, lo movemos a un componente dedicado (upload.tsx)
 // para que el tamaño/scroll esté centralizado y sea reutilizable.
@@ -72,7 +73,8 @@ export default function Page() {
   const [loading, setLoading] = React.useState(true);
   const [categoryFilter, setCategoryFilter] = React.useState("");
   const [cursos, setCursos] = React.useState<Curso[]>([]);
-  const [isFocused, setIsFocused] = useState(false);
+  const [openCategoryFilter, setOpenCategoryFilter] = useState(false);
+  const categoryFilterRef = React.useRef<HTMLDivElement>(null);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -182,16 +184,19 @@ export default function Page() {
     return Array.from(map.values());
   }, [cursos]);
 
-  const sugerencias = React.useMemo(() => {
-    const filtro = categoryFilter.toLowerCase();
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (!openCategoryFilter) return;
+      const target = event.target as Node;
+      const container = categoryFilterRef.current;
+      if (container && !container.contains(target)) {
+        setOpenCategoryFilter(false);
+      }
+    }
 
-    return cursosUnicos
-      .filter((curso) =>
-        !filtro ||
-        getCursoLabel(curso).toLowerCase().includes(filtro)
-      )
-      .slice(0, 4);
-  }, [categoryFilter, cursosUnicos]);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [openCategoryFilter]);
 
   return (
     <SidebarProvider>
@@ -215,14 +220,22 @@ export default function Page() {
 
           <div className="relative z-10 flex flex-col items-center justify-center gap-8 max-w-7xl w-full px-4 text-center">
             <div className="max-w-3xl w-full space-y-4">
-              <h1
-                className={`${baskervville.className} text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white`}
+              <motion.h1
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className={`${baskervville.className} text-4xl md:text-6xl font-normal text-white leading-tight drop-shadow-lg`}
               >
-                Proyectos de estudios
-              </h1>
+                Proyectos de estudiantes
+              </motion.h1>
             </div>
 
-            <div className="flex-shrink-0">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="flex-shrink-0"
+            >
               <Button
                 size="lg"
                 className={`${montserrat.className} border border-[#D65A7E]/70 bg-[#D65A7E]/30 text-white font-medium text-lg px-8 py-6 rounded-md backdrop-blur-sm transition-all hover:bg-[#D65A7E]/40 hover:border-[#D65A7E] hover:text-white/95 hover:scale-[1.01]`}
@@ -231,62 +244,60 @@ export default function Page() {
               >
                 Añadir archivo
               </Button>
-            </div>
+            </motion.div>
           </div>
         </div>
 
         <div className="px-6 md:px-10 lg:px-16 mt-6">
           <div className="max-w-7xl mx-auto">
-            <div className="relative w-full max-w-md">
-              <input
-                type="text"
-                value={categoryFilter}
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
-                onChange={(e) => setCategoryFilter(e.target.value)}
-                placeholder="Filtrar por categoria"
-                className={`${montserrat.className} w-full rounded-full bg-white/90 px-5 py-3 pr-12 text-sm text-black shadow-md outline-none ring-1 ring-white/40 focus:ring-2 focus:ring-white`}
-              />
+            <div ref={categoryFilterRef} className="relative w-full max-w-md">
+              <button
+                type="button"
+                onClick={() => setOpenCategoryFilter((prev) => !prev)}
+                className={`${montserrat.className} flex h-11 w-full items-center justify-between rounded-lg border border-[#123d58]/25 bg-[#f5f7f9] px-4 text-sm text-[#123d58] transition hover:bg-[#eef2f5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#123d58]/15`}
+              >
+                <span className="truncate text-[#123d58]">
+                  {categoryFilter || "Filtrar por categoría"}
+                </span>
+                <span className="text-xs opacity-60">▾</span>
+              </button>
 
-              {categoryFilter && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCategoryFilter("");
-                    setIsFocused(false);
-                  }}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
-                  aria-label="Limpiar filtro"
-                >
-                  ✕
-                </button>
-              )}
-
-              {isFocused && sugerencias.length > 0 && (
-                <ul className="absolute left-0 top-full mt-2 w-full rounded-xl bg-[#0E4A54] shadow-xl overflow-hidden z-50">
-                  {sugerencias.map((curso) => (
-                    <li
+              {openCategoryFilter && (
+                <div className="absolute left-0 top-12 z-50 w-full max-h-48 overflow-auto rounded-lg border border-black/10 bg-white p-1 text-sm shadow-lg">
+                  {cursosUnicos.map((curso) => (
+                    <button
                       key={`${curso.id_curso}-${curso.grado}`}
-                      onMouseDown={() => {
+                      type="button"
+                      onClick={() => {
                         setCategoryFilter(getCursoLabel(curso));
-                        setIsFocused(false);
+                        setOpenCategoryFilter(false);
                       }}
-                      className="px-4 py-3 text-sm text-white cursor-pointer hover:bg-[#D65A7E]"
+                      className="w-full rounded-md px-3 py-2 text-left hover:bg-black/[.04]"
                     >
                       {getCursoLabel(curso)}
-                    </li>
+                    </button>
                   ))}
-                </ul>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCategoryFilter("");
+                      setOpenCategoryFilter(false);
+                    }}
+                    className="w-full rounded-md px-3 py-2 text-left opacity-60 hover:bg-black/[.04]"
+                  >
+                    Quitar filtro
+                  </button>
+                </div>
               )}
             </div>
           </div>
         </div>
 
-        <div className="p-8 md:p-16">
+        <div className="p-8 md:p-16 pt-6 md:pt-10">
           <div className="max-w-7xl mx-auto space-y-8">
             {categoryFilter.trim() === "" && !loading && (
               <p className="text-lg text-[#0E4A54]/70 font-medium">
-                Ultimos proyectos subidos
+                Últimos proyectos subidos
               </p>
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10 lg:gap-12">
