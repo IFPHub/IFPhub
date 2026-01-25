@@ -45,7 +45,7 @@ export function ProjectCard({
       : "Proyecto";
 
   return (
-    <Card className="border border-[#124d58] bg-[#124d58] overflow-hidden shadow-xl group h-full flex flex-col relative py-0">
+    <Card className="border border-[#123d58] bg-[#123d58] overflow-hidden shadow-xl group h-full flex flex-col relative py-0">
       <div className="w-full h-[220px] overflow-hidden relative">
         <Image
           src={coverImage}
@@ -55,7 +55,7 @@ export function ProjectCard({
           className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#124d58] to-transparent opacity-60" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#123d58] to-transparent opacity-60" />
         <Badge className="absolute top-4 right-4 bg-[#D65A7E] hover:bg-[#b54666] text-white border-none shadow-lg">
           {cursoLabel}
         </Badge>

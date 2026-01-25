@@ -12,7 +12,7 @@ import {
 } from "@/app/frontend/components/ui/sidebar";
 
 import { Baskervville, Montserrat } from "next/font/google";
-import { LiquidButton } from "@/app/frontend/components/ui/shadecn-io/liquid-button";
+import { Button } from "@/app/frontend/components/ui/button";
 import Image from "next/image";
 import { ProjectCard } from "@/app/frontend/components/ui/projectCard";
 import Link from "next/link";
@@ -172,8 +172,8 @@ export default function Page() {
             <div className="absolute inset-0 bg-black/50" />
           </div>
 
-          <div className="relative z-10 flex flex-col lg:flex-row items-center lg:items-end justify-between gap-8 lg:gap-12 max-w-7xl w-full px-4">
-            <div className="max-w-3xl w-full space-y-4 text-center lg:text-left">
+          <div className="relative z-10 flex flex-col items-center justify-center gap-8 max-w-7xl w-full px-4 text-center">
+            <div className="max-w-3xl w-full space-y-4">
               <h1
                 className={`${baskervville.className} text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white`}
               >
@@ -181,22 +181,15 @@ export default function Page() {
               </h1>
             </div>
 
-            <div className="flex-shrink-0 self-center lg:self-end">
-              <LiquidButton
-                className={`${montserrat.className}
-                    px-8 py-5 md:px-10 md:py-6
-                    text-sm md:text-base
-                    [--liquid-button-color:#d46d85]
-                    text-black
-                    !bg-white
-                `}
-                variant="default"
+            <div className="flex-shrink-0">
+              <Button
+                size="lg"
+                className={`${montserrat.className} border border-[#D65A7E]/70 bg-[#D65A7E]/30 text-white font-medium text-lg px-8 py-6 rounded-md backdrop-blur-sm transition-all hover:bg-[#D65A7E]/40 hover:border-[#D65A7E] hover:text-white/95 hover:scale-[1.01]`}
                 type="button"
-                // ✅ CHANGE: abre el modal
                 onClick={() => setUploadOpen(true)}
               >
                 Añadir archivo
-              </LiquidButton>
+              </Button>
             </div>
           </div>
         </div>

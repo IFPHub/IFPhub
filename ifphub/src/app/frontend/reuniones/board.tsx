@@ -689,7 +689,7 @@ function Card({
       className="group cursor-pointer"
       style={bodyFont}
     >
-      <div className="flex h-full flex-col overflow-hidden rounded-xl border border-[#124d58] bg-[#124d58] shadow-xl">
+      <div className="flex h-full flex-col overflow-hidden rounded-xl border border-[#123d58] bg-[#123d58] shadow-xl">
         <div className="relative aspect-[4/3] w-full overflow-hidden">
           {it.coverUrl ? (
             <img
@@ -703,7 +703,7 @@ function Card({
             </div>
           )}
 
-          <div className="absolute inset-0 bg-gradient-to-t from-[#124d58] to-transparent opacity-70" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#123d58] to-transparent opacity-70" />
 
           {badgeLabel && (
             <div className="absolute top-4 right-4 rounded-md bg-[#D65A7E] px-3 py-1 text-xs font-semibold text-white shadow-lg">
@@ -1242,7 +1242,7 @@ export function Board() {
           {/* CREAR */}
           <button
             onClick={openCreateModal}
-            className="flex h-9 w-36 items-center justify-between rounded-md border border-[#124D58] bg-[#124D58] px-3 text-sm text-white transition hover:bg-[#0f3f47] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#124D58]/30"
+            className="flex h-9 w-36 items-center justify-between rounded-md border border-[#123d58] bg-[#123d58] px-3 text-sm text-white transition hover:bg-[#0f3f47] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#123d58]/30"
           >
             + Crear
           </button>
