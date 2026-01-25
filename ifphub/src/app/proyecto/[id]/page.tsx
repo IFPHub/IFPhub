@@ -26,6 +26,7 @@ type Comentario = {
   fecha_hora: string;
   likes: number;
   id_usuario: number;
+  nombre_usuario: string | null;
   entity_type: string;
   entity_id: number;
 };
@@ -51,6 +52,7 @@ export default async function Page({
   const { uid = null, sig = null } = await searchParams;
 
   const proyectoId = Number(id);
+  console.log(proyectoId);
   const supabase = createClient();
 
   // Obtener proyecto
@@ -91,7 +93,7 @@ export default async function Page({
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
                   <BreadcrumbLink
-                    href={`/compartir-proyectos?uid=${uid}&sig=${sig}`}
+                    href={`/proyectos-curso?uid=${uid}&sig=${sig}`}
                   >
                     Proyectos
                   </BreadcrumbLink>
@@ -178,7 +180,7 @@ export default async function Page({
                         />
                         <div>
                           <span className="text-sm text-gray-500">
-                            Usuario {c.id_usuario}
+                            {c.nombre_usuario || "Usuario desconocido"}
                           </span>
                           <p className="text-gray-800">{c.texto}</p>
                         </div>

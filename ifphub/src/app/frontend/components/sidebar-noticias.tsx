@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function Sidebar({ uid, sig }: { uid?: string; sig?: string }) {
   // Si existen uid y sig, se añaden a las URLs
   const query = uid && sig ? `?uid=${uid}&sig=${sig}` : "";
@@ -39,8 +41,15 @@ export default function Sidebar({ uid, sig }: { uid?: string; sig?: string }) {
         </div>
       </section>
 
-      <div className="h-[260px] rounded-lg bg-gradient-to-b from-[var(--soft)] to-[#ffdfe8] flex items-center justify-center font-extrabold text-accent">
-        PUBLICIDAD
+      <div className="h-[260px] rounded-lg overflow-hidden relative">
+        <Image
+          src="/imagenes/anuncio.png"
+          alt="Publicidad IFP"
+          fill
+          className="object-cover"
+          sizes="260px"
+          priority
+        />
       </div>
     </aside>
   );

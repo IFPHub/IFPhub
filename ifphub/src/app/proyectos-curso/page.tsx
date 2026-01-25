@@ -69,6 +69,7 @@ export default function Page() {
     const [loading, setLoading] = React.useState(true);
     const [categoryFilter, setCategoryFilter] = React.useState("");
     const [cursos, setCursos] = React.useState<Curso[]>([]);
+    const [isFocused, setIsFocused] = useState(false);
 
     React.useEffect(() => {
       const params = new URLSearchParams(window.location.search);
@@ -106,7 +107,11 @@ export default function Page() {
       fetchCursos();
     }, []);
 
-    const normalizedFilter = categoryFilter.trim().toLowerCase();
+    const normalizedFilter = categoryFilter
+      .replace(/\(\d+\)/g, "") // quita (1), (2), etc
+      .trim()
+      .toLowerCase();
+      
     const proyectosFiltrados = proyectos.filter((proyecto) => {
       if (!normalizedFilter) return true;
       const cursoNombre = proyecto.curso_nombre ?? "";
@@ -120,6 +125,30 @@ export default function Page() {
         cursoSiglas.includes(normalizedFilter)
       );
     });
+
+    const cursosUnicos = React.useMemo(() => {
+      const map = new Map<string, Curso>();
+
+      cursos.forEach((curso) => {
+        const key = `${curso.nombre}-${curso.grado}`;
+        if (!map.has(key)) {
+          map.set(key, curso);
+        }
+      });
+
+      return Array.from(map.values());
+    }, [cursos]);
+
+    const sugerencias = React.useMemo(() => {
+      const filtro = categoryFilter.toLowerCase();
+
+      return cursosUnicos
+        .filter((curso) =>
+          !filtro ||
+          getCursoLabel(curso).toLowerCase().includes(filtro)
+        )
+        .slice(0, 4);
+    }, [categoryFilter, cursosUnicos]);
 
   return (
     <SidebarProvider>
@@ -172,25 +201,33 @@ export default function Page() {
 
         <div className="px-6 md:px-10 lg:px-16 mt-6">
           <div className="max-w-7xl mx-auto">
-            <div className="flex w-full justify-center lg:justify-start">
+            <div className="relative w-full max-w-md">
               <input
                 type="text"
-                list="cursos-list"   // 👈 ESTO ES LA CLAVE
                 value={categoryFilter}
-                onChange={(event) => setCategoryFilter(event.target.value)}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
+                onChange={(e) => setCategoryFilter(e.target.value)}
                 placeholder="Filtrar por categoria"
-                className={`${montserrat.className} w-full max-w-md rounded-full bg-white/90 px-5 py-3 text-sm text-black placeholder-black/60 shadow-md outline-none ring-1 ring-white/40 focus:ring-2 focus:ring-white`}
-                aria-label="Filtrar proyectos por categoria"
+                className={`${montserrat.className} w-full rounded-full bg-white/90 px-5 py-3 text-sm text-black shadow-md outline-none ring-1 ring-white/40 focus:ring-2 focus:ring-white`}
               />
 
-              <datalist id="cursos-list">
-                {cursos.map((curso) => (
-                  <option
-                    key={curso.id_curso}
-                    value={getCursoLabel(curso)}
-                  />
-                ))}
-              </datalist>
+              {isFocused && sugerencias.length > 0 && (
+                <ul className="absolute left-0 top-full mt-2 w-full rounded-xl bg-[#0E4A54] shadow-xl overflow-hidden z-50">
+                  {sugerencias.map((curso) => (
+                    <li
+                      key={`${curso.id_curso}-${curso.grado}`}
+                      onMouseDown={() => {
+                        setCategoryFilter(getCursoLabel(curso));
+                        setIsFocused(false);
+                      }}
+                      className="px-4 py-3 text-sm text-white cursor-pointer hover:bg-[#D65A7E]"
+                    >
+                      {getCursoLabel(curso)}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </div>
         </div>
@@ -214,7 +251,13 @@ export default function Page() {
                 proyectosFiltrados.map((proyecto) => (
                   <Link
                     key={proyecto.id_proyecto}
-                    href={`/proyecto/${proyecto.id_proyecto}`}
+                    href={{
+                      pathname: `/proyecto/${proyecto.id_proyecto}`,
+                      query: {
+                        uid: uid ?? "",
+                        sig: sig ?? "",
+                      },
+                    }}
                   >
                     <ProjectCard
                       title={proyecto.titulo}

@@ -201,7 +201,7 @@ export default function Page() {
 
             {filteredEvents.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
-                {filteredEvents.map((event, index) => {
+                {filteredEvents.slice(0, 6).map((event, index) => {
                   const originalIndex = events.findIndex((e) => e === event);
                   return (
                     <EventCard
