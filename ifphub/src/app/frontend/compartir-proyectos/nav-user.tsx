@@ -50,6 +50,17 @@ export function NavUser({
         user.name
       )}`;
 
+  const handleLogout = () => {
+    // 🔥 limpiar sesión
+    sessionStorage.removeItem("uid");
+    sessionStorage.removeItem("sig");
+    sessionStorage.removeItem("ifphub_user_name");
+    sessionStorage.removeItem("ifphub_user_email");
+
+    // 🔁 redirigir a login
+    window.location.href = "/";
+  };
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -106,10 +117,9 @@ export function NavUser({
 
             <DropdownMenuSeparator />
 
-            <DropdownMenuItem asChild>
-              <a href="/">
-                <LogOut /> Log out
-              </a>
+            <DropdownMenuItem onClick={handleLogout}>
+              <LogOut className="mr-2 h-4 w-4" />
+              Log out
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -21,6 +21,8 @@ import {
 
 import { Separator } from "@/app/frontend/components/ui/separator";
 
+import { useRouter } from "next/navigation";
+
 export default function Page() {
   const [uid, setUid] = useState<string | null>(null);
   const [sig, setSig] = useState<string | null>(null);
@@ -30,6 +32,14 @@ export default function Page() {
     setUid(params.get("uid"));
     setSig(params.get("sig"));
   }, []);
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!uid || !sig) {
+      router.replace("/"); // LOGIN
+    }
+  }, [uid, sig, router]);
 
   if (!uid || !sig) return null;
 

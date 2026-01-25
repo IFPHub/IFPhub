@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function AuthPage() {
+  const router = useRouter();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -10,6 +12,15 @@ export default function AuthPage() {
   const [apellido, setApellido] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const uid = sessionStorage.getItem("uid");
+    const sig = sessionStorage.getItem("sig");
+
+    if (uid && sig) {
+      router.replace(`/noticias?uid=${uid}&sig=${sig}`);
+    }
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,7 +65,9 @@ export default function AuthPage() {
           sessionStorage.setItem("ifphub_user_email", mail);
         }
 
-        // Redirigimos con verificación incluida
+        sessionStorage.setItem("uid", uid);
+        sessionStorage.setItem("sig", sig);
+
         window.location.href = `/noticias?uid=${uid}&sig=${sig}`;
       }
     } else {
