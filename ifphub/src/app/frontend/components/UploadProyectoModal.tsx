@@ -8,16 +8,6 @@ type Curso = {
   grado: number | null;
 };
 
-const ALLOWED_FILE_TYPES = [
-  "application/pdf",
-  "application/zip",
-  "application/x-zip-compressed",
-  "application/vnd.rar",
-  "text/plain",
-  "application/msword",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-];
-
 const ALLOWED_IMAGE_TYPES = [
   "image/jpeg",
   "image/png",
@@ -30,11 +20,6 @@ const titleFont = { fontFamily: '"Libre Baskerville", serif' };
 
 const getPicsum = (seed: string | number, w = 800, h = 600) =>
   `https://picsum.photos/seed/${encodeURIComponent(String(seed))}/${w}/${h}`;
-
-function capitalize(str?: any) {
-  if (!str) return "";
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
 
 function pickFirstNonEmpty(...values: Array<string | null | undefined>): string | undefined {
   const found = values.find((v) => typeof v === "string" && v.trim() !== "");
@@ -73,20 +58,15 @@ export default function UploadProyectoModal({
   const [descripcion, setDescripcion] = useState("");
   const [selectedCurso, setSelectedCurso] = useState<Curso | null>(null);
   const [visibilidad, setVisibilidad] = useState<"public" | "private">("public");
-  const [coverUrl, setCoverUrl] = useState("");
   const [coverFile, setCoverFile] = useState<File | null>(null);
-  const [projectFile, setProjectFile] = useState<File | null>(null);
   const [showAllCourses, setShowAllCourses] = useState(false);
 
   const previewCoverSrc = useMemo(() => {
     if (coverFile) {
       return URL.createObjectURL(coverFile);
     }
-    return (
-      pickFirstNonEmpty(coverUrl) ??
-      getPicsum(`proyecto-new-${fallbackCoverSeedRef.current}`)
-    );
-  }, [coverFile, coverUrl]);
+    return getPicsum(`proyecto-new-${fallbackCoverSeedRef.current}`);
+  }, [coverFile]);
 
   useEffect(() => {
     function onDown(e: MouseEvent) {
@@ -111,64 +91,69 @@ export default function UploadProyectoModal({
     };
   }, [cursos]);
 
-  const courseLabel = selectedCurso
-    ? [
-        selectedCurso.nombre,
-        selectedCurso.grado ? `${selectedCurso.grado}º` : null,
-      ]
-        .filter(Boolean)
-        .join(" · ")
-    : "Curso";
-
   const isValid =
     titulo.trim().length > 0 &&
     descripcion.trim().length > 0 &&
     selectedCurso !== null &&
-    projectFile !== null;
+    coverFile !== null;
 
   const missingFields = [];
   if (!titulo.trim()) missingFields.push("Título");
   if (!descripcion.trim()) missingFields.push("Descripción");
   if (!selectedCurso) missingFields.push("Curso");
-  if (!projectFile) missingFields.push("Archivo del proyecto");
+  if (!coverFile) missingFields.push("Imagen de portada");
   const missingText = missingFields.join(", ");
 
   const handleSave = async () => {
-    if (!isValid || !uid) return;
+    if (!isValid || !uid) {
+      console.error("Validación fallida:", { isValid, uid });
+      return;
+    }
 
     try {
       const formData = new FormData();
+      
+      // ✅ Campos que espera el endpoint
       formData.append("titulo", titulo);
       formData.append("descripcion", descripcion);
       formData.append("id_curso", String(selectedCurso!.id_curso));
-      formData.append("id_usuario", uid);
+      formData.append("uid", uid); // ✅ uid, no id_usuario
       formData.append("visibilidad", visibilidad);
+      formData.append("file", coverFile!); // ✅ file, no imagen
 
-      if (projectFile) formData.append("file", projectFile);
-      if (coverFile) formData.append("imagen", coverFile);
-      if (coverUrl.trim()) formData.append("imagen_url", coverUrl.trim());
+      console.log("📤 Enviando datos:", {
+        titulo,
+        descripcion,
+        id_curso: selectedCurso!.id_curso,
+        uid,
+        visibilidad,
+        file: coverFile!.name
+      });
 
-      const res = await fetch("/api/proyecto/create", {
+      const res = await fetch("/api/proyecto/upload", { // ✅ Ruta correcta
         method: "POST",
         body: formData,
       });
 
-      if (!res.ok) throw new Error("Error al crear proyecto");
+      const responseData = await res.json();
+      console.log("📥 Respuesta del servidor:", responseData);
+
+      if (!res.ok) {
+        throw new Error(responseData.error || "Error al crear proyecto");
+      }
 
       // Limpiar formulario
       setTitulo("");
       setDescripcion("");
       setSelectedCurso(null);
       setVisibilidad("public");
-      setCoverUrl("");
       setCoverFile(null);
-      setProjectFile(null);
 
       onSuccess?.();
       onClose();
     } catch (err) {
-      console.error(err);
-      alert("No se pudo guardar el proyecto");
+      console.error("❌ Error completo:", err);
+      alert(`No se pudo guardar el proyecto: ${err instanceof Error ? err.message : 'Error desconocido'}`);
     }
   };
 
@@ -194,7 +179,7 @@ export default function UploadProyectoModal({
           </button>
         </div>
 
-        <div className="flex flex-col gap-6 px-6 pb-6">
+        <div className="flex flex-col gap-6 px-6 pb-6 pt-6">
           {/* GRID PRINCIPAL */}
           <div className="grid gap-8 md:grid-cols-[1.4fr_1.1fr]">
             {/* COLUMNA IZQUIERDA */}
@@ -225,16 +210,14 @@ export default function UploadProyectoModal({
                 />
               </div>
 
-              {/* CURSO + VISIBILIDAD + PORTADA */}
+              {/* CURSO + VISIBILIDAD */}
               <div className="grid gap-6 md:grid-cols-2">
-                {/* CURSO + VISIBILIDAD */}
+                {/* CURSO */}
                 <div>
                   <h3 className="mb-3 text-lg font-semibold text-[#123d58]" style={titleFont}>
-                    Categorías
+                    Curso
                   </h3>
 
-                  {/* CURSO */}
-                  <p className="mb-2 text-sm font-medium text-[#123d58]">Curso</p>
                   <div className="flex flex-wrap gap-2">
                     {randomCourses.visible.map((c) => {
                       const active = selectedCurso?.id_curso === c.id_curso;
@@ -297,11 +280,13 @@ export default function UploadProyectoModal({
                       ))}
                     </div>
                   )}
+                </div>
 
-                  {/* VISIBILIDAD */}
-                  <p className="mt-4 mb-2 text-sm font-medium text-[#123d58]">
+                {/* VISIBILIDAD */}
+                <div>
+                  <h3 className="mb-3 text-lg font-semibold text-[#123d58]" style={titleFont}>
                     Visibilidad
-                  </p>
+                  </h3>
                   <div className="flex flex-wrap gap-2">
                     <button
                       type="button"
@@ -327,88 +312,45 @@ export default function UploadProyectoModal({
                     </button>
                   </div>
                 </div>
+              </div>
 
-                {/* PORTADA */}
-                <div>
-                  <h3 className="mb-3 text-lg font-semibold text-[#123d58]" style={titleFont}>
-                    Portada
-                  </h3>
+              {/* PORTADA */}
+              <div>
+                <h3 className="mb-3 text-lg font-semibold text-[#123d58]" style={titleFont}>
+                  Imagen de portada
+                </h3>
 
+                <div className="mt-2">
                   <input
-                    type="url"
-                    value={coverUrl}
-                    onChange={(e) => setCoverUrl(e.target.value)}
-                    className="mb-2 h-10 w-full rounded-md border border-[#dbe2e8] bg-white px-3 text-xs text-[#123d58] placeholder:text-[#123d58]/50"
-                    placeholder="https://tuservidor.com/portada.png"
+                    id="cover-upload"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+                        alert("❌ Solo se permiten imágenes (JPG, PNG, WEBP)");
+                        e.target.value = "";
+                        return;
+                      }
+                      setCoverFile(file);
+                    }}
                   />
 
-                  <div className="mt-2">
-                    <input
-                      id="cover-upload"
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (!file) return;
-                        if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-                          alert("❌ Solo se permiten imágenes (JPG, PNG, WEBP)");
-                          e.target.value = "";
-                          return;
-                        }
-                        setCoverFile(file);
-                      }}
-                    />
+                  <label
+                    htmlFor="cover-upload"
+                    className="flex cursor-pointer items-center justify-center gap-2 rounded-md border border-dashed border-[#dbe2e8] bg-[#f8fafc] px-4 py-3 text-sm font-medium text-[#123d58] transition hover:bg-[#eef2f5]"
+                  >
+                    {coverFile ? "Cambiar imagen" : "Subir imagen de portada"}
+                  </label>
 
-                    <label
-                      htmlFor="cover-upload"
-                      className="flex cursor-pointer items-center justify-center gap-2 rounded-md border border-dashed border-[#dbe2e8] bg-[#f8fafc] px-4 py-3 text-sm font-medium text-[#123d58] transition hover:bg-[#eef2f5]"
-                    >
-                      {coverFile ? "Cambiar imagen" : "Subir imagen de portada"}
-                    </label>
-
-                    {coverFile && (
-                      <p className="mt-1 text-[11px] text-[#123d58]/60">
-                        Archivo seleccionado:{" "}
-                        <span className="font-medium">{coverFile.name}</span>
-                      </p>
-                    )}
-                  </div>
-
-                  {/* ARCHIVO DEL PROYECTO */}
-                  <div className="grid gap-3 mt-4">
-                    <span className="text-sm font-medium text-[#123d58]">
-                      Archivo del proyecto
-                    </span>
-
-                    <div>
-                      <input
-                        id="project-upload"
-                        type="file"
-                        accept=".pdf,.zip,.rar,.txt,.doc,.docx"
-                        className="hidden"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (!file) return;
-                          setProjectFile(file);
-                        }}
-                      />
-
-                      <label
-                        htmlFor="project-upload"
-                        className="flex cursor-pointer items-center justify-center gap-2 rounded-md border border-dashed border-[#dbe2e8] bg-[#f8fafc] px-4 py-3 text-sm font-medium text-[#123d58] transition hover:bg-[#eef2f5]"
-                      >
-                        {projectFile ? "Cambiar archivo" : "Subir archivo"}
-                      </label>
-
-                      {projectFile && (
-                        <p className="mt-1 text-[11px] text-[#123d58]/60">
-                          Archivo seleccionado:{" "}
-                          <span className="font-medium">{projectFile.name}</span>
-                        </p>
-                      )}
-                    </div>
-                  </div>
+                  {coverFile && (
+                    <p className="mt-1 text-[11px] text-[#123d58]/60">
+                      Archivo seleccionado:{" "}
+                      <span className="font-medium">{coverFile.name}</span>
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
