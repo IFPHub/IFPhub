@@ -3,6 +3,7 @@ import { Button } from "@/app/frontend/components/ui/button";
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/app/frontend/components/ui/field";
 import { Input } from "@/app/frontend/components/ui/input";
 import { useState } from "react";
+import { useEffect } from "react";
 
 interface LoginFormProps {
   onSubmit: (oficio: {
@@ -14,15 +15,29 @@ interface LoginFormProps {
     email: string;
   }) => void;
   className?: string;
+  nombre?: string;
+  emailInicial?: string;
 }
 
-export function LoginForm({ className, onSubmit }: LoginFormProps) {
+export function LoginForm({
+  className,
+  onSubmit,
+  nombre,
+  emailInicial,
+}: LoginFormProps) {
   const [titulo, setTitulo] = useState("");
   const [desc, setDesc] = useState("");
   const [curso, setCurso] = useState("");
   const [precio, setPrecio] = useState("");
   const [fecha, setFecha] = useState("");
   const [email, setEmail] = useState("");
+  useEffect(() => {
+    if (emailInicial) {
+      setEmail(emailInicial);
+    }
+  }, [emailInicial]);
+
+  console.log("Email inicial:", emailInicial, nombre);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -115,8 +130,7 @@ export function LoginForm({ className, onSubmit }: LoginFormProps) {
               id="email"
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="usuario@dominio.es"
+              readOnly
               required
             />
           </Field>

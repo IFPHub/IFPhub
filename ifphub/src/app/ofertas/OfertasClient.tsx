@@ -60,9 +60,22 @@ const baskervville = Baskervville({ weight: "400", subsets: ["latin"] });
 const montserrat = Montserrat({ subsets: ["latin"] });
 
 // Componente hijo
-function AceptarDialog({ titulo }: { titulo: string }) {
+function AceptarDialog({
+  titulo,
+  nombre,
+  mail,
+}: {
+  titulo: string;
+  nombre?: string;
+  mail?: string;
+}) {
   const [nombreLocal, setNombreLocal] = useState("");
   const [emailLocal, setEmailLocal] = useState("");
+
+  useEffect(() => {
+    if (nombre) setNombreLocal(nombre);
+    if (mail) setEmailLocal(mail);
+  }, [nombre, mail]);
 
   return (
     <Dialog>
@@ -87,8 +100,7 @@ function AceptarDialog({ titulo }: { titulo: string }) {
             <label className="text-sm font-medium">Nombre</label>
             <Input
               value={nombreLocal}
-              onChange={(e) => setNombreLocal(e.target.value)}
-              placeholder="Samuel García"
+              readOnly
             />
           </div>
 
@@ -96,8 +108,7 @@ function AceptarDialog({ titulo }: { titulo: string }) {
             <label className="text-sm font-medium">Email</label>
             <Input
               value={emailLocal}
-              onChange={(e) => setEmailLocal(e.target.value)}
-              placeholder="usuario@dominio.es"
+              readOnly
             />
           </div>
 
@@ -120,7 +131,15 @@ function AceptarDialog({ titulo }: { titulo: string }) {
 }
 
 
-function NuevaOfertaDialog({ onSubmit }: { onSubmit: (oficio: any) => void }) {
+function NuevaOfertaDialog({
+  onSubmit,
+  nombre,
+  mail,
+}: {
+  onSubmit: (oficio: any) => void;
+  nombre?: string;
+  mail?: string;
+}) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -140,6 +159,8 @@ function NuevaOfertaDialog({ onSubmit }: { onSubmit: (oficio: any) => void }) {
 
         <div className="py-4">
           <LoginForm
+            nombre={nombre}
+            emailInicial={mail}
             onSubmit={(oficio) => {
               onSubmit(oficio);
               setOpen(false);
@@ -159,43 +180,36 @@ export default function OfertasClient() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-
+  const [nombreUsuario, setNombreUsuario] = useState<string | null>(null);
+  const [mailUsuario, setMailUsuario] = useState<string | null>(null);
+  const [usuario, setUsuario] = useState<{
+      id_usuario: number;
+      nombre: string;
+      mail: string;
+    } | null>(null);
+  
   useEffect(() => {
     const storedUid = sessionStorage.getItem("uid");
     const storedSig = sessionStorage.getItem("sig");
 
-    // 🚫 Si no hay sesión, no hacemos nada
     if (!storedUid || !storedSig) return;
 
     setUid(storedUid);
     setSig(storedSig);
 
-    const urlUid = searchParams.get("uid");
-    const urlSig = searchParams.get("sig");
-
-    // 🔁 Añadir o corregir params en la URL
-    if (urlUid !== storedUid || urlSig !== storedSig) {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set("uid", storedUid);
-      params.set("sig", storedSig);
-
-      router.replace(`${pathname}?${params.toString()}`);
-    }
-
-    async function fetchOfertas() {
+    async function fetchUsuario() {
       try {
-      const res = await fetch("/api/oferta");
-      if (!res.ok) throw new Error("Error al cargar ofertas");
-
-      const data = await res.json();
-      setOficios(data);
+        const res = await fetch(`/api/usuarios/${storedUid}`);
+        if (!res.ok) throw new Error("Error al cargar usuario");
+        const data = await res.json();
+        console.log("Datos usuario:", data);
+        setUsuario(data ?? null);
       } catch (error) {
-      console.error(error);
-      } finally {
-      setLoading(false);
+        console.error(error);
       }
     }
 
+    fetchUsuario();
     fetchOfertas();
   }, []);
 
@@ -272,7 +286,11 @@ export default function OfertasClient() {
             transition={{ duration: 0.5, delay: 0.4 }}
             className="flex-shrink-0"
           >
-            <NuevaOfertaDialog onSubmit={handleNuevaOferta} />
+            <NuevaOfertaDialog
+              onSubmit={handleNuevaOferta}
+              nombre={usuario?.nombre}
+              mail={usuario?.mail}
+            />
           </motion.div>
           </div>
         </div>
@@ -310,7 +328,11 @@ export default function OfertasClient() {
                   </p>
                   <p className="text-xs text-muted-foreground">
                   </p>
-                  <AceptarDialog titulo={oficio.titulo} />
+                  <AceptarDialog
+                    titulo={oficio.titulo}
+                    nombre={usuario?.nombre}
+                    mail={usuario?.mail}
+                  />
                 </div>
               </div>
               ))}
