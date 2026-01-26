@@ -680,7 +680,7 @@ function CreateModal({
 
               <h3
                 className="mt-3 text-lg font-semibold text-[#123d58]"
-                style={titleFont}
+                style={bodyFont}
               >
                 {title || "Ejemplo"}
               </h3>
