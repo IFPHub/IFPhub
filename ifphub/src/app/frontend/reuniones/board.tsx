@@ -385,10 +385,10 @@ function CreateModal({
         style={bodyFont}
       >
         {/* PARTE ARRIBA */}
-        <div className="flex items-center justify-between border-b px-6 py-4">
+        <div className="mb-3 flex items-center justify-between border-b px-6 py-4">
           <h2
             className="text-xl font-semibold text-[#123d58]"
-            style={titleFont}
+            style={bodyFont}
           >
             Crear contenido
           </h2>
@@ -409,7 +409,7 @@ function CreateModal({
             <div>
               <h3
                 className="mb-2 text-lg font-semibold text-[#123d58]"
-                style={titleFont}
+                style={bodyFont}
               >
                 Título
               </h3>
@@ -425,14 +425,14 @@ function CreateModal({
             <div>
               <h3
                 className="mb-2 text-lg font-semibold text-[#123d58]"
-                style={titleFont}
+                style={bodyFont}
               >
                 Descripción
               </h3>
               <textarea
                 value={desc}
                 onChange={(e) => setDesc(e.target.value)}
-                className="min-h-[120px] w-full rounded-md border border-[#dbe2e8] bg-white p-4 text-sm text-[#123d58] placeholder:text-[#123d58]/50 focus:outline-none focus:ring-2 focus:ring-[#123d58]/15"
+                className="min-h-[120px] w-full resize-none rounded-md border border-[#dbe2e8] bg-white p-4 text-sm text-[#123d58] placeholder:text-[#123d58]/50 focus:outline-none focus:ring-2 focus:ring-[#123d58]/15"
                 placeholder="Describe el contenido..."
               />
             </div>
@@ -443,7 +443,7 @@ function CreateModal({
               <div>
                 <h3
                   className="mb-3 text-lg font-semibold text-[#123d58]"
-                  style={titleFont}
+                  style={bodyFont}
                 >
                   Categorías
                 </h3>
@@ -567,7 +567,7 @@ function CreateModal({
               <div>
                 <h3
                   className="mb-3 text-lg font-semibold text-[#123d58]"
-                  style={titleFont}
+                  style={bodyFont}
                 >
                   Portada
                 </h3>
