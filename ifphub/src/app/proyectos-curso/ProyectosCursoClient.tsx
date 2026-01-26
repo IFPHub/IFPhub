@@ -19,7 +19,7 @@ import { motion } from "framer-motion";
 
 // ✅ CHANGE: En vez de renderizar el Dialog aquí, lo movemos a un componente dedicado (upload.tsx)
 // para que el tamaño/scroll esté centralizado y sea reutilizable.
-import UploadDialog from "@/app/frontend/components/upload";
+import UploadProyectoModal from "@/app/frontend/components/UploadProyectoModal";
 
 const baskervville = Baskervville({ weight: "400", subsets: ["latin"] });
 const montserrat = Montserrat({ subsets: ["latin"] });
@@ -354,12 +354,23 @@ export default function Page() {
         </div>
 
         {/* ✅ CHANGE: Dialog extraído a componente dedicado */}
-        <UploadDialog
+        <UploadProyectoModal
           open={uploadOpen}
-          onOpenChange={setUploadOpen}
-          title="Subir archivo"
+          onClose={() => setUploadOpen(false)}
           cursos={cursosUnicos}
           uid={uid}
+          onSuccess={async () => {
+            // Recargar proyectos después de subir
+            try {
+              const res = await fetch("/api/proyecto");
+              if (res.ok) {
+                const data = await res.json();
+                setProyectos(data);
+              }
+            } catch (error) {
+              console.error("Error recargando proyectos:", error);
+            }
+          }}
         />
       </SidebarInset>
     </SidebarProvider>
