@@ -35,7 +35,7 @@ export function NavMain({
 }) {
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Menu</SidebarGroupLabel>
+      <SidebarGroupLabel>Menú</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => {
           const url =
